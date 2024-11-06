@@ -1,14 +1,18 @@
 const axios = require('axios');
 const { chunk } = require('lodash');
+const config = require('../config.json');
 
 class SolscanService {
   constructor() {
-    this.baseUrl = 'https://public-api.solscan.io';
-    this.batchSize = 10; // Number of transactions to process at once
-    this.rateLimitDelay = 100; // Delay between API calls in ms
+    const solscanConfig = config.api.solscan;
+    this.baseUrl = solscanConfig.baseUrl;
+    this.batchSize = solscanConfig.batchSize;
+    this.rateLimitDelay = solscanConfig.rateLimitDelay;
+    this.maxRetries = solscanConfig.maxRetries;
+    this.endpoints = solscanConfig.endpoints;
   }
 
-  async getAccountTransactions(address, limit = 50, before = '') {
+  async getAccountTransactions(address, limit = 50, before = '', retryCount = 0) {
     try {
       const params = {
         account: address,
@@ -16,13 +20,21 @@ class SolscanService {
         ...(before && { before })
       };
 
-      const response = await axios.get(`${this.baseUrl}/account/transactions`, { params });
+      const response = await axios.get(
+        `${this.baseUrl}${this.endpoints.accountTransactions}`, 
+        { 
+          params,
+          headers: {
+            'token': process.env.SOLSCAN_API_KEY
+          }
+        }
+      );
       return response.data;
     } catch (error) {
-      if (error.response?.status === 429) {
-        // Handle rate limiting
-        await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay));
-        return this.getAccountTransactions(address, limit, before);
+      if (error.response?.status === 429 && retryCount < this.maxRetries) {
+        const delay = this.rateLimitDelay * Math.pow(2, retryCount);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.getAccountTransactions(address, limit, before, retryCount + 1);
       }
       throw error;
     }
@@ -42,7 +54,7 @@ class SolscanService {
           break;
         }
 
-        // Process transactions in batches to avoid overwhelming the API
+        // Process transactions in batches
         const batches = chunk(transactions, this.batchSize);
         for (const batch of batches) {
           const burnTxs = batch.filter(tx => {
@@ -63,7 +75,6 @@ class SolscanService {
             sender: tx.tokenTransfers[0]?.fromUserAccount
           })));
 
-          // Rate limiting delay between batches
           await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay));
         }
 
@@ -77,16 +88,45 @@ class SolscanService {
     }
   }
 
-  async getTokenMetadata(tokenAddress) {
+  async getTokenMetadata(tokenAddress, retryCount = 0) {
     try {
-      const response = await axios.get(`${this.baseUrl}/token/meta`, {
-        params: { tokenAddress }
-      });
+      const response = await axios.get(
+        `${this.baseUrl}${this.endpoints.tokenMeta}`,
+        {
+          params: { tokenAddress },
+          headers: {
+            'token': process.env.SOLSCAN_API_KEY
+          }
+        }
+      );
       return response.data;
     } catch (error) {
-      if (error.response?.status === 429) {
-        await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay));
-        return this.getTokenMetadata(tokenAddress);
+      if (error.response?.status === 429 && retryCount < this.maxRetries) {
+        const delay = this.rateLimitDelay * Math.pow(2, retryCount);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.getTokenMetadata(tokenAddress, retryCount + 1);
+      }
+      throw error;
+    }
+  }
+
+  async getTokenHolders(tokenAddress, retryCount = 0) {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}${this.endpoints.tokenHolders}`,
+        {
+          params: { tokenAddress },
+          headers: {
+            'token': process.env.SOLSCAN_API_KEY
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 429 && retryCount < this.maxRetries) {
+        const delay = this.rateLimitDelay * Math.pow(2, retryCount);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.getTokenHolders(tokenAddress, retryCount + 1);
       }
       throw error;
     }

@@ -1,5 +1,4 @@
 const axios = require('axios');
-const WebSocket = require('ws');
 
 class SolanaTrackerService {
   constructor() {
@@ -54,57 +53,6 @@ class SolanaTrackerService {
       }
       throw error;
     }
-  }
-
-  setupPriceWebSocket(tokenAddress, callback) {
-    const ws = new WebSocket('wss://datastream.solanatracker.io');
-    let heartbeatInterval;
-    let reconnectAttempts = 0;
-    const maxReconnectAttempts = 5;
-
-    const connect = () => {
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-        reconnectAttempts = 0;
-        ws.send(JSON.stringify({
-          event: 'subscribe',
-          channel: `price:${tokenAddress}`
-        }));
-
-        // Setup heartbeat
-        heartbeatInterval = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'ping' }));
-          }
-        }, 30000);
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type !== 'pong') {
-            callback(data);
-          }
-        } catch (error) {
-          console.error('WebSocket message parsing error:', error);
-        }
-      };
-
-      ws.onclose = () => {
-        clearInterval(heartbeatInterval);
-        if (reconnectAttempts < maxReconnectAttempts) {
-          reconnectAttempts++;
-          setTimeout(connect, 1000 * Math.pow(2, reconnectAttempts));
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-    };
-
-    connect();
-    return ws;
   }
 }
 
