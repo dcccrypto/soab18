@@ -11,7 +11,32 @@ import { Text, Box, OrbitControls } from '@react-three/drei'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
-const roadmapData = [
+// Define interfaces for type safety
+interface RoadmapPhase {
+  phase: number
+  icon: React.ElementType
+  title: string
+  status: 'Completed' | 'In Progress' | 'Upcoming'
+  description: string
+  objective: string
+  details: string
+}
+
+interface RoadmapCubeProps {
+  phase: RoadmapPhase
+  position: [number, number, number]
+  onClick: (phase: RoadmapPhase) => void
+}
+
+interface RoadmapSceneProps {
+  setSelectedPhase: (phase: RoadmapPhase) => void
+}
+
+interface SimplifiedProgressBarProps {
+  progress: number
+}
+
+const roadmapData: RoadmapPhase[] = [
   {
     phase: 1,
     icon: Rocket,
@@ -122,12 +147,14 @@ const roadmapData = [
   }
 ]
 
-const RoadmapCube = ({ phase, position, onClick }) => {
-  const mesh = useRef()
+const RoadmapCube = ({ phase, position, onClick }: RoadmapCubeProps) => {
+  const mesh = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
 
-  useFrame((state) => {
-    mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+  useFrame(() => {
+    if (mesh.current) {
+      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+    }
   })
 
   return (
@@ -136,7 +163,7 @@ const RoadmapCube = ({ phase, position, onClick }) => {
       ref={mesh}
       position={position}
       scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onClick={onClick}
+      onClick={() => onClick(phase)}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
@@ -154,7 +181,7 @@ const RoadmapCube = ({ phase, position, onClick }) => {
   )
 }
 
-const RoadmapScene = ({ setSelectedPhase }) => {
+const RoadmapScene = ({ setSelectedPhase }: RoadmapSceneProps) => {
   const { camera } = useThree()
 
   useEffect(() => {
@@ -178,28 +205,17 @@ const RoadmapScene = ({ setSelectedPhase }) => {
   )
 }
 
-const SimplifiedProgressBar = ({ progress }) => {
-  const completedPhases = Math.floor((progress / 100) * roadmapData.length)
-
+const SimplifiedProgressBar = ({ progress }: SimplifiedProgressBarProps) => {
   return (
-    <div className="relative h-8 mb-12 bg-gray-200 rounded-full overflow-hidden">
-      <motion.div
-        className="h-full bg-gradient-to-r from-orange-500 to-red-500"
-        initial={{ width: 0 }}
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: 1, ease: "easeOut" }}
-      />
-      <div className="absolute inset-0 flex items-center justify-between px-2">
-        {roadmapData.map((phase, index) => (
-          <div
-            key={phase.phase}
-            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-              index < completedPhases ? 'bg-white text-orange-500' : 'bg-gray-400 text-white'
-            }`}
-          >
-            {phase.phase}
-          </div>
-        ))}
+    <div className="w-full max-w-3xl mx-auto mb-12">
+      <div className="bg-gray-700 h-4 rounded-full overflow-hidden">
+        <div 
+          className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className="text-center mt-2 text-orange-400">
+        {Math.round(progress)}% Complete
       </div>
     </div>
   )
@@ -207,15 +223,15 @@ const SimplifiedProgressBar = ({ progress }) => {
 
 export default function Roadmap() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [selectedPhase, setSelectedPhase] = useState(null)
+  const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [progress, setProgress] = useState(66.67) // 8 out of 12 phases completed (8/12 * 100)
+  const [progress] = useState(66.67) // 8 out of 12 phases completed
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode)
   }
 
-  const handlePhaseClick = (phase) => {
+  const handlePhaseClick = (phase: RoadmapPhase) => {
     setSelectedPhase(phase)
     setIsDialogOpen(true)
   }

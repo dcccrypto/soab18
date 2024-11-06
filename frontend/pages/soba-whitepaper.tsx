@@ -34,8 +34,8 @@ const TeamMember = ({ name, role, description, imageUrl }: { name: string; role:
   </div>
 )
 
-export default function Component() {
-  const [activeSection, setActiveSection] = useState('')
+export default function WhitePaper() {
+  const [activeSection, setActiveSection] = useState('introduction')
 
   const handleDownload = () => {
     const doc = new jsPDF()
@@ -55,18 +55,31 @@ export default function Component() {
     }
   }
 
-  const sections = [
-    { id: 'introduction', title: 'Introduction to $SOBA' },
-    { id: 'tokenomics', title: 'Tokenomics' },
-    { id: 'roadmap', title: 'Roadmap' },
-    { id: 'community', title: 'Community Initiatives' },
-    { id: 'team', title: 'Team' },
-    { id: 'vision', title: 'Vision and Future Plans' },
-    { id: 'disclaimer', title: 'Legal Disclaimer' },
+  interface Section {
+    id: string
+    title: string
+  }
+
+  const sections: Section[] = [
+    { id: 'introduction', title: '1. Introduction to $SOBA' },
+    { id: 'tokenomics', title: '2. Tokenomics' },
+    { id: 'roadmap', title: '3. Roadmap' },
+    { id: 'community', title: '4. Community Initiatives' },
+    { id: 'team', title: '5. Team' },
+    { id: 'vision', title: '6. Vision and Future Plans' },
+    { id: 'disclaimer', title: '7. Legal Disclaimer' },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="container mx-auto px-4 py-12">
+      <motion.h1 
+        className="text-4xl font-bold text-center mb-8 text-orange-400"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        $SOBA Whitepaper
+      </motion.h1>
       <div className="max-w-4xl mx-auto">
         {/* Cover Page */}
         <motion.div
