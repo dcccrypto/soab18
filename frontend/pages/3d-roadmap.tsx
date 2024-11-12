@@ -221,15 +221,10 @@ const SimplifiedProgressBar = ({ progress }: SimplifiedProgressBarProps) => {
   )
 }
 
-export default function Roadmap() {
-  const [isDarkMode, setIsDarkMode] = useState(true)
+export default function RoadmapPage() {
   const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [progress] = useState(66.67) // 8 out of 12 phases completed
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode)
-  }
 
   const handlePhaseClick = (phase: RoadmapPhase) => {
     setSelectedPhase(phase)
@@ -237,139 +232,8 @@ export default function Roadmap() {
   }
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-      <div className={`backdrop-blur-md ${isDarkMode ? 'bg-black bg-opacity-50' : 'bg-white bg-opacity-50'} min-h-screen`}>
-        {/* Header */}
-        <header className="container mx-auto px-4 py-8">
-          <nav className="flex justify-between items-center mb-8">
-            <Image 
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo_256x256-ncAT5qaZrGhObqpoOr5sQQ2Dj5huL2.png" 
-              alt="Sol Bastard Logo" 
-              width={100} 
-              height={100} 
-              className="w-24 h-auto" 
-            />
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">Home</Link>
-              <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">White Paper</Link>
-              <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">Community</Link>
-              <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">Tokenomics</Link>
-              <Button className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white font-bold py-2 px-4 rounded-full transition-colors duration-300 flex items-center gap-2">
-                Buy $SOBA
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-full bg-orange-500 text-white"
-              >
-                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-            </div>
-          </nav>
-        </header>
-
-        {/* Roadmap Content */}
-        <main className="container mx-auto px-4 py-12">
-          <h1 className="text-5xl font-bold mb-6 text-center">$SOBA Roadmap</h1>
-          <p className="text-xl text-center mb-12 max-w-3xl mx-auto">
-            Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
-          </p>
-          
-          {/* Simplified Progress Bar */}
-          <SimplifiedProgressBar progress={progress} />
-
-          <div className="h-[800px] mb-12 overflow-hidden">
-            <Canvas>
-              <RoadmapScene setSelectedPhase={handlePhaseClick} />
-            </Canvas>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {roadmapData.map((phase) => (
-              <motion.div
-                key={phase.phase}
-                className={`p-6 rounded-lg shadow-lg cursor-pointer
-                  ${phase.status === 'Completed' 
-                    ? 'bg-gradient-to-br from-orange-600 to-red-700' 
-                    : isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}
-                onClick={() => handlePhaseClick(phase)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <div className="flex items-center mb-4">
-                  <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
-                  <h3 className="text-xl font-bold">{phase.title}</h3>
-                </div>
-                <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
-                <p className="text-base">{phase.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* CTA Section */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Ready to Join the $SOBA Revolution?</h2>
-            <p className="text-xl mb-8">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
-            <div className="flex justify-center gap-4">
-              <Button className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white font-bold text-lg px-8 py-4 rounded-full transition-colors duration-300 flex items-center gap-2">
-                Buy $SOBA Now
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button variant="outline" className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white text-lg px-8 py-4 rounded-full">
-                Join Our Community
-              </Button>
-            </div>
-          
-          </div>
-
-          {/* Phase Details Dialog */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="bg-gray-900 text-white border-orange-500">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-orange-400">{selectedPhase?.title}</DialogTitle>
-                <DialogDescription>
-                  <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
-                  <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
-                  <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
-                  <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
-                  <p className="text-gray-300">{selectedPhase?.details}</p>
-                </DialogDescription>
-              </DialogHeader>
-              <Button onClick={() => setIsDialogOpen(false)} className="bg-orange-500 hover:bg-orange-600 text-white">Close</Button>
-            </DialogContent>
-          </Dialog>
-        </main>
-
-        {/* Footer */}
-        <footer className="py-8 backdrop-blur-lg bg-black bg-opacity-30">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="mb-4 md:mb-0">
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300 mr-4">White Paper</Link>
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300 mr-4">Roadmap</Link>
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">Tokenomics</Link>
-              </div>
-              <div className="flex space-x-4">
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-                </Link>
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
-                </Link>
-                <Link href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2h-19C1.67 2 1 2.67 1 3.5v17c0 .83.67 1.5 1.5 1.5h19c.83 0 1.5-.67 1.5-1.5v-17c0-.83-.67-1.5-1.5-1.5zM5 19.5v-13c0-.28.22-.5.5-.5h13c.28 0 .5.22.5.5v13c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5z"></path><path d="M12 6l-4 4h3v4h2v-4h3l-4-4z"></path></svg>
-                </Link>
-              </div>
-            </div>
-            <div className="mt-8 text-center text-sm text-gray-400">
-              <p>&copy; {new Date().getFullYear()} Sol Bastard. All rights reserved.</p>
-              <a href="mailto:contact@solbastardsoba.com" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
-                contact@solbastardsoba.com
-              </a>
-            </div>
-          </div>
-        </footer>
-      </div>
+    <div className="container mx-auto px-4 py-12">
+      {/* Content only */}
     </div>
   )
 }

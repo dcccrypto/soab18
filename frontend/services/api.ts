@@ -17,6 +17,21 @@ interface BurnTransaction {
   sender: string;
 }
 
+interface BurnHistoryResponse {
+  data: {
+    solana: {
+      transfers: Array<{
+        amount: number;
+        block: {
+          timestamp: {
+            time: string;
+          }
+        }
+      }>;
+    }
+  }
+}
+
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -56,8 +71,15 @@ export const tokenService = {
 
   async getBurnHistory(tokenAddress: string): Promise<BurnTransaction[]> {
     try {
-      const response = await api.get(`/api/tokens/${tokenAddress}/burns`);
-      return response.data;
+      const response = await api.get<BurnHistoryResponse>(`/api/tokens/${tokenAddress}/burns`);
+      
+      // Transform the response to match the frontend format
+      return response.data.data.solana.transfers.map(transfer => ({
+        txHash: '', // This field isn't available in the new format
+        timestamp: new Date(transfer.block.timestamp.time).getTime(),
+        amount: transfer.amount,
+        sender: '' // This field isn't available in the new format
+      }));
     } catch (error) {
       console.error('Error fetching burn history:', error);
       throw error;

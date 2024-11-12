@@ -8,8 +8,25 @@ exports.getBurnHistory = async (req, res) => {
     const { tokenAddress } = req.params;
     const burns = await Burn.find()
       .sort({ timestamp: -1 })
-      .limit(100); // Limit to last 100 burns for performance
-    res.json(burns);
+      .limit(100);
+
+    // Transform the data to match the format from bitquery
+    const formattedBurns = burns.map(burn => ({
+      amount: burn.amount,
+      block: {
+        timestamp: {
+          time: new Date(burn.timestamp).toISOString().replace('T', ' ').slice(0, 19)
+        }
+      }
+    }));
+
+    res.json({
+      data: {
+        solana: {
+          transfers: formattedBurns
+        }
+      }
+    });
   } catch (error) {
     console.error('Error fetching burn history:', error);
     res.status(500).json({ error: 'Failed to fetch burn history' });
