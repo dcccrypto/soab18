@@ -10,8 +10,8 @@ let config = {
    url: 'https://graphql.bitquery.io',
    headers: { 
       'Content-Type': 'application/json', 
-      'X-API-KEY': 'BQYISwh8yawD8SCyoivVVeRq1kvpvKnD', 
-      'Authorization': 'Bearer ory_at_-gNDGdhaGYvS4nsZY8OtQi7SGZFvIp-vaTwg9xhvxfY.oh9JLemokecOom5XTfSgFspSjz2Y-j8URxjHi_qZRHU'
+      'X-API-KEY': 'htfzd', 
+      'Authorization': 'gf'
    },
    data : data
 };
