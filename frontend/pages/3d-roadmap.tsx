@@ -1,239 +1,275 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Users, Megaphone, LineChart, Building, Handshake, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
-import * as THREE from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Text, Box, OrbitControls } from '@react-three/drei'
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import React, { useState, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { Flame, Users, TrendingUp, Calendar, Download, ExternalLink } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import { TOKEN_INFO, TEAM_MEMBERS, ROADMAP_PHASES } from '../constants'
 
-// Define interfaces for type safety
-interface RoadmapPhase {
-  phase: number
-  icon: React.ElementType
-  title: string
-  status: 'Completed' | 'In Progress' | 'Upcoming'
-  description: string
-  objective: string
-  details: string
-}
-
-interface RoadmapCubeProps {
-  phase: RoadmapPhase
-  position: [number, number, number]
-  onClick: (phase: RoadmapPhase) => void
-}
-
-interface RoadmapSceneProps {
-  setSelectedPhase: (phase: RoadmapPhase) => void
-}
-
-interface SimplifiedProgressBarProps {
-  progress: number
-}
-
-const roadmapData: RoadmapPhase[] = [
-  {
-    phase: 1,
-    icon: Rocket,
-    title: "Fair Launch",
-    status: "Completed",
-    description: "Launch on Pump.fun and Raydium",
-    objective: "Make $SOBA accessible to early adopters, establishing its presence.",
-    details: "Our journey began with a fair launch, ensuring equal opportunity for all participants. This phase marked the birth of $SOBA on the Solana blockchain."
-  },
-  {
-    phase: 2,
-    icon: Users,
-    title: "Community Building",
-    status: "Completed",
-    description: "Engagement on TikTok, Twitter (X), Telegram",
-    objective: "Build a loyal, vibrant community to amplify $SOBA's brand.",
-    details: "We focused on creating a strong, engaged community across various social platforms. Meme contests and events helped foster a sense of belonging and excitement around $SOBA."
-  },
-  {
-    phase: 3,
-    icon: Megaphone,
-    title: "Marketing Expansion",
-    status: "Completed",
-    description: "Campaigns featuring Crypto Bastard, influencer partnerships",
-    objective: "Grow brand awareness and reach broader audiences.",
-    details: "Our marketing efforts expanded, leveraging the influence of Crypto Bastard and other key figures in the crypto space to increase $SOBA's visibility."
-  },
-  {
-    phase: 4,
-    icon: LineChart,
-    title: "Listings and Growth",
-    status: "Completed",
-    description: "Listings on CoinMarketCap and CoinGecko, community giveaways",
-    objective: "Increase visibility on major tracking platforms.",
-    details: "This phase saw $SOBA listed on major crypto tracking platforms, significantly boosting our credibility and reach. Community giveaways further incentivized participation."
-  },
-  {
-    phase: 5,
-    icon: Building,
-    title: "Exchange Listings",
-    status: "Completed",
-    description: "Additional exchange listings",
-    objective: "Broaden access to $SOBA for easier trading.",
-    details: "We expanded $SOBA's presence on various cryptocurrency exchanges, making it more accessible to a wider range of traders and investors."
-  },
-  {
-    phase: 6,
-    icon: Handshake,
-    title: "Strategic Partnerships",
-    status: "Completed",
-    description: "Collaborations with other projects and influencers",
-    objective: "Strengthen $SOBA's ecosystem through partnerships.",
-    details: "Strategic alliances were formed with complementary projects and influential figures in the crypto space, enhancing $SOBA's ecosystem and reach."
-  },
-  {
-    phase: 7,
-    icon: Palette,
-    title: "NFT Launch",
-    status: "Completed",
-    description: "Release exclusive $SOBA NFT collection",
-    objective: "Expand the ecosystem with collectible digital assets.",
-    details: "We launched our exclusive NFT collection, providing unique digital assets to our community and adding another layer of value to the $SOBA ecosystem."
-  },
-  {
-    phase: 8,
-    icon: Flame,
-    title: "Regular Burns",
-    status: "Completed",
-    description: "Implement regular burns",
-    objective: "Boost long-term value by reducing supply.",
-    details: "A token burning mechanism was implemented to systematically reduce $SOBA's supply, aiming to increase its scarcity and potential value over time."
-  },
-  {
-    phase: 9,
-    icon: Cpu,
-    title: "Advanced Features",
-    status: "Upcoming",
-    description: "NFT staking, AI-driven PFP Generator, gated content",
-    objective: "Enhance the ecosystem with unique, community-focused features.",
-    details: "This exciting phase will introduce advanced features like NFT staking, an AI-powered profile picture generator, and exclusive gated content for $SOBA holders."
-  },
-  {
-    phase: 10,
-    icon: Gamepad,
-    title: "Gamification",
-    status: "Upcoming",
-    description: "Leaderboards, achievement system, social sharing",
-    objective: "Drive engagement through interactive experiences.",
-    details: "We plan to gamify the $SOBA experience with leaderboards, an achievement system, and social sharing features to boost community engagement and interaction."
-  },
-  {
-    phase: 11,
-    icon: Vote,
-    title: "DAO Transition",
-    status: "Upcoming",
-    description: "Decentralized governance, community voting",
-    objective: "Empower the community to shape $SOBA's direction.",
-    details: "This phase will mark $SOBA's transition to a Decentralized Autonomous Organization (DAO), giving our community direct influence over the project's future direction."
-  },
-  {
-    phase: 12,
-    icon: Rocket,
-    title: "Expansion",
-    status: "Upcoming",
-    description: "Strategic alliances, cross-platform engagement, mainstream presence",
-    objective: "Broaden $SOBA's reputation beyond crypto.",
-    details: "The final phase of our current roadmap focuses on expanding $SOBA's influence beyond the crypto sphere, aiming for mainstream recognition and adoption."
-  }
-]
-
-const RoadmapCube = ({ phase, position, onClick }: RoadmapCubeProps) => {
-  const mesh = useRef<THREE.Mesh>(null)
-  const [hovered, setHovered] = useState(false)
-
-  useFrame(() => {
-    if (mesh.current) {
-      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
-    }
-  })
+const WhitepaperSection = ({ title, children, id }: { title: string; children: React.ReactNode; id: string }) => {
+  const ref = useRef<HTMLDivElement>(null)
 
   return (
-    <Box
-      args={[2.5, 2.5, 2.5]}
-      ref={mesh}
-      position={position}
-      scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onClick={() => onClick(phase)}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
+    <motion.div
+      ref={ref}
+      id={id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mb-12 bg-gray-800 rounded-lg p-6 shadow-lg scroll-mt-20"
     >
-      <meshStandardMaterial color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} />
-      <Text
-        position={[0, 0, 1.26]}
-        fontSize={0.8}
-        color="#FFFFFF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {phase.phase}
-      </Text>
-    </Box>
+      <h2 className="text-3xl font-bold mb-6 text-orange-500 border-b border-orange-500 pb-2">{title}</h2>
+      {children}
+    </motion.div>
   )
 }
 
-const RoadmapScene = ({ setSelectedPhase }: RoadmapSceneProps) => {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    camera.position.set(0, 5, 25)
-  }, [camera])
-
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <OrbitControls enableZoom={false} enablePan={false} />
-      {roadmapData.map((phase, index) => (
-        <RoadmapCube
-          key={phase.phase}
-          phase={phase}
-          position={[(index % 4 - 1.5) * 4, -Math.floor(index / 4) * 4 + 4, 0]}
-          onClick={() => setSelectedPhase(phase)}
-        />
-      ))}
-    </>
-  )
-}
-
-const SimplifiedProgressBar = ({ progress }: SimplifiedProgressBarProps) => {
-  return (
-    <div className="w-full max-w-3xl mx-auto mb-12">
-      <div className="bg-gray-700 h-4 rounded-full overflow-hidden">
-        <div 
-          className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <div className="text-center mt-2 text-orange-400">
-        {Math.round(progress)}% Complete
-      </div>
+const TeamMember = ({ name, role, description, imageUrl }: { name: string; role: string; description: string; imageUrl: string }) => (
+  <div className="bg-gray-700 p-4 rounded-lg flex items-center space-x-4">
+    <img src={imageUrl} alt={name} className="w-16 h-16 rounded-full object-cover" />
+    <div>
+      <p className="font-bold text-orange-400">{name}</p>
+      <p className="text-orange-300">{role}</p>
+      <p className="text-sm text-gray-300">{description}</p>
     </div>
-  )
-}
+  </div>
+)
 
-export default function RoadmapPage() {
-  const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [progress] = useState(66.67) // 8 out of 12 phases completed
+export default function Component() {
+  const [activeSection, setActiveSection] = useState('')
 
-  const handlePhaseClick = (phase: RoadmapPhase) => {
-    setSelectedPhase(phase)
-    setIsDialogOpen(true)
+  const handleDownload = () => {
+    const doc = new jsPDF()
+    doc.setFontSize(16)
+    doc.text('$SOBA Whitepaper', 20, 20)
+    doc.setFontSize(12)
+    doc.text('This is a sample PDF of the $SOBA Whitepaper.', 20, 30)
+    doc.text('For the full content, please visit our website.', 20, 40)
+    doc.save('soba-whitepaper.pdf')
   }
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId)
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' })
+      setActiveSection(sectionId)
+    }
+  }
+
+  const sections = [
+    { id: 'introduction', title: 'Introduction to $SOBA' },
+    { id: 'tokenomics', title: 'Tokenomics' },
+    { id: 'roadmap', title: 'Roadmap' },
+    { id: 'community', title: 'Community Initiatives' },
+    { id: 'team', title: 'Team' },
+    { id: 'vision', title: 'Vision and Future Plans' },
+    { id: 'disclaimer', title: 'Legal Disclaimer' },
+  ]
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Content only */}
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Cover Page */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-6xl font-bold mb-4 text-orange-500">$SOBA Whitepaper</h1>
+          <p className="text-2xl mb-8 text-orange-300">The Memecoin with a Mission</p>
+          <img
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-DBqVkxZx-T3IBDgcc0UVW81J7xogS5cUSXwPGrR.png"
+            alt="SOBA Logo"
+            className="w-48 h-48 mx-auto mb-8"
+          />
+          <button
+            onClick={handleDownload}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full inline-flex items-center transition-all duration-300 transform hover:scale-105"
+            aria-label="Download Full Whitepaper PDF"
+          >
+            <Download className="w-5 h-5 mr-2" />
+            Download Full Whitepaper (PDF)
+          </button>
+        </motion.div>
+
+        {/* Table of Contents */}
+        <WhitepaperSection title="Table of Contents" id="toc">
+          <nav>
+            <ol className="list-decimal list-inside space-y-3 text-orange-300">
+              {sections.map((section) => (
+                <li key={section.id}>
+                  <button
+                    onClick={() => scrollToSection(section.id)}
+                    className={`hover:text-orange-500 transition-colors ${
+                      activeSection === section.id ? 'text-orange-500 font-bold' : ''
+                    }`}
+                  >
+                    {section.title}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </WhitepaperSection>
+
+        {/* Introduction */}
+        <WhitepaperSection title="1. Introduction to $SOBA" id="introduction">
+          <p className="mb-4 text-gray-300">
+            Sol Bastard ($SOBA) is a revolutionary MEMEcoin inspired by Crypto Bastard, a renowned TikTok Influencer celebrated for his entertaining and insightful crypto content. While $SOBA embodies the playful spirit of Crypto Bastard, it's backed by a dedicated team committed to creating real value in the crypto space.
+          </p>
+          <p className="mb-6 text-gray-300">
+            Our mission is to forge a vibrant, inclusive community where humor and shared purpose converge, bringing tangible benefits to all members. $SOBA isn't just another token; it's a movement that combines the best of meme culture with serious crypto innovation.
+          </p>
+          <div className="flex items-center justify-center space-x-8 my-8">
+            <div className="text-center">
+              <Flame className="w-16 h-16 text-orange-500 mx-auto mb-2" />
+              <p className="text-sm text-orange-300">Community-Driven</p>
+            </div>
+            <div className="text-center">
+              <Users className="w-16 h-16 text-orange-500 mx-auto mb-2" />
+              <p className="text-sm text-orange-300">Fair Launch</p>
+            </div>
+            <div className="text-center">
+              <TrendingUp className="w-16 h-16 text-orange-500 mx-auto mb-2" />
+              <p className="text-sm text-orange-300">Innovative Features</p>
+            </div>
+          </div>
+        </WhitepaperSection>
+
+        {/* Tokenomics */}
+        <WhitepaperSection title="2. Tokenomics" id="tokenomics">
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-orange-400">Token Distribution</h3>
+            <ul className="list-disc list-inside space-y-2 text-gray-300">
+              <li>Total Supply: {TOKEN_INFO.TOTAL_SUPPLY} $SOBA tokens</li>
+              <li>Current Circulating Supply: {TOKEN_INFO.CIRCULATING_SUPPLY} tokens</li>
+              <li>Burned Tokens: {TOKEN_INFO.BURNED_TOKENS} tokens</li>
+              <li>Founder Holdings: {TOKEN_INFO.FOUNDER_HOLDINGS} tokens (4.08% held by Crypto Bastard)</li>
+            </ul>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-orange-400">Fair Launch</h3>
+            <p className="text-gray-300">
+              $SOBA was launched on Pump.fun, ensuring equal opportunity for all investors. This approach aligns with our commitment to fairness and community empowerment.
+            </p>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-orange-400">Liquidity Security</h3>
+            <p className="text-gray-300">
+              All liquidity is permanently burned, enhancing stability and fostering community trust. This measure prevents rug pulls and ensures the long-term viability of $SOBA.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-orange-400">Deflationary Model</h3>
+            <p className="text-gray-300">
+              $SOBA implements a deflationary model through regular token burns. This mechanism is designed to increase scarcity and potentially enhance the value of $SOBA over time.
+            </p>
+          </div>
+        </WhitepaperSection>
+
+        {/* Roadmap */}
+        <WhitepaperSection title="3. Roadmap" id="roadmap">
+          <div className="space-y-6">
+            {ROADMAP_PHASES.map((phase, index) => (
+              <div key={index} className="flex items-start space-x-4 bg-gray-700 p-4 rounded-lg">
+                <Calendar className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="font-bold text-orange-400">{phase.phase}: {phase.title}</p>
+                  <p className="text-sm text-orange-300 mb-2">{phase.status}</p>
+                  <p className="text-gray-300">{phase.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </WhitepaperSection>
+
+        {/* Community Initiatives */}
+        <WhitepaperSection title="4. Community Initiatives" id="community">
+          <p className="mb-6 text-gray-300">
+            The $SOBA community is the lifeblood of our project. We're committed to fostering a vibrant, engaged, and rewarding environment for all our members.
+          </p>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-orange-400">Social Media Engagement</h3>
+              <p className="text-gray-300">
+                We maintain an active presence on TikTok, Twitter (X), and Telegram, providing real-time updates, hosting AMAs, and encouraging community interaction.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-orange-400">Meme Contests</h3>
+              <p className="text-gray-300">
+                Regular meme contests showcase our community's creativity and humor, with $SOBA tokens awarded to the best entries.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-orange-400">Charitable Initiatives</h3>
+              <p className="text-gray-300">
+                A portion of $SOBA funds is allocated to community-chosen charitable causes, amplifying our positive impact beyond the crypto sphere.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-3 text-orange-400">Governance Participation</h3>
+              <p className="text-gray-300">
+                $SOBA holders have a voice in key project decisions through our governance system, ensuring the community shapes the future of $SOBA.
+              </p>
+            </div>
+          </div>
+        </WhitepaperSection>
+
+        {/* Team */}
+        <WhitepaperSection title="5. Team" id="team">
+          <div className="space-y-6">
+            {TEAM_MEMBERS.map((member, index) => (
+              <TeamMember
+                key={index}
+                name={member.name}
+                role={member.role}
+                description={member.description}
+                imageUrl={member.imageUrl}
+              />
+            ))}
+          </div>
+        </WhitepaperSection>
+
+        {/* Vision and Future Plans */}
+        <WhitepaperSection title="6. Vision and Future Plans" id="vision">
+          <p className="mb-6 text-gray-300">
+            $SOBA aims to redefine the memecoin landscape by combining humor with real utility and community value. Our vision extends beyond just being a token; we're building an ecosystem that rewards creativity, engagement, and loyalty.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-xl font-semibold mb-2  text-orange-400">NFT Integration</h3>
+              <p className="text-gray-300">Launching unique NFT collections that offer exclusive benefits to $SOBA holders.</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-orange-400">DeFi Features</h3>
+              <p className="text-gray-300">Developing staking and yield farming opportunities to provide additional value to our community.</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-orange-400">Cross-Chain Expansion</h3>
+              <p className="text-gray-300">Exploring opportunities to expand $SOBA's presence across multiple blockchain networks.</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-orange-400">Real-World Partnerships</h3>
+              <p className="text-gray-300">Forging alliances with businesses to increase $SOBA's utility in everyday transactions.</p>
+            </div>
+          </div>
+        </WhitepaperSection>
+
+        {/* Legal Disclaimer */}
+        <WhitepaperSection title="7. Legal Disclaimer" id="disclaimer">
+          <p className="text-sm text-gray-400 mb-4">
+            This whitepaper is for informational purposes only and does not constitute financial advice. $SOBA tokens are not securities and do not represent ownership in any company. Cryptocurrency investments carry high risk, and you should consult with a financial advisor before making any investment decisions.
+          </p>
+          <p className="text-sm text-gray-400  mb-4">
+            The $SOBA team is not responsible for any losses incurred from trading or holding $SOBA tokens. By participating in the $SOBA ecosystem, you acknowledge that you have read, understood, and agree to abide by all terms and conditions set forth by the project.
+          </p>
+          <p className="text-sm text-gray-400">
+            This document may be updated or altered without notice. It is the responsibility of the reader to ensure they are referring to the most current version of the whitepaper.
+          </p>
+        </WhitepaperSection>
+      </div>
     </div>
   )
 }

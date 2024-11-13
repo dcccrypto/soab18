@@ -1,248 +1,180 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Users, Megaphone, LineChart, Building, Handshake, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
-import * as THREE from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Text, Box, OrbitControls } from '@react-three/drei'
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { ContractAddress } from '@/components/ContractAddress'
-import { BurnStats } from '@/components/BurnStats'
-import { BurnHistory } from '@/components/BurnHistory'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { ExternalLink, Flame } from 'lucide-react'
+import { TOKEN_INFO, CONTRACT_ADDRESS, ICON_SIZES, ASSETS } from '../constants'
 
-// Define a type for the roadmap data
-type RoadmapPhase = {
-  phase: number;
-  icon: any; // Adjust this type if you have a specific type for icons
-  title: string;
-  status: string;
-  description: string;
-  objective: string;
-  details: string;
-};
-
-const roadmapData = [
-  {
-    phase: 1,
-    icon: Rocket,
-    title: "Fair Launch",
-    status: "Completed",
-    description: "Launch on Pump.fun and Raydium",
-    objective: "Make $SOBA accessible to early adopters, establishing its presence.",
-    details: "Our journey began with a fair launch, ensuring equal opportunity for all participants. This phase marked the birth of $SOBA on the Solana blockchain."
-  },
-  {
-    phase: 2,
-    icon: Users,
-    title: "Community Building",
-    status: "Completed",
-    description: "Engagement on TikTok, Twitter (X), Telegram",
-    objective: "Build a loyal, vibrant community to amplify $SOBA's brand.",
-    details: "We focused on creating a strong, engaged community across various social platforms. Meme contests and events helped foster a sense of belonging and excitement around $SOBA."
-  },
-  {
-    phase: 3,
-    icon: Megaphone,
-    title: "Marketing Expansion",
-    status: "Completed",
-    description: "Campaigns featuring Crypto Bastard, influencer partnerships",
-    objective: "Grow brand awareness and reach broader audiences.",
-    details: "Our marketing efforts expanded, leveraging the influence of Crypto Bastard and other key figures in the crypto space to increase $SOBA's visibility."
-  },
-  {
-    phase: 4,
-    icon: LineChart,
-    title: "Listings and Growth",
-    status: "Completed",
-    description: "Listings on CoinMarketCap and CoinGecko, community giveaways",
-    objective: "Increase visibility on major tracking platforms.",
-    details: "This phase saw $SOBA listed on major crypto tracking platforms, significantly boosting our credibility and reach. Community giveaways further incentivized participation."
-  },
-  {
-    phase: 5,
-    icon: Building,
-    title: "Exchange Listings",
-    status: "Completed",
-    description: "Additional exchange listings",
-    objective: "Broaden access to $SOBA for easier trading.",
-    details: "We expanded $SOBA's presence on various cryptocurrency exchanges, making it more accessible to a wider range of traders and investors."
-  },
-  {
-    phase: 6,
-    icon: Handshake,
-    title: "Strategic Partnerships",
-    status: "Completed",
-    description: "Collaborations with other projects and influencers",
-    objective: "Strengthen $SOBA's ecosystem through partnerships.",
-    details: "Strategic alliances were formed with complementary projects and influential figures in the crypto space, enhancing $SOBA's ecosystem and reach."
-  },
-  {
-    phase: 7,
-    icon: Palette,
-    title: "NFT Launch",
-    status: "Completed",
-    description: "Release exclusive $SOBA NFT collection",
-    objective: "Expand the ecosystem with collectible digital assets.",
-    details: "We launched our exclusive NFT collection, providing unique digital assets to our community and adding another layer of value to the $SOBA ecosystem."
-  },
-  {
-    phase: 8,
-    icon: Flame,
-    title: "Regular Burns",
-    status: "Completed",
-    description: "Implement regular burns",
-    objective: "Boost long-term value by reducing supply.",
-    details: "A token burning mechanism was implemented to systematically reduce $SOBA's supply, aiming to increase its scarcity and potential value over time."
-  },
-  {
-    phase: 9,
-    icon: Cpu,
-    title: "Advanced Features",
-    status: "Upcoming",
-    description: "NFT staking, AI-driven PFP Generator, gated content",
-    objective: "Enhance the ecosystem with unique, community-focused features.",
-    details: "This exciting phase will introduce advanced features like NFT staking, an AI-powered profile picture generator, and exclusive gated content for $SOBA holders."
-  },
-  {
-    phase: 10,
-    icon: Gamepad,
-    title: "Gamification",
-    status: "Upcoming",
-    description: "Leaderboards, achievement system, social sharing",
-    objective: "Drive engagement through interactive experiences.",
-    details: "We plan to gamify the $SOBA experience with leaderboards, an achievement system, and social sharing features to boost community engagement and interaction."
-  },
-  {
-    phase: 11,
-    icon: Vote,
-    title: "DAO Transition",
-    status: "Upcoming",
-    description: "Decentralized governance, community voting",
-    objective: "Empower the community to shape $SOBA's direction.",
-    details: "This phase will mark $SOBA's transition to a Decentralized Autonomous Organization (DAO), giving our community direct influence over the project's future direction."
-  },
-  {
-    phase: 12,
-    icon: Rocket,
-    title: "Expansion",
-    status: "Upcoming",
-    description: "Strategic alliances, cross-platform engagement, mainstream presence",
-    objective: "Broaden $SOBA's reputation beyond crypto.",
-    details: "The final phase of our current roadmap focuses on expanding $SOBA's influence beyond the crypto sphere, aiming for mainstream recognition and adoption."
-  }
-]
-
-const RoadmapCube = ({ phase, position, onClick }: { phase: RoadmapPhase, position: [number, number, number], onClick: () => void }) => {
-  const mesh = useRef<THREE.Mesh>(null)
-  const [hovered, setHovered] = useState(false)
-
-  useFrame((state) => {
-    if (mesh.current) {
-      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
-    }
-  })
-
-  return (
-    <Box
-      args={[2.5, 2.5, 2.5]}
-      ref={mesh}
-      position={position}
-      scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onClick={onClick}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      <meshStandardMaterial color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} />
-      <Text
-        position={[0, 0, 1.26]}
-        fontSize={0.8}
-        color="#FFFFFF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {phase.phase}
-      </Text>
-    </Box>
-  )
-}
-
-const RoadmapScene = ({ setSelectedPhase }: { setSelectedPhase: (phase: RoadmapPhase) => void }) => {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    camera.position.set(0, 5, 25)
-  }, [camera])
-
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <OrbitControls enableZoom={false} enablePan={false} />
-      {roadmapData.map((phase, index) => (
-        <RoadmapCube
-          key={phase.phase}
-          phase={phase}
-          position={[(index % 4 - 1.5) * 4, -Math.floor(index / 4) * 4 + 4, 0]}
-          onClick={() => setSelectedPhase(phase)}
-        />
-      ))}
-    </>
-  )
-}
-
-const SimplifiedProgressBar = ({ progress }: { progress: number }) => {
-  const completedPhases = Math.floor((progress / 100) * roadmapData.length)
-
-  return (
-    <div className="relative h-8 mb-12 bg-gray-200 rounded-full overflow-hidden">
-      <motion.div
-        className="h-full bg-gradient-to-r from-orange-500 to-red-500"
-        initial={{ width: 0 }}
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: 1, ease: "easeOut" }}
-      />
-      <div className="absolute inset-0 flex items-center justify-between px-2">
-        {roadmapData.map((phase, index) => (
-          <div
-            key={phase.phase}
-            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-              index < completedPhases ? 'bg-white text-orange-500' : 'bg-gray-400 text-white'
-            }`}
-          >
-            {phase.phase}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+interface BurnEvent {
+  date: string
+  amount: number
+  txHash: string
 }
 
 export default function BurnsPage() {
+  const [burnHistory, setBurnHistory] = useState<BurnEvent[]>([])
+  const [totalBurned, setTotalBurned] = useState(Number(TOKEN_INFO.BURNED_TOKENS.replace(/,/g, '')))
+  const [burnRate, setBurnRate] = useState(2.5)
+  const [nextBurnDate, setNextBurnDate] = useState(new Date('2024-04-01'))
+
+  useEffect(() => {
+    // Simulated burn history data
+    const mockBurnHistory = [
+      { date: '2024-01-01', amount: 10000000, txHash: '0x123...abc' },
+      { date: '2024-01-15', amount: 15000000, txHash: '0x456...def' },
+      { date: '2024-02-01', amount: 20000000, txHash: '0x789...ghi' },
+      { date: '2024-02-15', amount: 25000000, txHash: '0xabc...jkl' },
+      { date: '2024-03-01', amount: 4779668.51, txHash: '0xdef...mno' },
+    ]
+    setBurnHistory(mockBurnHistory)
+  }, [])
+
+  const chartData = burnHistory.map(burn => ({
+    date: burn.date,
+    amount: burn.amount / 1000000, // Convert to millions for better display
+  }))
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <motion.h1 
-        className="text-4xl font-bold text-center mb-8 text-orange-400"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        $SOBA Burns Tracker
-      </motion.h1>
+    <div className="min-h-screen py-12 px-4">
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto text-center mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Image
+            src={ASSETS.LOGO}
+            alt="SOBA Logo"
+            width={ASSETS.LOGO_DIMENSIONS.width}
+            height={ASSETS.LOGO_DIMENSIONS.height}
+            className="mx-auto mb-8 w-24 h-24"
+          />
+        </motion.div>
+        <h1 className="text-4xl font-bold mb-4 text-orange-400">$SOBA Token Burns</h1>
+        <p className="text-xl text-orange-300 mb-8">
+          Track our deflationary mechanism in action
+        </p>
+      </div>
 
-      <div className="grid gap-8">
-        <ContractAddress />
-        
+      {/* Burn Stats */}
+      <div className="max-w-6xl mx-auto mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <BurnStats />
+          <motion.div
+            className="p-6 rounded-lg shadow-lg bg-[#111]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center mb-4">
+              <Flame className="w-8 h-8 mr-3 text-[#FF6B00]" />
+              <h3 className="text-xl font-bold text-orange-400">Total Burned</h3>
+            </div>
+            <p className="text-3xl font-bold text-orange-300">{TOKEN_INFO.BURNED_TOKENS}</p>
+            <p className="text-orange-400/60">$SOBA Tokens</p>
+          </motion.div>
+          <motion.div
+            className="p-6 rounded-lg shadow-lg bg-[#111]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex items-center mb-4">
+              <Flame className="w-8 h-8 mr-3 text-[#FF6B00]" />
+              <h3 className="text-xl font-bold text-orange-400">Burn Rate</h3>
+            </div>
+            <p className="text-3xl font-bold text-orange-300">{burnRate}%</p>
+            <p className="text-orange-400/60">Per Month</p>
+          </motion.div>
+          <motion.div
+            className="p-6 rounded-lg shadow-lg bg-[#111]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center mb-4">
+              <Flame className="w-8 h-8 mr-3 text-[#FF6B00]" />
+              <h3 className="text-xl font-bold text-orange-400">Next Burn</h3>
+            </div>
+            <p className="text-3xl font-bold text-orange-300">
+              {nextBurnDate.toLocaleDateString()}
+            </p>
+            <p className="text-orange-400/60">Estimated Date</p>
+          </motion.div>
         </div>
+      </div>
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4 text-orange-400">Recent Burns</h2>
-          <BurnHistory />
+      {/* Burn Chart */}
+      <div className="max-w-6xl mx-auto mb-12">
+        <div className="bg-[#111] p-6 rounded-lg shadow-lg">
+          <h3 className="text-xl font-bold mb-6 text-orange-400">Burn History</h3>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <XAxis dataKey="date" stroke="#FF6B00" />
+                <YAxis stroke="#FF6B00" />
+                <Tooltip
+                  contentStyle={{ background: '#111', border: '1px solid #FF6B00' }}
+                  labelStyle={{ color: '#FF6B00' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#FF6B00"
+                  strokeWidth={2}
+                  dot={{ fill: '#FF6B00' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Burn History Table */}
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-[#111] p-6 rounded-lg shadow-lg overflow-x-auto">
+          <h3 className="text-xl font-bold mb-6 text-orange-400">Burn Transactions</h3>
+          <table className="w-full">
+            <thead>
+              <tr className="text-left border-b border-gray-800">
+                <th className="px-6 py-3 text-orange-400">Date</th>
+                <th className="px-6 py-3 text-orange-400">Amount</th>
+                <th className="px-6 py-3 text-orange-400">Transaction</th>
+              </tr>
+            </thead>
+            <tbody>
+              {burnHistory.map((burn, index) => (
+                <motion.tr 
+                  key={burn.txHash || index}
+                  className="border-t border-gray-800 hover:bg-gray-800/50"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                >
+                  <td className="px-6 py-4 text-orange-300">
+                    {burn.date}
+                  </td>
+                  <td className="px-6 py-4 text-orange-300">
+                    {burn.amount.toLocaleString()} SOBA
+                  </td>
+                  <td className="px-6 py-4">
+                    <a
+                      href={`https://solscan.io/tx/${burn.txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-orange-400 hover:text-orange-300 flex items-center gap-2"
+                    >
+                      {burn.txHash.slice(0, 8)}...{burn.txHash.slice(-8)}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

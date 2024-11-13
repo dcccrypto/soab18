@@ -1,12 +1,11 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
 import { Button } from './ui/button';
+import { CONTRACT_ADDRESS, ICON_SIZES } from '../constants';
 
 export const ContractAddress: React.FC = () => {
-  const address = "25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH8";
-  
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(address);
+    navigator.clipboard.writeText(CONTRACT_ADDRESS);
     // Add toast notification here if desired
   };
 
@@ -17,7 +16,7 @@ export const ContractAddress: React.FC = () => {
       </h2>
       <div className="flex items-center justify-between gap-4 bg-black rounded-lg p-4">
         <code className="text-orange-300 text-lg font-mono flex-1 break-all">
-          {address}
+          {CONTRACT_ADDRESS}
         </code>
         <Button
           onClick={copyToClipboard}

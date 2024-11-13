@@ -1,44 +1,27 @@
 import React from 'react';
 import Image from 'next/image';
+import { SOCIAL_LINKS, ICON_SIZES } from '../constants';
 
 interface SocialLinksProps {
   className?: string;
 }
 
 export const SocialLinks: React.FC<SocialLinksProps> = ({ className = '' }) => {
-  const socialLinks = [
-    {
-      name: 'Telegram',
-      icon: '/images/assets/icons/telegram_logo.png',
-      url: 'https://t.me/SOBAtoken'
-    },
-    {
-      name: 'Twitter',
-      icon: '/images/assets/icons/x_com_logo.png',
-      url: 'https://x.com/SOBAtoken'
-    },
-    {
-      name: 'TikTok',
-      icon: '/images/assets/icons/tiktok_logo.png',
-      url: 'https://tiktok.com/@sobatoken'
-    }
-  ];
-
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      {socialLinks.map(link => (
+      {Object.entries(SOCIAL_LINKS).map(([key, value]) => (
         <a
-          key={link.name}
-          href={link.url}
+          key={key}
+          href={value.url}
           target="_blank"
           rel="noopener noreferrer"
           className="p-2 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors"
         >
           <Image
-            src={link.icon}
-            alt={link.name}
-            width={24}
-            height={24}
+            src={value.icon}
+            alt={`${key.toLowerCase()} icon`}
+            width={ICON_SIZES.SOCIAL.width}
+            height={ICON_SIZES.SOCIAL.height}
             className="w-5 h-5"
           />
         </a>

@@ -2,8 +2,10 @@
 
 import React, { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { Flame, Users, TrendingUp, Calendar, Download, ExternalLink } from 'lucide-react'
 import { jsPDF } from 'jspdf'
+import { TOKEN_INFO, TEAM_MEMBERS, ROADMAP_PHASES, ASSETS, ICON_SIZES } from '../constants'
 
 const WhitepaperSection = ({ title, children, id }: { title: string; children: React.ReactNode; id: string }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -55,12 +57,7 @@ export default function WhitePaper() {
     }
   }
 
-  interface Section {
-    id: string
-    title: string
-  }
-
-  const sections: Section[] = [
+  const sections = [
     { id: 'introduction', title: '1. Introduction to $SOBA' },
     { id: 'tokenomics', title: '2. Tokenomics' },
     { id: 'roadmap', title: '3. Roadmap' },
@@ -71,15 +68,7 @@ export default function WhitePaper() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <motion.h1 
-        className="text-4xl font-bold text-center mb-8 text-orange-400"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        $SOBA Whitepaper
-      </motion.h1>
+    <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
         {/* Cover Page */}
         <motion.div
@@ -90,10 +79,12 @@ export default function WhitePaper() {
         >
           <h1 className="text-6xl font-bold mb-4 text-orange-500">$SOBA Whitepaper</h1>
           <p className="text-2xl mb-8 text-orange-300">The Memecoin with a Mission</p>
-          <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-DBqVkxZx-T3IBDgcc0UVW81J7xogS5cUSXwPGrR.png"
+          <Image
+            src={ASSETS.LOGO}
             alt="SOBA Logo"
-            className="w-48 h-48 mx-auto mb-8"
+            width={ASSETS.LOGO_DIMENSIONS.width}
+            height={ASSETS.LOGO_DIMENSIONS.height}
+            className="mx-auto mb-8"
           />
           <button
             onClick={handleDownload}
@@ -154,10 +145,10 @@ export default function WhitePaper() {
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3 text-orange-400">Token Distribution</h3>
             <ul className="list-disc list-inside space-y-2 text-gray-300">
-              <li>Total Supply: 1,000,000,000 $SOBA tokens</li>
-              <li>Current Circulating Supply: 925,220,331.49 tokens</li>
-              <li>Burned Tokens: 74,779,668.51 tokens</li>
-              <li>Founder Holdings: 41,080,000 tokens (4.08% held by Crypto Bastard)</li>
+              <li>Total Supply: {TOKEN_INFO.TOTAL_SUPPLY} $SOBA tokens</li>
+              <li>Current Circulating Supply: {TOKEN_INFO.CIRCULATING_SUPPLY} tokens</li>
+              <li>Burned Tokens: {TOKEN_INFO.BURNED_TOKENS} tokens</li>
+              <li>Founder Holdings: {TOKEN_INFO.FOUNDER_HOLDINGS} tokens (4.08% held by Crypto Bastard)</li>
             </ul>
           </div>
           <div className="mb-6">
@@ -183,22 +174,13 @@ export default function WhitePaper() {
         {/* Roadmap */}
         <WhitepaperSection title="3. Roadmap" id="roadmap">
           <div className="space-y-6">
-            {[
-              { phase: "Phase 1", title: "Fair Launch", status: "Completed", description: "Successfully launched on Pump.fun and Raydium, establishing $SOBA's presence in the market." },
-              { phase: "Phase 2", title: "Community Building", status: "Completed", description: "Engaged community across TikTok, Twitter (X), and Telegram, fostering a strong $SOBA culture." },
-              { phase: "Phase 3", title: "Marketing Expansion", status: "Completed", description: "Launched campaigns featuring Crypto Bastard and partnered with key influencers to increase visibility." },
-              { phase: "Phase 4", title: "Listings and Growth", status: "Completed", description: "Secured listings on CoinMarketCap and CoinGecko, enhancing credibility and reach." },
-              { phase: "Phase 5", title: "Exchange Listings", status: "In Progress", description: "Expanding $SOBA's presence on various cryptocurrency exchanges for wider accessibility." },
-              { phase: "Phase 6", title: "Strategic Partnerships", status: "Upcoming", description: "Forming alliances with complementary projects to strengthen the $SOBA ecosystem." },
-              { phase: "Phase 7", title: "NFT Launch", status: "Upcoming", description: "Releasing an exclusive $SOBA NFT collection to add value for our community." },
-              { phase: "Phase 8", title: "Advanced Features", status: "Planned", description: "Implementing staking, rewards systems, and other engaging utilities for $SOBA holders." },
-            ].map((item, index) => (
+            {ROADMAP_PHASES.map((phase, index) => (
               <div key={index} className="flex items-start space-x-4 bg-gray-700 p-4 rounded-lg">
                 <Calendar className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
                 <div>
-                  <p className="font-bold text-orange-400">{item.phase}: {item.title}</p>
-                  <p className="text-sm text-orange-300 mb-2">{item.status}</p>
-                  <p className="text-gray-300">{item.description}</p>
+                  <p className="font-bold text-orange-400">{phase.phase}: {phase.title}</p>
+                  <p className="text-sm text-orange-300 mb-2">{phase.status}</p>
+                  <p className="text-gray-300">{phase.description}</p>
                 </div>
               </div>
             ))}
@@ -241,36 +223,15 @@ export default function WhitePaper() {
         {/* Team */}
         <WhitepaperSection title="5. Team" id="team">
           <div className="space-y-6">
-            <TeamMember
-              name="Crypto Bastard"
-              role="Founder"
-              description="Famous TikTok influencer and the visionary behind $SOBA, bringing unparalleled reach and charisma to the project."
-              imageUrl="/placeholder.svg?height=200&width=200"
-            />
-            <TeamMember
-              name="Pb (DarkCobraCalls)"
-              role="Project Manager and Developer"
-              description="Oversees project management, team coordination, and leads the development efforts, ensuring the technical success of $SOBA."
-              imageUrl="/placeholder.svg?height=200&width=200"
-            />
-            <TeamMember
-              name="Dan Margin"
-              role="Marketing Lead"
-              description="Experienced negotiator with strong connections to numerous crypto influencers, driving $SOBA's promotional efforts."
-              imageUrl="/placeholder.svg?height=200&width=200"
-            />
-            <TeamMember
-              name="Titus"
-              role="Project Lead"
-              description="Dynamic leader passionately driving the vision forward, supporting negotiations and strategic decisions."
-              imageUrl="/placeholder.svg?height=200&width=200"
-            />
-            <TeamMember
-              name="Alex_TNT"
-              role="NFT and Graphic Designer"
-              description="Responsible for NFT development and graphic design, ensuring high-quality visual standards across the project."
-              imageUrl="/placeholder.svg?height=200&width=200"
-            />
+            {TEAM_MEMBERS.map((member, index) => (
+              <TeamMember
+                key={index}
+                name={member.name}
+                role={member.role}
+                description={member.description}
+                imageUrl={member.imageUrl}
+              />
+            ))}
           </div>
         </WhitepaperSection>
 
@@ -311,22 +272,6 @@ export default function WhitePaper() {
             This document may be updated or altered without notice. It is the responsibility of the reader to ensure they are referring to the most current version of the whitepaper.
           </p>
         </WhitepaperSection>
-
-        {/* Footer */}
-        <div className="text-center mt-12">
-          <p className="text-gray-400 mb-4">For the latest updates and information, visit our official website and social media channels.</p>
-          <div className="flex justify-center space-x-4">
-            <a href="https://solbastard.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 transition-colors duration-300 flex items-center">
-              <ExternalLink className="w-4 h-4 mr-1" /> Website
-            </a>
-            <a href="https://twitter.com/solbastard" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 transition-colors duration-300 flex items-center">
-              <ExternalLink className="w-4 h-4 mr-1" /> Twitter
-            </a>
-            <a href="https://t.me/solbastard" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 transition-colors duration-300 flex items-center">
-              <ExternalLink className="w-4 h-4 mr-1" /> Telegram
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   )
