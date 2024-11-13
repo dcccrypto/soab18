@@ -15,6 +15,7 @@ export default function Header({ isDarkMode = true, toggleTheme }: HeaderProps) 
     { name: 'Home', href: '/' },
     { name: 'White Paper', href: NAV_LINKS.WHITEPAPER },
     { name: 'Community', href: NAV_LINKS.COMMUNITY },
+    { name: 'Tokenomics', href: NAV_LINKS.TOKENOMICS },
     { name: 'Roadmap', href: NAV_LINKS.ROADMAP },
   ];
 
@@ -28,7 +29,8 @@ export default function Header({ isDarkMode = true, toggleTheme }: HeaderProps) 
             width={ICON_SIZES.SOCIAL.width * 2}
             height={ICON_SIZES.SOCIAL.height * 2}
             className="w-24 h-auto" 
-            priority
+            priority={true}
+            unoptimized={true}
           />
         </Link>
         <div className="flex items-center space-x-4">
