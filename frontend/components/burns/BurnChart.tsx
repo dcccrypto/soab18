@@ -9,27 +9,28 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ChartData,
+  ChartOptions
 } from 'chart.js'
 import { ExternalLink } from 'lucide-react'
 import { BURN_INFO } from '@/constants'
 import { formatDate, formatNumber } from '@/lib/utils'
 
-if (typeof window !== 'undefined') {
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-  )
-}
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
 export const BurnChart = () => {
-  const chartRef = useRef<ChartJS>(null)
+  const chartRef = useRef(null)
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export const BurnChart = () => {
     }
   })
 
-  const data = {
+  const data: ChartData<'line'> = {
     labels: cumulativeData.map(burn => formatDate(new Date(burn.date))),
     datasets: [
       {
@@ -87,12 +88,12 @@ export const BurnChart = () => {
     ]
   }
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
+      mode: 'nearest',
+      axis: 'x',
       intersect: false
     },
     scales: {

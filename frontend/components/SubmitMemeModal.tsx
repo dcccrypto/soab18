@@ -18,8 +18,8 @@ export const SubmitMemeModal = ({ isOpen, onClose }: SubmitMemeModalProps) => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB')
       return
     }
 
@@ -31,22 +31,19 @@ export const SubmitMemeModal = ({ isOpen, onClose }: SubmitMemeModalProps) => {
     reader.readAsDataURL(file)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (!selectedFile) return
 
     setIsSubmitting(true)
     try {
-      // TODO: Implement actual file upload logic here
-      await new Promise(resolve => setTimeout(resolve, 1500)) // Simulated delay
+      // Implement your file upload logic here
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulated delay
       onClose()
-      alert('Meme submitted successfully!')
     } catch (error) {
-      alert('Failed to submit meme. Please try again.')
+      console.error('Error uploading meme:', error)
     } finally {
       setIsSubmitting(false)
-      setSelectedFile(null)
-      setPreview(null)
     }
   }
 
@@ -69,8 +66,8 @@ export const SubmitMemeModal = ({ isOpen, onClose }: SubmitMemeModalProps) => {
           >
             <ButtonBase
               variant="ghost"
-              size="icon"
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              size="sm"
+              className="absolute right-4 top-4 w-8 h-8 p-0 flex items-center justify-center text-gray-400 hover:text-white"
               onClick={onClose}
               aria-label="Close modal"
             >
@@ -81,7 +78,7 @@ export const SubmitMemeModal = ({ isOpen, onClose }: SubmitMemeModalProps) => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div 
-                className="relative border-2 border-dashed border-orange-500/30 rounded-lg p-8 hover:border-orange-500/50 transition-colors"
+                className="relative border-2 border-dashed border-orange-500/30 rounded-lg p-8 hover:border-orange-500/50 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
@@ -95,11 +92,10 @@ export const SubmitMemeModal = ({ isOpen, onClose }: SubmitMemeModalProps) => {
                 
                 {preview ? (
                   <div className="relative aspect-video w-full">
-                    <Image
+                    <img
                       src={preview}
                       alt="Meme preview"
-                      fill
-                      className="object-contain rounded-lg"
+                      className="w-full h-full object-contain rounded-lg"
                     />
                   </div>
                 ) : (

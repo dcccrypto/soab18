@@ -1,38 +1,21 @@
 import { motion } from 'framer-motion';
 import { Flame, TrendingUp, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { tokenService } from '@/services/api';
+import { BURN_INFO } from '@/constants';
+import { formatNumber } from '@/lib/utils';
 
 export const BurnStats = () => {
   const [burnStats, setBurnStats] = useState({
-    totalBurned: 74779668.51,
+    totalBurned: BURN_INFO.BURN_HISTORY.reduce((acc, burn) => acc + burn.amount, 0),
     burnRate: 2.5,
-    nextBurnDate: new Date('2024-04-01')
+    nextBurnDate: new Date(BURN_INFO.NEXT_BURN.TARGET_DATE)
   });
-
-  useEffect(() => {
-    const fetchBurnStats = async () => {
-      try {
-        const tokenInfo = await tokenService.getTokenInfo('25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH8');
-        const nextBurnInfo = await tokenService.getNextBurnInfo('25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH8');
-        setBurnStats({
-          totalBurned: tokenInfo.totalBurned,
-          burnRate: tokenInfo.burnRate,
-          nextBurnDate: new Date(nextBurnInfo.nextBurnDate)
-        });
-      } catch (error) {
-        console.error('Error fetching burn stats:', error);
-      }
-    };
-
-    fetchBurnStats();
-  }, []);
 
   const stats = [
     {
       icon: Flame,
       title: "Total Burned",
-      value: `${burnStats.totalBurned.toLocaleString()} SOBA`,
+      value: `${formatNumber(burnStats.totalBurned)} SOBA`,
       color: "text-orange-500"
     },
     {
@@ -50,22 +33,28 @@ export const BurnStats = () => {
   ];
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {stats.map((stat, index) => (
-        <motion.div 
+        <motion.div
           key={stat.title}
-          className="bg-gray-900 p-6 rounded-lg"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="bg-black/40 rounded-xl p-6 border border-orange-500/20 hover:border-orange-500/40 transition-all"
         >
           <div className="flex items-center gap-3 mb-4">
-            <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            <h2 className="text-xl font-bold text-orange-400">{stat.title}</h2>
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            </div>
+            <h3 className="text-lg font-semibold text-orange-500">
+              {stat.title}
+            </h3>
           </div>
-          <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
+          <p className="text-2xl font-bold text-white">
+            {stat.value}
+          </p>
         </motion.div>
       ))}
-    </>
+    </div>
   );
 }; 

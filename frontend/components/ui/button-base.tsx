@@ -1,12 +1,15 @@
-import { motion } from 'framer-motion'
+import { motion, HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { ButtonHTMLAttributes } from 'react'
 
-interface ButtonBaseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonBaseProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
   className?: string
 }
+
+type MotionButtonProps = ButtonBaseProps & HTMLMotionProps<"button">
 
 export const ButtonBase = ({ 
   children, 
@@ -14,7 +17,7 @@ export const ButtonBase = ({
   variant = 'default',
   size = 'md',
   ...props 
-}: ButtonBaseProps) => {
+}: MotionButtonProps) => {
   const baseStyles = "relative overflow-hidden rounded-full flex items-center justify-center gap-2 font-semibold transition-all duration-300 group"
   
   const variants = {
