@@ -11,4 +11,14 @@ export interface MetricItems {
   BURNED: MetricItem
   FOUNDER: MetricItem
   HOLDERS: MetricItem
+}
+
+export interface TokenStats {
+  price: number;
+  totalSupply: number;
+  founderBalance: number;
+  holders: number;
+  lastUpdated: string;
+  cached?: boolean;
+  cacheAge?: number;
 } 

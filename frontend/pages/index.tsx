@@ -1,20 +1,10 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { TokenStatsDisplay } from '../components/TokenStats';
 
 export default function Home() {
-  const router = useRouter()
-
-  useEffect(() => {
-    const redirect = async () => {
-      await router.replace('/landing-page')
-    }
-    redirect()
-  }, [router])
-
-  // Return a loading state or null
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-orange-500"></div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">SOBA Token Stats</h1>
+      <TokenStatsDisplay />
     </div>
-  )
+  );
 } 
