@@ -1,10 +1,12 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+// This is needed for button-base and other components
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Remove duplicate formatNumber function and keep the more detailed one
 export function formatNumber(number: number, decimals = 2): string {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,

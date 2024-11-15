@@ -1,72 +1,128 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Sun, Moon } from 'lucide-react';
-import { ASSETS, NAV_LINKS, ICON_SIZES } from '../constants';
+import { useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X, Sun, Moon } from 'lucide-react'
+import { NAV_LINKS } from '@/constants'
+import { ButtonBase } from './ui/button-base'
 
 interface HeaderProps {
-  isDarkMode?: boolean;
-  toggleTheme?: () => void;
+  isDarkMode?: boolean
+  toggleTheme?: () => void
 }
 
-export default function Header({ isDarkMode = true, toggleTheme }: HeaderProps) {
-  const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'White Paper', href: NAV_LINKS.WHITEPAPER },
-    { name: 'Community', href: NAV_LINKS.COMMUNITY },
-    { name: 'Tokenomics', href: NAV_LINKS.TOKENOMICS },
-    { name: 'Roadmap', href: NAV_LINKS.ROADMAP },
-  ];
+export const Header = ({ isDarkMode = true, toggleTheme }: HeaderProps) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <header className="container mx-auto px-4 py-8">
-      <nav className="flex justify-between items-center mb-8">
-        <Link href="/">
-          <Image 
-            src={ASSETS.LOGO}
-            alt="SOBA Logo" 
-            width={ICON_SIZES.SOCIAL.width * 2}
-            height={ICON_SIZES.SOCIAL.height * 2}
-            className="w-24 h-auto" 
-            priority={true}
-            unoptimized={true}
-          />
-        </Link>
-        <div className="flex items-center space-x-4">
-          {navItems.map((item) => (
-            <Link 
-              key={item.name}
-              href={item.href} 
-              className="text-orange-400 hover:text-orange-300 transition-colors duration-300"
-            >
-              {item.name}
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-gradient-to-b from-black via-black/98 to-black/95 backdrop-blur-md border-b border-orange-500/10 shadow-lg shadow-black/20">
+        <div className="container mx-auto px-4 h-full">
+          <div className="flex items-center justify-between h-full">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 group">
+              <Image
+                src="/images/assets/icons/logo.svg"
+                alt="SOBA Logo"
+                width={32}
+                height={32}
+                className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
+                priority
+              />
+              <span className="text-xl font-bold gradient-text drop-shadow-sm">$SOBA</span>
             </Link>
-          ))}
-          <Button 
-            asChild
-            className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white font-bold py-2 px-4 rounded-full transition-colors duration-300 flex items-center gap-2"
-          >
-            <Link href="#dex-section">
-              Buy $SOBA
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-          {toggleTheme && (
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-300"
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-6">
+              {Object.entries(NAV_LINKS).map(([key, href]) => (
+                <Link
+                  key={key}
+                  href={href}
+                  className="text-orange-400/90 hover:text-orange-400 transition-colors duration-300 text-base font-medium relative group"
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600 transition-all duration-300 group-hover:w-full" />
+                </Link>
+              ))}
+              <ButtonBase 
+                variant="default" 
+                size="md"
+                className="px-6 py-2 text-base font-semibold rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-[0_4px_16px_rgba(255,165,0,0.15)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.25)] transition-all duration-300"
+              >
+                Buy $SOBA
+              </ButtonBase>
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              className="md:hidden text-orange-500 p-2 rounded-xl hover:bg-orange-500/10 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {isDarkMode ? (
-                <Sun size={ICON_SIZES.SOCIAL.width} />
-              ) : (
-                <Moon size={ICON_SIZES.SOCIAL.height} />
-              )}
-            </button>
-          )}
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </motion.button>
+          </div>
         </div>
-      </nav>
-    </header>
-  );
+      </header>
+
+      {/* Mobile Navigation */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.nav
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-b from-black via-black/98 to-black/95 backdrop-blur-md border-b border-orange-500/10 shadow-lg shadow-black/20"
+          >
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col space-y-2 py-4">
+                {Object.entries(NAV_LINKS).map(([key, href]) => (
+                  <ButtonBase
+                    key={key}
+                    variant="ghost"
+                    size="md"
+                    className="w-full justify-start text-left hover:bg-orange-500/10"
+                    onClick={() => {
+                      window.location.href = href;
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
+                  </ButtonBase>
+                ))}
+                <ButtonBase 
+                  variant="default"
+                  size="md"
+                  className="w-full shadow-[0_4px_16px_rgba(255,165,0,0.15)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.25)]"
+                >
+                  Buy $SOBA
+                </ButtonBase>
+                {toggleTheme && (
+                  <ButtonBase
+                    variant="ghost"
+                    size="md"
+                    onClick={toggleTheme}
+                    className="w-full justify-start text-left hover:bg-orange-500/10"
+                  >
+                    {isDarkMode ? (
+                      <>
+                        <Sun className="w-5 h-5 mr-2" />
+                        Light Mode
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-5 h-5 mr-2" />
+                        Dark Mode
+                      </>
+                    )}
+                  </ButtonBase>
+                )}
+              </div>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
+    </>
+  )
 } 

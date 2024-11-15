@@ -1,16 +1,16 @@
-import React from 'react'
-import Header from './Header'
+import { ReactNode } from 'react'
+import { Header } from './Header'
 import { Footer } from './Footer'
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
-export default function Layout({ children }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-black">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pt-[64px]">
         {children}
       </main>
       <Footer />

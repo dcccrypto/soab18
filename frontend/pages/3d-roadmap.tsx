@@ -3,26 +3,51 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Rocket, Users, Megaphone, LineChart, Building, Handshake, Palette, Flame, Cpu, Gamepad, Vote, ArrowRight, TrendingUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Rocket, Users, Megaphone, LineChart, Building, Handshake, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Text, Box, OrbitControls } from '@react-three/drei'
-import { Mesh } from 'three'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { ROADMAP_PHASES, NAV_LINKS, ASSETS, ICON_SIZES } from '../constants'
-import { SocialLinks } from '@/components/SocialLinks'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { NAV_LINKS, SOCIAL_LINKS } from '@/constants'
+import { ButtonBase } from '@/components/ui/button-base'
+import { useScroll, useTransform } from 'framer-motion'
 
 interface RoadmapPhase {
-  phase: number;
-  icon: any;
-  title: string;
-  status: string;
-  description: string;
-  objective: string;
-  details: string;
+  phase: number
+  icon: React.ElementType
+  title: string
+  status: 'Completed' | 'In Progress' | 'Upcoming'
+  description: string
+  objective: string
+  details: string
 }
+
+interface RoadmapCubeProps {
+  phase: RoadmapPhase
+  position: [number, number, number]
+  onClick: () => void
+}
+
+interface RoadmapSceneProps {
+  setSelectedPhase: (phase: RoadmapPhase) => void
+}
+
+interface SimplifiedProgressBarProps {
+  progress: number
+}
+
+const fadeInUpVariant = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+} as const
 
 const roadmapData: RoadmapPhase[] = [
   {
@@ -39,121 +64,116 @@ const roadmapData: RoadmapPhase[] = [
     icon: Users,
     title: "Community Building",
     status: "Completed",
-    description: "Growing our social media presence",
-    objective: "Build a strong and engaged community across multiple platforms.",
-    details: "Focused on community engagement through Twitter, Telegram, and TikTok, creating a vibrant ecosystem of $SOBA supporters."
+    description: "Engagement on TikTok, Twitter (X), Telegram",
+    objective: "Build a loyal, vibrant community to amplify $SOBA's brand.",
+    details: "We focused on creating a strong, engaged community across various social platforms. Meme contests and events helped foster a sense of belonging and excitement around $SOBA."
   },
   {
     phase: 3,
     icon: Megaphone,
-    title: "Marketing Push",
-    status: "In Progress",
-    description: "Expanding brand awareness",
-    objective: "Increase visibility and attract new community members.",
-    details: "Strategic marketing campaigns across social media platforms, influencer partnerships, and community-driven content creation."
+    title: "Marketing Expansion",
+    status: "Completed",
+    description: "Campaigns featuring Crypto Bastard, influencer partnerships",
+    objective: "Grow brand awareness and reach broader audiences.",
+    details: "Our marketing efforts expanded, leveraging the influence of Crypto Bastard and other key figures in the crypto space to increase $SOBA's visibility."
   },
   {
     phase: 4,
     icon: LineChart,
-    title: "Exchange Listings",
-    status: "Upcoming",
-    description: "Major exchange partnerships",
-    objective: "Improve accessibility and trading volume.",
-    details: "Working on partnerships with major cryptocurrency exchanges to list $SOBA, making it more accessible to a wider audience."
+    title: "Listings and Growth",
+    status: "Completed",
+    description: "Listings on CoinMarketCap and CoinGecko, community giveaways",
+    objective: "Increase visibility on major tracking platforms.",
+    details: "This phase saw $SOBA listed on major crypto tracking platforms, significantly boosting our credibility and reach. Community giveaways further incentivized participation."
   },
   {
     phase: 5,
     icon: Building,
-    title: "Platform Development",
-    status: "Planned",
-    description: "Building utility features",
-    objective: "Create practical use cases for $SOBA.",
-    details: "Development of staking platform, governance system, and other utility features to enhance the $SOBA ecosystem."
+    title: "Exchange Listings",
+    status: "Completed",
+    description: "Additional exchange listings",
+    objective: "Broaden access to $SOBA for easier trading.",
+    details: "We expanded $SOBA's presence on various cryptocurrency exchanges, making it more accessible to a wider range of traders and investors."
   },
   {
     phase: 6,
     icon: Handshake,
     title: "Strategic Partnerships",
-    status: "Planned",
-    description: "Ecosystem expansion",
-    objective: "Form strategic alliances within the crypto space.",
-    details: "Establishing partnerships with other projects and platforms to create synergies and expand the $SOBA ecosystem."
+    status: "Completed",
+    description: "Collaborations with other projects and influencers",
+    objective: "Strengthen $SOBA's ecosystem through partnerships.",
+    details: "Strategic alliances were formed with complementary projects and influential figures in the crypto space, enhancing $SOBA's ecosystem and reach."
   },
   {
     phase: 7,
     icon: Palette,
     title: "NFT Launch",
-    status: "Planned",
-    description: "Unique NFT collection",
-    objective: "Create exclusive digital assets for the community.",
-    details: "Launch of unique NFT collections with utility within the $SOBA ecosystem, providing additional value to holders."
+    status: "Completed",
+    description: "Release exclusive $SOBA NFT collection",
+    objective: "Expand the ecosystem with collectible digital assets.",
+    details: "We launched our exclusive NFT collection, providing unique digital assets to our community and adding another layer of value to the $SOBA ecosystem."
   },
   {
     phase: 8,
     icon: Flame,
-    title: "Token Burns",
-    status: "Ongoing",
-    description: "Regular supply reduction",
-    objective: "Create deflationary pressure on token supply.",
-    details: "Implementation of regular token burning mechanisms to reduce supply and potentially increase value over time."
+    title: "Regular Burns",
+    status: "Completed",
+    description: "Implement regular burns",
+    objective: "Boost long-term value by reducing supply.",
+    details: "A token burning mechanism was implemented to systematically reduce $SOBA's supply, aiming to increase its scarcity and potential value over time."
   },
   {
     phase: 9,
     icon: Cpu,
-    title: "Tech Integration",
-    status: "Planned",
-    description: "Advanced features",
-    objective: "Implement cutting-edge blockchain features.",
-    details: "Integration of advanced blockchain features and cross-chain functionality to enhance the technical capabilities of $SOBA."
+    title: "Advanced Features",
+    status: "Upcoming",
+    description: "NFT staking, AI-driven PFP Generator, gated content",
+    objective: "Enhance the ecosystem with unique, community-focused features.",
+    details: "This exciting phase will introduce advanced features like NFT staking, an AI-powered profile picture generator, and exclusive gated content for $SOBA holders."
   },
   {
     phase: 10,
     icon: Gamepad,
-    title: "GameFi Elements",
-    status: "Planned",
-    description: "Gaming integration",
-    objective: "Add gaming elements to the ecosystem.",
-    details: "Development of gaming features and integration with existing blockchain games to create entertaining use cases for $SOBA."
+    title: "Gamification",
+    status: "Upcoming",
+    description: "Leaderboards, achievement system, social sharing",
+    objective: "Drive engagement through interactive experiences.",
+    details: "We plan to gamify the $SOBA experience with leaderboards, an achievement system, and social sharing features to boost community engagement and interaction."
   },
   {
     phase: 11,
     icon: Vote,
-    title: "DAO Governance",
-    status: "Planned",
-    description: "Community governance",
-    objective: "Implement decentralized governance.",
-    details: "Launch of DAO governance system allowing token holders to participate in key decisions about the project's future."
+    title: "DAO Transition",
+    status: "Upcoming",
+    description: "Decentralized governance, community voting",
+    objective: "Empower the community to shape $SOBA's direction.",
+    details: "This phase will mark $SOBA's transition to a Decentralized Autonomous Organization (DAO), giving our community direct influence over the project's future direction."
   },
   {
     phase: 12,
-    icon: TrendingUp,
-    title: "Global Expansion",
-    status: "Planned",
-    description: "Worldwide adoption",
-    objective: "Achieve global recognition and adoption.",
-    details: "Focus on global expansion through localized marketing, community building, and strategic partnerships in different regions."
+    icon: Rocket,
+    title: "Expansion",
+    status: "Upcoming",
+    description: "Strategic alliances, cross-platform engagement, mainstream presence",
+    objective: "Broaden $SOBA's reputation beyond crypto.",
+    details: "The final phase of our current roadmap focuses on expanding $SOBA's influence beyond the crypto sphere, aiming for mainstream recognition and adoption."
   }
-];
-
-interface RoadmapCubeProps {
-  phase: RoadmapPhase;
-  position: [number, number, number];
-  onClick: () => void;
-}
+]
 
 const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) => {
-  const mesh = useRef<Mesh>(null)
+  const mesh = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
 
   useFrame(() => {
     if (mesh.current) {
-      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+      mesh.current.rotation.x += 0.005
+      mesh.current.rotation.y += 0.005
     }
   })
 
   return (
     <Box
-      args={[2.5, 2.5, 2.5]}
+      args={[2, 2, 2]}
       ref={mesh}
       position={position}
       scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
@@ -163,8 +183,8 @@ const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) =
     >
       <meshStandardMaterial color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} />
       <Text
-        position={[0, 0, 1.26]}
-        fontSize={0.8}
+        position={[0, 0, 1.01]}
+        fontSize={0.5}
         color="#FFFFFF"
         anchorX="center"
         anchorY="middle"
@@ -175,15 +195,11 @@ const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) =
   )
 }
 
-interface RoadmapSceneProps {
-  setSelectedPhase: (phase: RoadmapPhase) => void;
-}
-
 const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
   const { camera } = useThree()
 
   useEffect(() => {
-    camera.position.set(0, 5, 25)
+    camera.position.set(0, 10, 30)
   }, [camera])
 
   return (
@@ -195,7 +211,7 @@ const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
         <RoadmapCube
           key={phase.phase}
           phase={phase}
-          position={[(index % 4 - 1.5) * 4, -Math.floor(index / 4) * 4 + 4, 0]}
+          position={[(index % 4 - 1.5) * 5, -Math.floor(index / 4) * 5 + 8, 0]}
           onClick={() => setSelectedPhase(phase)}
         />
       ))}
@@ -203,17 +219,13 @@ const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
   )
 }
 
-interface SimplifiedProgressBarProps {
-  progress: number;
-}
-
 const SimplifiedProgressBar: React.FC<SimplifiedProgressBarProps> = ({ progress }) => {
-  const completedPhases = Math.floor((progress / 100) * 12)
+  const completedPhases = Math.floor((progress / 100) * roadmapData.length)
 
   return (
-    <div className="relative w-full h-2 bg-gray-700 rounded-full mb-12">
+    <div className="relative h-8 mb-12 bg-gray-200 rounded-full overflow-hidden">
       <motion.div
-        className="absolute top-0 left-0 h-full bg-orange-500 rounded-full"
+        className="h-full bg-gradient-to-r from-orange-500 to-red-500"
         initial={{ width: 0 }}
         animate={{ width: `${progress}%` }}
         transition={{ duration: 1, ease: "easeOut" }}
@@ -238,7 +250,9 @@ export default function Roadmap() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [progress, setProgress] = useState(66.67) // 8 out of 12 phases completed
+  const [progress, setProgress] = useState(66.67) // 8 out of 12 phases completed (8/12 * 100)
+  const { scrollY } = useScroll()
+  const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
   const handlePhaseClick = (phase: RoadmapPhase) => {
     setSelectedPhase(phase)
@@ -246,94 +260,147 @@ export default function Roadmap() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="backdrop-blur-md bg-black bg-opacity-50 min-h-screen">
-        {/* Main Content */}
-        <main className="container mx-auto px-4 py-12">
-          <h1 className="text-5xl font-bold mb-6 text-center">$SOBA Roadmap</h1>
-          <p className="text-xl text-center mb-12 max-w-3xl mx-auto">
-            Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
-          </p>
-          
-          <SimplifiedProgressBar progress={progress} />
-
-          <div className="h-[800px] mb-12 overflow-hidden">
-            <Canvas>
-              <RoadmapScene setSelectedPhase={handlePhaseClick} />
-            </Canvas>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {roadmapData.map((phase) => (
-              <motion.div
-                key={phase.phase}
-                className={`p-6 rounded-lg shadow-lg cursor-pointer
-                  ${phase.status === 'Completed' 
-                    ? 'bg-gradient-to-br from-orange-600 to-red-700' 
-                    : 'bg-gray-800'}`}
-                onClick={() => handlePhaseClick(phase)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <div className="flex items-center mb-4">
-                  <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
-                  <h3 className="text-xl font-bold">{phase.title}</h3>
-                </div>
-                <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
-                <p className="text-base">{phase.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* CTA Section */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Ready to Join the $SOBA Revolution?</h2>
-            <p className="text-xl mb-8">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
-            <div className="flex justify-center gap-4">
-              <Button 
-                asChild
-                className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white font-bold text-lg px-8 py-4 rounded-full transition-colors duration-300 flex items-center gap-2"
-              >
-                <Link href="#dex-section">
-                  Buy $SOBA Now
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline" 
-                className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white text-lg px-8 py-4 rounded-full"
-              >
-                <Link href={NAV_LINKS.COMMUNITY}>Join Our Community</Link>
-              </Button>
+    <div className="min-h-screen gradient-dark text-white">
+      <Header />
+      
+      <main>
+        <section className="min-h-[70vh] pt-16 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
+          <motion.div 
+            className="absolute inset-0 z-[1]"
+            style={{ y: heroY }}
+          >
+            <div className="relative w-full h-full">
+              <Image
+                src="/roadmapbg.png"
+                alt="Roadmap background"
+                fill
+                priority
+                className="object-cover object-center opacity-70 transition-opacity duration-700"
+                quality={100}
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/90 transition-all duration-700" />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Phase Details Dialog */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="bg-gray-900 text-white border-orange-500">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-orange-400">{selectedPhase?.title}</DialogTitle>
-                <DialogDescription>
-                  <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
-                  <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
-                  <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
-                  <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
-                  <p className="text-gray-300">{selectedPhase?.details}</p>
-                </DialogDescription>
-              </DialogHeader>
-              <Button onClick={() => setIsDialogOpen(false)} className="bg-orange-500 hover:bg-orange-600 text-white">Close</Button>
-            </DialogContent>
-          </Dialog>
-        </main>
-
-        {/* Social Links */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center">
-            <SocialLinks className="gap-6" />
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <motion.div
+              variants={fadeInUpVariant}
+              initial="hidden"
+              animate="visible"
+              className="max-w-4xl mx-auto space-y-6"
+            >
+              <h1 className="text-5xl font-bold mb-6 text-center gradient-text">$SOBA Roadmap</h1>
+              <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
+                Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
+              </p>
+              <div className="flex justify-center gap-4">
+                <ButtonBase
+                  size="lg"
+                  className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    View Progress
+                    <ArrowRight className="w-5 h-5" />
+                  </span>
+                </ButtonBase>
+                <ButtonBase
+                  size="lg"
+                  variant="outline"
+                  className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
+                >
+                  Learn More
+                </ButtonBase>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </div>
+        </section>
+
+        <section className="min-h-screen relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
+          
+          {/* Roadmap Content */}
+          <div className="container mx-auto px-4 py-12 relative z-10">
+            {/* Simplified Progress Bar */}
+            <SimplifiedProgressBar progress={progress} />
+
+            <div className="h-[800px] mb-12 overflow-hidden card-base">
+              <Canvas>
+                <RoadmapScene setSelectedPhase={handlePhaseClick} />
+              </Canvas>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {roadmapData.map((phase) => (
+                <motion.div
+                  key={phase.phase}
+                  className={`card-base p-6 cursor-pointer
+                    ${phase.status === 'Completed' 
+                      ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
+                      : 'bg-black/40 hover:bg-black/50'}`}
+                  onClick={() => handlePhaseClick(phase)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center mb-4">
+                    <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
+                    <h3 className="text-xl font-bold">{phase.title}</h3>
+                  </div>
+                  <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
+                  <p className="text-base text-gray-300">{phase.description}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTA Section */}
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold mb-4 gradient-text">Ready to Join the $SOBA Revolution?</h2>
+              <p className="text-xl mb-8 text-gray-300">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
+              <div className="flex justify-center gap-4">
+                <ButtonBase
+                  size="lg"
+                  className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    Buy $SOBA Now
+                    <ArrowRight className="w-5 h-5" />
+                  </span>
+                </ButtonBase>
+                <ButtonBase
+                  size="lg"
+                  variant="outline"
+                  className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
+                >
+                  Join Our Community
+                </ButtonBase>
+              </div>
+            </div>
+
+            {/* Phase Details Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent className="bg-black/95 text-white border-orange-500">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold gradient-text">{selectedPhase?.title}</DialogTitle>
+                  <DialogDescription>
+                    <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
+                    <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
+                    <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
+                    <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
+                    <p className="text-gray-300">{selectedPhase?.details}</p>
+                  </DialogDescription>
+                </DialogHeader>
+                <ButtonBase onClick={() => setIsDialogOpen(false)} className="bg-orange-500 hover:bg-orange-600 text-white">
+                  Close
+                </ButtonBase>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </section>
+      </main>
+
+      <div className="h-32 bg-gradient-to-b from-transparent via-neutral-900/50 to-neutral-900 transition-all duration-700" />
+      <Footer />
     </div>
   )
 }
