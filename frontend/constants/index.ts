@@ -285,7 +285,24 @@ export const BURN_INFO = {
   TOTAL_BURNED: 2923939.833,
   BURN_WALLET: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
   BURN_WALLET_ADDRESS: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
-  BURN_RATE: 2, // 2% per transaction
+  BURN_RATE: 2,
+  BURN_HISTORY: [
+    {
+      date: "2024-02-01T00:00:00Z",
+      amount: 1000000,
+      txHash: "xxxxx"
+    },
+    {
+      date: "2024-01-15T00:00:00Z",
+      amount: 923939.833,
+      txHash: "xxxxx"
+    },
+    {
+      date: "2024-01-01T00:00:00Z",
+      amount: 1000000,
+      txHash: "xxxxx"
+    }
+  ],
   NEXT_BURN: {
     TARGET_DATE: "2024-12-25T00:00:00Z",
     ESTIMATED_AMOUNT: 1000000,
@@ -296,7 +313,7 @@ export const BURN_INFO = {
   },
   DISPLAY: {
     DISPLAY_DECIMALS: 3,
-    UPDATE_INTERVAL: 30000 // 30 seconds
+    UPDATE_INTERVAL: 30000
   }
 } as const
 
