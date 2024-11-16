@@ -111,10 +111,11 @@ export const TRACKING_LINKS = {
 export const TOKEN_INFO = {
   TOTAL_SUPPLY: 1000000000,
   CIRCULATING_SUPPLY: 750000000,
+  BURNED_TOKENS: BURN_INFO.TOTAL_BURNED,
   DECIMALS: 9,
   SYMBOL: 'SOBA',
   NAME: 'SOBA Token',
-  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 } as const;
 
 // Assets and Dimensions
@@ -360,114 +361,60 @@ export const BURN_SECTIONS = {
 
 export const TOKENOMICS_CONTENT = {
   HERO: {
-    TITLE: "$SOBA Tokenomics",
-    SUBTITLE: "Discover the economic model behind $SOBA, designed for fairness, transparency, and community empowerment.",
-    BACKGROUND_GRADIENT: "bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]"
+    TITLE: "SOBA Tokenomics",
+    SUBTITLE: "Understanding the distribution and utility of $SOBA tokens"
   },
   DISTRIBUTION: {
     TITLE: "Token Distribution",
-    SUBTITLE: "Current distribution of $SOBA tokens",
+    SUBTITLE: "How $SOBA tokens are allocated across different purposes",
     CHART_DATA: [
-      { 
-        name: 'Circulating Supply', 
-        value: TOKEN_INFO.CIRCULATING_SUPPLY, 
-        color: '#FF6B00',
-        percentage: 99.68
+      {
+        name: 'Circulating Supply',
+        value: TOKEN_INFO.CIRCULATING_SUPPLY,
+        color: '#FF4500',
+        percentage: 75
       },
-      { 
-        name: 'Burned Tokens', 
-        value: TOKEN_INFO.BURNED_TOKENS, 
+      {
+        name: 'Burned Tokens',
+        value: TOKEN_INFO.BURNED_TOKENS,
         color: '#FF8C00',
-        percentage: 0.32
+        percentage: 2.92
+      },
+      {
+        name: 'Reserved for Development',
+        value: TOKEN_INFO.TOTAL_SUPPLY * 0.15,
+        color: '#FFA500',
+        percentage: 15
+      },
+      {
+        name: 'Team Allocation',
+        value: TOKEN_INFO.TOTAL_SUPPLY * 0.07,
+        color: '#FFD700',
+        percentage: 7
       }
     ]
   },
   METRICS: {
     TITLE: "Key Metrics",
-    SUBTITLE: "Essential statistics about $SOBA token",
+    SUBTITLE: "Important statistics about $SOBA token",
     ITEMS: {
       TOTAL_SUPPLY: {
-        TITLE: "Total Supply",
         VALUE: TOKEN_INFO.TOTAL_SUPPLY,
-        DESCRIPTION: "The original total supply of $SOBA tokens at launch",
-        DISPLAY_TYPE: "number" as const
+        LABEL: "Total Supply",
+        DESCRIPTION: "Maximum number of $SOBA tokens that will ever exist",
+        ICON: "Zap"
       },
-      CIRCULATING: {
-        TITLE: "Circulating Supply",
+      CIRCULATING_SUPPLY: {
         VALUE: TOKEN_INFO.CIRCULATING_SUPPLY,
-        DESCRIPTION: "Current $SOBA tokens in circulation",
-        DISPLAY_TYPE: "number" as const
-      },
-      BURNED: {
-        TITLE: "Burned Supply",
-        VALUE: TOKEN_INFO.BURNED_TOKENS,
-        DESCRIPTION: "Tokens permanently removed from circulation",
-        DISPLAY_TYPE: "number" as const
-      },
-      PRICE: {
-        TITLE: "Current Price",
-        VALUE: TOKEN_INFO.PRICE,
-        DESCRIPTION: "Live $SOBA token price in USD",
-        DISPLAY_TYPE: "price" as const
-      },
-      HOLDERS: {
-        TITLE: "Total Holders",
-        VALUE: TOKEN_INFO.HOLDERS,
-        DESCRIPTION: "Unique wallet addresses holding $SOBA",
-        DISPLAY_TYPE: "number" as const
-      }
-    }
-  },
-  FEATURES: [
-    {
-      TITLE: "Fair Launch",
-      DESCRIPTION: "Sol Bastard ($SOBA) had a fair launch on Pump.fun, ensuring that everyone had an equal opportunity to invest from the start. This approach aligns with our commitment to fairness and community empowerment.",
-      ICON: "Flame",
-      SHORT_DESC: "Equal opportunity for all participants",
-      GRADIENT: "from-orange-500 to-orange-600"
-    },
-    {
-      TITLE: "Community-Driven",
-      DESCRIPTION: "The $SOBA community is at the heart of our project. We actively engage with our community through various social media platforms and involve them in key decisions, fostering a sense of ownership and shared success.",
-      ICON: "Users",
-      SHORT_DESC: "Active engagement and decision-making",
-      GRADIENT: "from-orange-500 to-orange-600"
-    },
-    {
-      TITLE: "Deflationary Model",
-      DESCRIPTION: "Our token burning mechanism regularly reduces the total supply of $SOBA, creating a deflationary effect. This approach aims to increase the scarcity and potential value of $SOBA over time.",
-      ICON: "Zap",
-      SHORT_DESC: "Regular token burns to reduce supply",
-      GRADIENT: "from-orange-500 to-orange-600"
-    },
-    {
-      TITLE: "Liquidity Security",
-      DESCRIPTION: "All liquidity for $SOBA has been permanently burned. This action enhances the token's stability and builds trust within our community by preventing rug pulls and ensuring long-term viability.",
-      ICON: "Lock",
-      SHORT_DESC: "All liquidity permanently burned",
-      GRADIENT: "from-orange-500 to-orange-600"
-    },
-    {
-      TITLE: "Transparency",
-      DESCRIPTION: "We believe in full transparency. The initial developer allocation has been completely redistributed, demonstrating our commitment to a fair and community-driven project. Our current holdings are a result of active participation and project growth.",
-      ICON: "Eye",
-      SHORT_DESC: "Open communication and fair practices",
-      GRADIENT: "from-orange-500 to-orange-600"
-    }
-  ],
-  CTA: {
-    TITLE: "Ready to Join the $SOBA Revolution?",
-    SUBTITLE: "Be part of our community-driven journey and experience the future of memecoins.",
-    BUTTONS: {
-      PRIMARY: {
-        TEXT: "Buy $SOBA Now",
-        HREF: "#",
-        ICON: "ArrowRight"
-      },
-      SECONDARY: {
-        TEXT: "Join Our Community",
-        HREF: "#",
+        LABEL: "Circulating Supply",
+        DESCRIPTION: "Number of $SOBA tokens currently in circulation",
         ICON: "Users"
+      },
+      BURNED_TOKENS: {
+        VALUE: TOKEN_INFO.BURNED_TOKENS,
+        LABEL: "Burned Tokens",
+        DESCRIPTION: "Total number of $SOBA tokens permanently removed from circulation",
+        ICON: "Flame"
       }
     }
   }
