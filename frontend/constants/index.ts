@@ -1,3 +1,51 @@
+// Burn Information
+export const BURN_INFO = {
+  TOTAL_BURNED: 2923939.833,
+  BURN_WALLET: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
+  BURN_WALLET_ADDRESS: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
+  BURN_RATE: 2,
+  BURN_HISTORY: [
+    {
+      date: "2024-02-01T00:00:00Z",
+      amount: 1000000,
+      txHash: "xxxxx"
+    },
+    {
+      date: "2024-01-15T00:00:00Z",
+      amount: 923939.833,
+      txHash: "xxxxx"
+    },
+    {
+      date: "2024-01-01T00:00:00Z",
+      amount: 1000000,
+      txHash: "xxxxx"
+    }
+  ],
+  NEXT_BURN: {
+    TARGET_DATE: "2024-12-25T00:00:00Z",
+    ESTIMATED_AMOUNT: 1000000,
+    DESCRIPTION: "December Mega Burn Event",
+    EVENT_NAME: "December Mega Burn",
+    CURRENT_USD_VALUE: 55459.80,
+    LAST_BURN_DATE: "2024-11-25T00:00:00Z"
+  },
+  DISPLAY: {
+    DISPLAY_DECIMALS: 3,
+    UPDATE_INTERVAL: 30000
+  }
+} as const;
+
+// Token Information
+export const TOKEN_INFO = {
+  TOTAL_SUPPLY: 1000000000,
+  CIRCULATING_SUPPLY: 750000000,
+  BURNED_TOKENS: BURN_INFO.TOTAL_BURNED,
+  DECIMALS: 9,
+  SYMBOL: 'SOBA',
+  NAME: 'SOBA Token',
+  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+} as const;
+
 // Contract Information
 export const CONTRACT_ADDRESS = "25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH"
 
@@ -106,17 +154,6 @@ export const TRACKING_LINKS = {
   COINPAPRIKA: 'https://coinpaprika.com/coin/soba-sol-bastard/',
   COINRANKING: 'https://coinranking.com/coin/sol-bastard'
 } as const
-
-// Token Information
-export const TOKEN_INFO = {
-  TOTAL_SUPPLY: 1000000000,
-  CIRCULATING_SUPPLY: 750000000,
-  BURNED_TOKENS: BURN_INFO.TOTAL_BURNED,
-  DECIMALS: 9,
-  SYMBOL: 'SOBA',
-  NAME: 'SOBA Token',
-  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-} as const;
 
 // Assets and Dimensions
 export const ASSETS = {
@@ -279,44 +316,6 @@ export const SOCIAL_FEED_DATA = {
     }
   ]
 } as const
-
-// Burn Information
-export const BURN_INFO = {
-  TOTAL_BURNED: 2923939.833,
-  BURN_WALLET: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
-  BURN_WALLET_ADDRESS: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
-  BURN_RATE: 2,
-  BURN_HISTORY: [
-    {
-      date: "2024-02-01T00:00:00Z",
-      amount: 1000000,
-      txHash: "xxxxx"
-    },
-    {
-      date: "2024-01-15T00:00:00Z",
-      amount: 923939.833,
-      txHash: "xxxxx"
-    },
-    {
-      date: "2024-01-01T00:00:00Z",
-      amount: 1000000,
-      txHash: "xxxxx"
-    }
-  ],
-  NEXT_BURN: {
-    TARGET_DATE: "2024-12-25T00:00:00Z",
-    ESTIMATED_AMOUNT: 1000000,
-    DESCRIPTION: "December Mega Burn Event",
-    EVENT_NAME: "December Mega Burn",
-    CURRENT_USD_VALUE: 55459.80,
-    LAST_BURN_DATE: "2024-11-25T00:00:00Z"
-  },
-  DISPLAY: {
-    DISPLAY_DECIMALS: 3,
-    UPDATE_INTERVAL: 30000
-  }
-} as const
-
 
 // Burn Page Sections
 export const BURN_SECTIONS = {
