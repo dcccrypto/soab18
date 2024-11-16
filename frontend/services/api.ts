@@ -9,6 +9,18 @@ const api = axios.create({
   }
 });
 
+export const tokenService = {
+  async getBurnHistory() {
+    try {
+      const response = await api.get('/api/burn-history');
+      return response.data;
+    } catch (error) {
+      console.error('[API Error] Failed to fetch burn history:', error);
+      throw error;
+    }
+  }
+};
+
 export const fetchTokenStats = async () => {
   try {
     const response = await api.get('/api/token-stats');

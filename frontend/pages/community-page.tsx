@@ -20,6 +20,34 @@ import {
   SOCIAL_FEED_DATA,
   ICON_SIZES
 } from '@/constants'
+import dynamic from 'next/dynamic'
+import { ClientOnly } from '@/components/client-only'
+
+// Dynamic imports for Dialog components
+const DynamicDialog = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.Dialog),
+  { ssr: false }
+)
+
+const DynamicDialogContent = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogContent),
+  { ssr: false }
+)
+
+const DynamicDialogHeader = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogHeader),
+  { ssr: false }
+)
+
+const DynamicDialogTitle = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogTitle),
+  { ssr: false }
+)
+
+const DynamicDialogDescription = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogDescription),
+  { ssr: false }
+)
 
 // Add animation variants
 const fadeInUpVariant = {
@@ -490,21 +518,23 @@ export default function CommunityPage() {
           </div>
         </ScrollAnimatedSection>
 
-        <Dialog open={isProposalsOpen} onOpenChange={setIsProposalsOpen}>
-          <DialogContent className="sm:max-w-[600px] bg-[#111] border border-orange-500/20">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-orange-500">Active Proposals</DialogTitle>
-              <DialogDescription className="text-orange-300">
-                Review and vote on current community proposals
-              </DialogDescription>
-            </DialogHeader>
-            <ScrollArea className="max-h-[60vh] mt-4">
-              <div className="space-y-4 pr-4">
-                {activeProposals.map(renderProposalCard)}
-              </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+        <ClientOnly>
+          <DynamicDialog open={isProposalsOpen} onOpenChange={setIsProposalsOpen}>
+            <DynamicDialogContent className="sm:max-w-[600px] bg-[#111] border border-orange-500/20">
+              <DynamicDialogHeader>
+                <DynamicDialogTitle className="text-2xl font-bold text-orange-500">Active Proposals</DynamicDialogTitle>
+                <DynamicDialogDescription className="text-orange-300">
+                  Review and vote on current community proposals
+                </DynamicDialogDescription>
+              </DynamicDialogHeader>
+              <ScrollArea className="max-h-[60vh] mt-4">
+                <div className="space-y-4 pr-4">
+                  {activeProposals.map(renderProposalCard)}
+                </div>
+              </ScrollArea>
+            </DynamicDialogContent>
+          </DynamicDialog>
+        </ClientOnly>
       </main>
     </div>
   )

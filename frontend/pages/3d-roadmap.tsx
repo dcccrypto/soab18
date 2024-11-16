@@ -1,20 +1,21 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { ClientOnly } from '@/components/client-only'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Rocket, Users, Megaphone, LineChart, Building, Handshake, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
+import { Rocket, Users, Megaphone, LineChart, Building, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Text, Box, OrbitControls } from '@react-three/drei'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { ButtonBase } from '@/components/ui/button-base'
+import { useScroll, useTransform } from 'framer-motion'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants'
-import { ButtonBase } from '@/components/ui/button-base'
-import { useScroll, useTransform } from 'framer-motion'
 
 interface RoadmapPhase {
   phase: number
@@ -97,7 +98,7 @@ const roadmapData: RoadmapPhase[] = [
   },
   {
     phase: 6,
-    icon: Handshake,
+    icon: Users,
     title: "Strategic Partnerships",
     status: "Completed",
     description: "Collaborations with other projects and influencers",
@@ -246,6 +247,32 @@ const SimplifiedProgressBar: React.FC<SimplifiedProgressBarProps> = ({ progress 
   )
 }
 
+// Dynamic imports for Dialog components
+const DynamicDialog = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.Dialog),
+  { ssr: false }
+)
+
+const DynamicDialogContent = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogContent),
+  { ssr: false }
+)
+
+const DynamicDialogHeader = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogHeader),
+  { ssr: false }
+)
+
+const DynamicDialogTitle = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogTitle),
+  { ssr: false }
+)
+
+const DynamicDialogDescription = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogDescription),
+  { ssr: false }
+)
+
 export default function Roadmap() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
@@ -378,23 +405,30 @@ export default function Roadmap() {
             </div>
 
             {/* Phase Details Dialog */}
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogContent className="bg-black/95 text-white border-orange-500">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold gradient-text">{selectedPhase?.title}</DialogTitle>
-                  <DialogDescription>
-                    <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
-                    <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
-                    <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
-                    <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
-                    <p className="text-gray-300">{selectedPhase?.details}</p>
-                  </DialogDescription>
-                </DialogHeader>
-                <ButtonBase onClick={() => setIsDialogOpen(false)} className="bg-orange-500 hover:bg-orange-600 text-white">
-                  Close
-                </ButtonBase>
-              </DialogContent>
-            </Dialog>
+            <ClientOnly>
+              <DynamicDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DynamicDialogContent className="bg-black/95 text-white border-orange-500">
+                  <DynamicDialogHeader>
+                    <DynamicDialogTitle className="text-2xl font-bold gradient-text">
+                      {selectedPhase?.title}
+                    </DynamicDialogTitle>
+                    <DynamicDialogDescription>
+                      <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
+                      <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
+                      <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
+                      <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
+                      <p className="text-gray-300">{selectedPhase?.details}</p>
+                    </DynamicDialogDescription>
+                  </DynamicDialogHeader>
+                  <ButtonBase 
+                    onClick={() => setIsDialogOpen(false)} 
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                  >
+                    Close
+                  </ButtonBase>
+                </DynamicDialogContent>
+              </DynamicDialog>
+            </ClientOnly>
           </div>
         </section>
       </main>

@@ -4,53 +4,68 @@ import { tokenService } from '@/services/api';
 import { ExternalLink } from 'lucide-react';
 
 interface BurnTransaction {
-  txHash: string;
-  timestamp: number;
+  timestamp: string;
   amount: number;
-  sender: string;
+  txHash: string;
 }
 
 export const BurnHistory = () => {
   const [burnHistory, setBurnHistory] = useState<BurnTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBurnHistory = async () => {
       try {
-        const history = await tokenService.getBurnHistory('25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH8');
+        setLoading(true);
+        const history = await tokenService.getBurnHistory();
         setBurnHistory(history);
       } catch (error) {
         console.error('Error fetching burn history:', error);
+        setError('Failed to load burn history');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchBurnHistory();
   }, []);
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+      <div className="flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 p-4 text-center">
+        {error}
       </div>
     );
   }
 
   return (
-    <motion.div 
-      className="bg-gray-900 rounded-lg overflow-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="overflow-x-auto"
     >
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-800">
+      <div className="inline-block min-w-full align-middle">
+        <table className="min-w-full divide-y divide-gray-800">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-orange-400">Date</th>
-              <th className="px-6 py-3 text-left text-orange-400">Amount</th>
-              <th className="px-6 py-3 text-left text-orange-400">Transaction</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Transaction
+              </th>
             </tr>
           </thead>
           <tbody>

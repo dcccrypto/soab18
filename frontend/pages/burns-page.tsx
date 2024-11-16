@@ -1,5 +1,7 @@
-'use client'
+"use client"
 
+import dynamic from 'next/dynamic'
+import { ClientOnly } from '@/components/client-only'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Flame, Copy, ExternalLink, TrendingUp, Clock, ArrowUpRight } from 'lucide-react'
@@ -35,6 +37,17 @@ const fadeInUpVariant = {
     }
   }
 } as const
+
+const TooltipProviderComponent = dynamic(
+  () => import('@/components/ui/tooltip').then(mod => ({
+    default: ({ children, ...props }: any) => (
+      <ClientOnly>
+        <mod.TooltipProvider {...props}>{children}</mod.TooltipProvider>
+      </ClientOnly>
+    )
+  })),
+  { ssr: false }
+)
 
 export default function BurnsPage() {
   const { burnedTokens, burnRate, burnedValue, nextBurnDate } = useBurnStats()
@@ -311,7 +324,7 @@ export default function BurnsPage() {
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
                     <code className="text-orange-400 flex-1 font-mono">{BURN_INFO.BURN_WALLET_ADDRESS}</code>
-                    <TooltipProvider>
+                    <TooltipProviderComponent>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -327,7 +340,7 @@ export default function BurnsPage() {
                           <p>Copy to clipboard</p>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
+                    </TooltipProviderComponent>
                   </div>
                   <div className="space-y-4">
                     {BURN_SECTIONS.CONTRIBUTE.STEPS.map((step, index) => (

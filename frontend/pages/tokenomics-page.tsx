@@ -1,12 +1,14 @@
 "use client"
 
+import dynamic from 'next/dynamic'
+import { ClientOnly } from '@/components/client-only'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { Flame, Users, Zap, Lock, ArrowRight, Info, Eye } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Header } from '@/components/Header'
 import { TOKENOMICS_CONTENT } from '@/constants'
 import { ButtonBase } from '@/components/ui/button-base'
@@ -27,6 +29,32 @@ const fadeInUpVariant = {
 // Add these type definitions
 type MetricKey = keyof typeof TOKENOMICS_CONTENT.METRICS.ITEMS
 type ChartData = typeof TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA
+
+// Update the dynamic import to handle Dialog components properly
+const DynamicDialog = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.Dialog),
+  { ssr: false }
+)
+
+const DynamicDialogContent = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogContent),
+  { ssr: false }
+)
+
+const DynamicDialogHeader = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogHeader),
+  { ssr: false }
+)
+
+const DynamicDialogTitle = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogTitle),
+  { ssr: false }
+)
+
+const DynamicDialogDescription = dynamic(
+  () => import('@/components/ui/dialog').then(mod => mod.DialogDescription),
+  { ssr: false }
+)
 
 export default function TokenomicsPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
@@ -292,20 +320,27 @@ export default function TokenomicsPage() {
         </ScrollAnimatedSection>
       </main>
 
-      {/* Dialog for Tokenomics Features */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#111] text-white border-orange-500">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-orange-400">{dialogContent.title}</DialogTitle>
-            <DialogDescription>
-              <p className="text-gray-300">{dialogContent.description}</p>
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => setIsDialogOpen(false)} className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white">
-            Close
-          </Button>
-        </DialogContent>
-      </Dialog>
+      {/* Update Dialog implementation */}
+      <ClientOnly>
+        <DynamicDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DynamicDialogContent className="bg-[#111] text-white border-orange-500">
+            <DynamicDialogHeader>
+              <DynamicDialogTitle className="text-2xl font-bold text-orange-400">
+                {dialogContent.title}
+              </DynamicDialogTitle>
+              <DynamicDialogDescription>
+                <p className="text-gray-300">{dialogContent.description}</p>
+              </DynamicDialogDescription>
+            </DynamicDialogHeader>
+            <Button 
+              onClick={() => setIsDialogOpen(false)} 
+              className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
+            >
+              Close
+            </Button>
+          </DynamicDialogContent>
+        </DynamicDialog>
+      </ClientOnly>
     </div>
   )
 }
