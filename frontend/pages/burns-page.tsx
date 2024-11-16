@@ -15,11 +15,13 @@ import { formatNumber, formatDate } from '@/lib/utils'
 import { useBurnStats } from '@/hooks/useBurnStats'
 import Image from 'next/image'
 import { Header } from '@/components/Header'
+import useSWR from 'swr'
+import fetcher from '@/lib/fetcher'
 
 const SOBA_QUOTES = [
   "Time to make SOBA more scarce! 🔥",
   "Every burn makes SOBA stronger! 💪",
-  "Join the burn revolution! 🚀",
+  "Join the burn revolution! ",
   "SOBA getting rarer by the minute! ⏰",
   "Less SOBA = More Value! 📈",
   "December Mega Burn incoming! 🔥",
@@ -50,6 +52,24 @@ const TooltipProviderComponent = dynamic(
 )
 
 export default function BurnsPage() {
+  const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
+    refreshInterval: 30000
+  })
+
+  // Add loading state
+  if (!tokenStats) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <Flame className="w-8 h-8 text-orange-500" />
+        </motion.div>
+      </div>
+    )
+  }
+
   const { burnedTokens, burnRate, burnedValue, nextBurnDate } = useBurnStats()
   const [timeUntilNextBurn, setTimeUntilNextBurn] = useState('')
   const [showQuote, setShowQuote] = useState(false)
@@ -157,6 +177,18 @@ export default function BurnsPage() {
     return Math.min(Math.max((elapsedDuration / totalDuration) * 100, 0), 100)
   }
 
+  // Add animated number display
+  const AnimatedNumber = ({ value }: { value: number }) => (
+    <motion.span
+      key={value}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="inline-block"
+    >
+      {formatNumber(value)}
+    </motion.span>
+  )
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <Header />
@@ -257,7 +289,8 @@ export default function BurnsPage() {
                         <p className="text-sm text-gray-400 mb-1">Tokens Collected</p>
                         <div className="flex items-end gap-2">
                           <p className="text-xl font-bold text-orange-500">
-                            {formatNumber(BURN_INFO.NEXT_BURN.CURRENT_COLLECTED)} SOBA
+                            <AnimatedNumber value={tokenStats.burnedTokens} />
+                            <span className="ml-2">SOBA</span>
                           </p>
                         </div>
                       </div>
@@ -323,7 +356,7 @@ export default function BurnsPage() {
               <CardContent>
                 <div className="space-y-6">
                   <div className="flex items-center gap-4 p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                    <code className="text-orange-400 flex-1 font-mono">{BURN_INFO.BURN_WALLET_ADDRESS}</code>
+                    <code className="text-orange-400 flex-1 font-mono">{BURN_INFO.BURN_WALLET}</code>
                     <TooltipProviderComponent>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -331,7 +364,7 @@ export default function BurnsPage() {
                             variant="ghost"
                             size="icon"
                             className="hover:bg-orange-500/20"
-                            onClick={() => navigator.clipboard.writeText(BURN_INFO.BURN_WALLET_ADDRESS)}
+                            onClick={() => navigator.clipboard.writeText(BURN_INFO.BURN_WALLET)}
                           >
                             <Copy className="w-4 h-4" />
                           </Button>

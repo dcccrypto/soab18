@@ -15,6 +15,9 @@ import { ButtonBase } from '@/components/ui/button-base'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { type MetricItems } from '@/types'
 import Image from 'next/image'
+import useSWR from 'swr'
+import fetcher from '@/lib/fetcher'
+import { AnimatedValue } from '@/components/AnimatedValue'
 
 // Animation variants
 const fadeInUpVariant = {
@@ -83,6 +86,10 @@ export default function TokenomicsPage() {
   // Add this for parallax effect
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
+
+  const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
+    refreshInterval: 30000
+  })
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -229,7 +236,11 @@ export default function TokenomicsPage() {
                     <CardContent>
                       <div className="space-y-2">
                         <div className="text-3xl font-bold text-orange-400">
-                          {value.DISPLAY_TYPE === 'percent' ? formatPercent(value.VALUE) : formatNumber(value.VALUE)}
+                          <AnimatedValue 
+                            value={tokenStats ? formatNumber(value.VALUE) : '...'}
+                            prefix={value.DISPLAY_TYPE === 'price' ? '$' : ''}
+                            suffix={value.DISPLAY_TYPE === 'price' ? '' : ''}
+                          />
                         </div>
                         <div className="text-sm text-orange-300/80">
                           {value.DESCRIPTION}

@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'fra
 import { useTheme } from '@/hooks/useTheme'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { useBurnStats } from '@/hooks/useBurnStats'
+import useSWR from 'swr'
 import { 
   DEX_LINKS,
   CONTRACT_ADDRESS,
@@ -21,6 +22,7 @@ import { ContractAddress } from '@/components/ContractAddress'
 import { ButtonBase } from '@/components/ui/button-base'
 import { SubmitMemeModal } from '@/components/SubmitMemeModal'
 import { formatNumber } from '@/lib/utils'
+import fetcher from '@/lib/fetcher'
 
 interface DexLink {
   name: string
@@ -69,6 +71,22 @@ export default function LandingPage() {
   
   // Parallax effect for hero section
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
+
+  const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
+    refreshInterval: 30000 // Refresh every 30 seconds
+  })
+
+  // Add animated number display
+  const AnimatedNumber = ({ value }: { value: number }) => (
+    <motion.span
+      key={value}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="inline-block"
+    >
+      {formatNumber(value)}
+    </motion.span>
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -366,10 +384,11 @@ export default function LandingPage() {
                       <h3 className="text-lg font-semibold text-gray-300">Tokens Burned</h3>
                     </div>
                     <p className="text-3xl font-bold text-orange-400">
-                      {burnedTokens.toLocaleString(undefined, {
-                        minimumFractionDigits: BURN_DISPLAY.DISPLAY_DECIMALS,
-                        maximumFractionDigits: BURN_DISPLAY.DISPLAY_DECIMALS
-                      })} SOBA
+                      {tokenStats ? (
+                        <AnimatedNumber value={tokenStats.burnedTokens} />
+                      ) : (
+                        '...'
+                      )} SOBA
                     </p>
                   </motion.div>
 

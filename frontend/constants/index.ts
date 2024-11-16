@@ -109,10 +109,13 @@ export const TRACKING_LINKS = {
 
 // Token Information
 export const TOKEN_INFO = {
-  TOTAL_SUPPLY: '1,000,000,000',
-  CIRCULATING_SUPPLY: '925,220,331.49',
-  BURNED_TOKENS: '74,779,668.51',
-  FOUNDER_HOLDINGS: '41,080,000'
+  TOTAL_SUPPLY: 925219888.276,
+  CIRCULATING_SUPPLY: 922295948.443,
+  BURNED_TOKENS: 2923939.833,
+  FOUNDER_HOLDINGS: 0.32,
+  HOLDERS: 0,
+  PRICE: 0.00554598,
+  LAST_UPDATED: new Date().toISOString()
 } as const
 
 // Assets and Dimensions
@@ -279,79 +282,21 @@ export const SOCIAL_FEED_DATA = {
 
 // Burn Information
 export const BURN_INFO = {
-  BURN_WALLET_ADDRESS: "25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH8",
-  TOTAL_SUPPLY: 1000000000,
-  BURN_HISTORY: [
-    {
-      amount: 15970099.995509,
-      txHash: "4s4EyPN8SSicrbRx9mc3ECAjbZQU1azGtfGtXUao3kE3UW6LRdTvdwXwDamRLxNvGt2iGHX7SvbWt9kGuyNSNX9A",
-      date: "2024-10-30 04:25:21"
-    },
-    {
-      amount: 24008.065933,
-      txHash: "57juqgQWyesG2xtFcJdQo7tKMFDpmVgVzTBmM3wyoZDoaD1zAkapzYw9ZeMnHGfhWDeaVbFHk2YRqusFb6ZqyPTC",
-      date: "2024-10-28 14:05:59"
-    },
-    {
-      amount: 1.63421,
-      txHash: "2iz2sVAueNoY7rAZrZoKAqNEAUqwn9e9hx6B2DxAmm6xBskGPsGKg1pXXsmZcjFMEqUk8BBN8A8DoYS8ef9uBRyh",
-      date: "2024-10-28 14:05:12"
-    },
-    {
-      amount: 75000,
-      txHash: "3kimGxAZGZh6Gg6pwFPXrrWx3mqqzVvSud8zxQanBCzAUnX9aU6SiHC11JQQogwd86nXkYuVnVSDioHUPe8uaxQB",
-      date: "2024-10-21 02:33:46"
-    },
-    {
-      amount: 25000,
-      txHash: "5AD5dBpojTQM6SsCsejeztu2zqEaKMQ3rqqGGPqmp4NRagxHR7VajKXALFGVqTFonXLckPvyw21BEyCkYYQauoMt",
-      date: "2024-10-21 02:21:23"
-    },
-    {
-      amount: 3283086.116599,
-      txHash: "3PLRtU2i3KLwA7FMPL1KuZozbFeNyyqkHJVznqNBpqKFNJ6A7iUDxWXjHL8hRxh7rycZUNxUFFAjfiego7oVF9HN",
-      date: "2024-10-01 14:57:06"
-    },
-    {
-      amount: 21423986.113573,
-      txHash: "5a5AztHHBSXYcsxoc17bKQhyJCytdimPmSaWVhrApG99xhJSWtVWExcvwKPp4XmWVbdQJDgY8VKhVZU6mEGeLUUu",
-      date: "2024-08-25 03:17:07"
-    },
-    {
-      amount: 82100.974142,
-      txHash: "cKR3Exm7P9WwrUyLHvD3yZFZrQm2zTKUzLFKpE41QKLwyiEzQwwsypzfb2vBcjEnPAdPhx3ymWbWnAVfz5zi2Yn",
-      date: "2024-08-24 14:37:28"
-    },
-    {
-      amount: 215000,
-      txHash: "apj6z65J7fuG5posHKDMGGpUSjLVbZW8yChBrAZR4Xg8kTjAoL3az5wdU6BanCDVsq7hqxjhP8nKpRJ4fRu2xJ9",
-      date: "2024-08-19 23:23:29"
-    },
-    {
-      amount: 60000,
-      txHash: "3J4xvx7XCEUBt8TUK6V3FnWjL4hDTrBc5VnJUYJ8RPe2bhcRMMkXqQzUxmUeZjZxrWyCRUFg8k5qVeCjEbiSX29p",
-      date: "2024-08-04 02:32:37"
-    },
-    {
-      amount: 22005000,
-      txHash: "2YJddGWGfJ6wmk5DjjB5jmLonZvB8GBLv4gzJA4QZEGM9TTj38r68AgvMEN9QWCiPcDV57JfoNv2CDjBcUEWo7yZ",
-      date: "2024-08-01 13:53:14"
-    }
-  ],
-  DISPLAY_OPTIONS: {
-    DECIMALS: 2,
-    DATE_FORMAT: "YYYY-MM-DD HH:mm:ss"
-  },
+  TOTAL_BURNED: 2923939.833,
+  BURN_WALLET: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
+  BURN_WALLET_ADDRESS: "BurnWa11etXXXXXXXXXXXXXXXXXXXXXXXX",
+  BURN_RATE: 2, // 2% per transaction
   NEXT_BURN: {
-    DATE: "2024-12-01",
-    ESTIMATED_TOKENS: "100M+",
-    CURRENT_COLLECTED: 74779668,
-    CURRENT_USD_VALUE: 747796.68,
-    BURN_FREQUENCY: "Yearly",
-    LAST_BURN_DATE: "2023-12-01",
-    TARGET_DATE: "2024-12-01",
-    EVENT_NAME: "December Mega Burn 2024",
-    DESCRIPTION: "Join the biggest burn event of the year! 🔥"
+    TARGET_DATE: "2024-12-25T00:00:00Z",
+    ESTIMATED_AMOUNT: 1000000,
+    DESCRIPTION: "December Mega Burn Event",
+    EVENT_NAME: "December Mega Burn",
+    CURRENT_USD_VALUE: 55459.80,
+    LAST_BURN_DATE: "2024-11-25T00:00:00Z"
+  },
+  DISPLAY: {
+    DISPLAY_DECIMALS: 3,
+    UPDATE_INTERVAL: 30000 // 30 seconds
   }
 } as const
 
@@ -407,9 +352,18 @@ export const TOKENOMICS_CONTENT = {
     TITLE: "Token Distribution",
     SUBTITLE: "Current distribution of $SOBA tokens",
     CHART_DATA: [
-      { name: 'Circulating Supply', value: 925220331.49, color: '#FF6B00' },
-      { name: 'Burned Tokens', value: 74779668.51, color: '#FF8C00' },
-      { name: 'Founder Holdings', value: 41080000, color: '#FFA500' }
+      { 
+        name: 'Circulating Supply', 
+        value: TOKEN_INFO.CIRCULATING_SUPPLY, 
+        color: '#FF6B00',
+        percentage: 99.68
+      },
+      { 
+        name: 'Burned Tokens', 
+        value: TOKEN_INFO.BURNED_TOKENS, 
+        color: '#FF8C00',
+        percentage: 0.32
+      }
     ]
   },
   METRICS: {
@@ -418,33 +372,33 @@ export const TOKENOMICS_CONTENT = {
     ITEMS: {
       TOTAL_SUPPLY: {
         TITLE: "Total Supply",
-        VALUE: 1_000_000_000,
+        VALUE: TOKEN_INFO.TOTAL_SUPPLY,
         DESCRIPTION: "The original total supply of $SOBA tokens at launch",
-        DISPLAY_TYPE: "number" // number or percent
+        DISPLAY_TYPE: "number" as const
       },
       CIRCULATING: {
         TITLE: "Circulating Supply",
-        VALUE: 925_220_331.49,
+        VALUE: TOKEN_INFO.CIRCULATING_SUPPLY,
         DESCRIPTION: "Current $SOBA tokens in circulation",
-        DISPLAY_TYPE: "number"
+        DISPLAY_TYPE: "number" as const
       },
       BURNED: {
         TITLE: "Burned Supply",
-        VALUE: 74_779_668.51,
+        VALUE: TOKEN_INFO.BURNED_TOKENS,
         DESCRIPTION: "Tokens permanently removed from circulation",
-        DISPLAY_TYPE: "number"
+        DISPLAY_TYPE: "number" as const
       },
-      FOUNDER: {
-        TITLE: "Founder Holdings",
-        VALUE: 41_080_000,
-        DESCRIPTION: "Tokens held by Crypto Bastard",
-        DISPLAY_TYPE: "percent"
+      PRICE: {
+        TITLE: "Current Price",
+        VALUE: TOKEN_INFO.PRICE,
+        DESCRIPTION: "Live $SOBA token price in USD",
+        DISPLAY_TYPE: "price" as const
       },
       HOLDERS: {
         TITLE: "Total Holders",
-        VALUE: 2_289,
+        VALUE: TOKEN_INFO.HOLDERS,
         DESCRIPTION: "Unique wallet addresses holding $SOBA",
-        DISPLAY_TYPE: "number"
+        DISPLAY_TYPE: "number" as const
       }
     }
   },
