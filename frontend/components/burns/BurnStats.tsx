@@ -1,30 +1,29 @@
-import { Card } from '@/components/ui/card'
+import { useBurnWallet } from '@/hooks/useBurnWallet'
+import { BURN_HISTORY, BURN_SECTIONS } from '@/constants/static'
 import { formatNumber } from '@/lib/utils'
-import { BURN_SECTIONS } from '@/constants'
-import { Flame, Clock } from 'lucide-react'
+import { Flame, DollarSign } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 
-interface BurnStatsProps {
-  totalBurned: number
-  timeUntilNextBurn: string
-  nextBurnDate: string
-}
+export const BurnStats = () => {
+  const { balance, usdValue, isLoading } = useBurnWallet()
+  
+  // Total burns is static history plus current wallet balance
+  const totalBurned = BURN_HISTORY.TOTAL_STATIC_BURNS + balance
 
-export const BurnStats = ({ totalBurned, timeUntilNextBurn, nextBurnDate }: BurnStatsProps) => {
   const stats = [
     {
       icon: Flame,
       title: BURN_SECTIONS.STATS.CARDS[0].title,
       description: BURN_SECTIONS.STATS.CARDS[0].description,
-      value: `${formatNumber(totalBurned)} SOBA`,
+      value: isLoading ? 'Loading...' : `${formatNumber(totalBurned)} SOBA`,
       color: "text-orange-500"
     },
     {
-      icon: Clock,
+      icon: DollarSign,
       title: BURN_SECTIONS.STATS.CARDS[1].title,
       description: BURN_SECTIONS.STATS.CARDS[1].description,
-      value: timeUntilNextBurn,
-      subValue: nextBurnDate,
-      color: "text-orange-500"
+      value: isLoading ? 'Loading...' : `$${formatNumber(usdValue)}`,
+      color: "text-green-500"
     }
   ]
 
@@ -38,10 +37,10 @@ export const BurnStats = ({ totalBurned, timeUntilNextBurn, nextBurnDate }: Burn
           <div className="p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-orange-500/10">
-                <stat.icon className="w-6 h-6 text-orange-500" />
+                <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-orange-500">
+                <h3 className={`text-lg font-semibold ${stat.color}`}>
                   {stat.title}
                 </h3>
                 <p className="text-sm text-gray-400">
@@ -53,11 +52,6 @@ export const BurnStats = ({ totalBurned, timeUntilNextBurn, nextBurnDate }: Burn
               <p className="text-2xl font-bold text-white">
                 {stat.value}
               </p>
-              {stat.subValue && (
-                <p className="text-sm text-gray-400 mt-1">
-                  {stat.subValue}
-                </p>
-              )}
             </div>
           </div>
         </Card>
