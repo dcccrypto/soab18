@@ -39,11 +39,12 @@ export const BURN_INFO = {
 export const TOKEN_INFO = {
   TOTAL_SUPPLY: 1000000000,
   CIRCULATING_SUPPLY: 750000000,
-  BURNED_TOKENS: BURN_INFO.TOTAL_BURNED,
+  BURNED_TOKENS: 2923939.833,
   DECIMALS: 9,
   SYMBOL: 'SOBA',
   NAME: 'SOBA Token',
-  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  FOUNDER_HOLDINGS: 40800000
 } as const;
 
 // Contract Information
