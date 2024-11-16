@@ -1,10 +1,16 @@
-import { TokenStatsDisplay } from '../components/TokenStats';
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import LandingPage from './landing-page'
 
 export default function Home() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">SOBA Token Stats</h1>
-      <TokenStatsDisplay />
-    </div>
-  );
+  const router = useRouter()
+
+  useEffect(() => {
+    // Redirect /index to /
+    if (router.pathname === '/index') {
+      router.replace('/')
+    }
+  }, [router])
+
+  return <LandingPage />
 } 
