@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BURN_INFO } from '@/constants'
+import { BURN_INFO, TOKEN_INFO } from '@/constants'
 
 interface BurnStats {
   burnedTokens: number
@@ -20,15 +20,14 @@ export const useBurnStats = (): BurnStats => {
     // Calculate total burned from burn history
     const totalBurned = BURN_INFO.BURN_HISTORY.reduce((acc, burn) => acc + burn.amount, 0)
     
-    // Calculate burn rate (example: 2.5% of total supply)
-    const burnRate = (totalBurned / BURN_INFO.TOTAL_SUPPLY) * 100
+    // Calculate burn rate as percentage of total supply
+    const burnRate = (totalBurned / TOKEN_INFO.TOTAL_SUPPLY) * 100
     
-    // Calculate burned value (example: $0.1 per token)
-    const burnedValue = totalBurned * 0.1
+    // Calculate burned value using current USD value from BURN_INFO
+    const burnedValue = (totalBurned * BURN_INFO.NEXT_BURN.CURRENT_USD_VALUE) / BURN_INFO.NEXT_BURN.ESTIMATED_AMOUNT
     
-    // Get next burn date from the most recent burn + 30 days
-    const mostRecentBurn = new Date(BURN_INFO.BURN_HISTORY[0].date)
-    const nextBurnDate = new Date(mostRecentBurn.getTime() + 30 * 24 * 60 * 60 * 1000)
+    // Get next burn date from BURN_INFO
+    const nextBurnDate = new Date(BURN_INFO.NEXT_BURN.TARGET_DATE)
 
     setStats({
       burnedTokens: totalBurned,

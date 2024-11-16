@@ -109,14 +109,13 @@ export const TRACKING_LINKS = {
 
 // Token Information
 export const TOKEN_INFO = {
-  TOTAL_SUPPLY: 925219888.276,
-  CIRCULATING_SUPPLY: 922295948.443,
-  BURNED_TOKENS: 2923939.833,
-  FOUNDER_HOLDINGS: 0.32,
-  HOLDERS: 0,
-  PRICE: 0.00554598,
-  LAST_UPDATED: new Date().toISOString()
-} as const
+  TOTAL_SUPPLY: 1000000000,
+  CIRCULATING_SUPPLY: 750000000,
+  DECIMALS: 9,
+  SYMBOL: 'SOBA',
+  NAME: 'SOBA Token',
+  MINT_ADDRESS: 'SOBAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+} as const;
 
 // Assets and Dimensions
 export const ASSETS = {
