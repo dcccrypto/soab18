@@ -358,6 +358,9 @@ export const BURN_SECTIONS = {
   }
 } as const
 
+// First, let's define the allowed icon types
+type TokenomicsIcon = "Users" | "Flame" | "Scale" | "Zap" | "Lock" | "Eye" | "ArrowRight";
+
 export const TOKENOMICS_CONTENT = {
   HERO: {
     TITLE: "SOBA Tokenomics",
@@ -401,20 +404,66 @@ export const TOKENOMICS_CONTENT = {
         VALUE: TOKEN_INFO.TOTAL_SUPPLY,
         LABEL: "Total Supply",
         DESCRIPTION: "Maximum number of $SOBA tokens that will ever exist",
-        ICON: "Zap"
+        ICON: "Zap" as TokenomicsIcon,
+        TITLE: "Total Supply",
+        DISPLAY_TYPE: "number" as const
       },
       CIRCULATING_SUPPLY: {
         VALUE: TOKEN_INFO.CIRCULATING_SUPPLY,
         LABEL: "Circulating Supply",
         DESCRIPTION: "Number of $SOBA tokens currently in circulation",
-        ICON: "Users"
+        ICON: "Users" as TokenomicsIcon,
+        TITLE: "Circulating Supply",
+        DISPLAY_TYPE: "number" as const
       },
       BURNED_TOKENS: {
         VALUE: TOKEN_INFO.BURNED_TOKENS,
         LABEL: "Burned Tokens",
         DESCRIPTION: "Total number of $SOBA tokens permanently removed from circulation",
-        ICON: "Flame"
+        ICON: "Flame" as TokenomicsIcon,
+        TITLE: "Burned Tokens",
+        DISPLAY_TYPE: "number" as const
+      }
+    }
+  },
+  FEATURES: [
+    {
+      TITLE: "Fair Launch",
+      DESCRIPTION: "Equal opportunity for all investors through Pump.fun launch",
+      ICON: "Scale" as TokenomicsIcon,
+      SHORT_DESC: "Fair and transparent launch process"
+    },
+    {
+      TITLE: "Regular Burns",
+      DESCRIPTION: "Scheduled token burns to increase scarcity and value",
+      ICON: "Flame" as TokenomicsIcon,
+      SHORT_DESC: "Deflationary tokenomics"
+    },
+    {
+      TITLE: "Community Driven",
+      DESCRIPTION: "Governance and decision-making led by token holders",
+      ICON: "Users" as TokenomicsIcon,
+      SHORT_DESC: "Community-first approach"
+    }
+  ],
+  CTA: {
+    TITLE: "Get Involved with $SOBA",
+    SUBTITLE: "Join the revolution in meme tokens",
+    BUTTONS: {
+      PRIMARY: {
+        TITLE: "Buy $SOBA",
+        DESCRIPTION: "Get your tokens now on supported exchanges",
+        URL: "#buy-soba",
+        ICON: "ArrowRight" as TokenomicsIcon,
+        TEXT: "Buy $SOBA"
+      },
+      SECONDARY: {
+        TITLE: "Join Community",
+        DESCRIPTION: "Be part of the $SOBA revolution",
+        URL: "#community",
+        ICON: "Users" as TokenomicsIcon,
+        TEXT: "Join Community"
       }
     }
   }
-} as const 
+} as const; 

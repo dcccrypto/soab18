@@ -235,13 +235,11 @@ export default function TokenomicsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        <div className="text-3xl font-bold text-orange-400">
-                          <AnimatedValue 
-                            value={tokenStats ? formatNumber(value.VALUE) : '...'}
-                            prefix={value.DISPLAY_TYPE === 'price' ? '$' : ''}
-                            suffix={value.DISPLAY_TYPE === 'price' ? '' : ''}
-                          />
-                        </div>
+                        {value.DISPLAY_TYPE === "number" && (
+                          <p className="text-2xl font-bold text-orange-400">
+                            {formatNumber(value.VALUE)}
+                          </p>
+                        )}
                         <div className="text-sm text-orange-300/80">
                           {value.DESCRIPTION}
                         </div>
@@ -312,7 +310,7 @@ export default function TokenomicsPage() {
                   variant="default"
                   size="lg"
                   className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white font-bold px-8 py-4 rounded-full flex items-center gap-2"
-                  onClick={() => window.location.href = TOKENOMICS_CONTENT.CTA.BUTTONS.PRIMARY.HREF}
+                  onClick={() => window.location.href = TOKENOMICS_CONTENT.CTA.BUTTONS.PRIMARY.URL}
                 >
                   {TOKENOMICS_CONTENT.CTA.BUTTONS.PRIMARY.TEXT}
                   <ArrowRight className="w-5 h-5" />
@@ -321,7 +319,7 @@ export default function TokenomicsPage() {
                   variant="outline"
                   size="lg"
                   className="text-[#FF6B00] border-[#FF6B00] hover:bg-[#FF6B00] hover:text-white px-8 py-4 rounded-full"
-                  onClick={() => window.location.href = TOKENOMICS_CONTENT.CTA.BUTTONS.SECONDARY.HREF}
+                  onClick={() => window.location.href = TOKENOMICS_CONTENT.CTA.BUTTONS.SECONDARY.URL}
                 >
                   {TOKENOMICS_CONTENT.CTA.BUTTONS.SECONDARY.TEXT}
                 </ButtonBase>
