@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
-import { Flame, Users, Zap, Lock, ArrowRight, Info, Eye } from 'lucide-react'
+import { Flame, Users, Lock, Eye, Vote, LineChart, Info, ArrowRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Header } from '@/components/Header'
@@ -200,17 +200,20 @@ export default function TokenomicsPage() {
           <div className="flex justify-center gap-8 mb-12">
             {TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA.map((entry, index) => (
               <motion.div
-                key={entry.name}
+                key={entry.label}
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 animate={{ opacity: activeIndex === null || activeIndex === index ? 1 : 0.5 }}
+                onHoverStart={() => setActiveIndex(index)}
+                onHoverEnd={() => setActiveIndex(null)}
               >
                 <div 
                   className="w-4 h-4 rounded-full" 
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="text-orange-300 font-medium">{entry.name}</span>
-                <span className="text-orange-400 font-bold">{formatPercent(entry.value)}</span>
+                <span className="text-orange-300">
+                  {entry.label}: {entry.value}%
+                </span>
               </motion.div>
             ))}
           </div>
@@ -283,12 +286,12 @@ export default function TokenomicsPage() {
                   <div className="flex items-center mb-4">
                     {feature.ICON === 'Flame' && <Flame className="w-8 h-8 mr-3 text-[#FF6B00]" />}
                     {feature.ICON === 'Users' && <Users className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'Zap' && <Zap className="w-8 h-8 mr-3 text-[#FF6B00]" />}
                     {feature.ICON === 'Lock' && <Lock className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'Eye' && <Eye className="w-8 h-8 mr-3 text-[#FF6B00]" />}
+                    {feature.ICON === 'Vote' && <Vote className="w-8 h-8 mr-3 text-[#FF6B00]" />}
+                    {feature.ICON === 'LineChart' && <LineChart className="w-8 h-8 mr-3 text-[#FF6B00]" />}
                     <h3 className="text-xl font-bold text-orange-400">{feature.TITLE}</h3>
                   </div>
-                  <p className="text-orange-300">{feature.SHORT_DESC}</p>
+                  <p className="text-orange-300">{feature.DESCRIPTION}</p>
                 </motion.div>
               ))}
             </div>

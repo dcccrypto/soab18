@@ -215,8 +215,8 @@ export default function CommunityPage() {
       description: "Join our Telegram group for real-time discussions and community updates.",
     },
     {
-      ...SOCIAL_LINKS.DISCORD, // This is actually TikTok in constants
-      description: "Connect with fellow $SOBA holders and participate in community events.",
+      ...SOCIAL_LINKS.TIKTOK,
+      description: "Watch our latest content and viral $SOBA moments.",
     }
   ]
 
