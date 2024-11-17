@@ -20,9 +20,21 @@ export function Footer() {
             />
             <span className="text-orange-500 font-bold">$SOBA</span>
           </div>
-          
-          <div className="flex items-center gap-6">
-            {Object.values(SOCIAL_LINKS).map((social) => (
+
+          <nav className="flex gap-6">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-orange-400 hover:text-orange-300 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-4">
+            {SOCIAL_LINKS.map((social) => (
               <motion.a
                 key={social.name}
                 href={social.url}
