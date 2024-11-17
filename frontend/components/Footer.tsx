@@ -4,6 +4,14 @@ import { motion } from 'framer-motion'
 import { SOCIAL_LINKS, NAV_LINKS, ICON_SIZES } from '@/constants'
 import { ButtonBase } from './ui/button-base'
 
+// Convert objects to arrays with proper typing
+const navLinksArray = Object.entries(NAV_LINKS).map(([key, href]) => ({
+  label: key,
+  href
+}))
+
+const socialLinksArray = Object.values(SOCIAL_LINKS)
+
 export function Footer() {
   return (
     <footer className="bg-black/40 border-t border-orange-500/20">
@@ -22,7 +30,7 @@ export function Footer() {
           </div>
 
           <nav className="flex gap-6">
-            {NAV_LINKS.map((link) => (
+            {navLinksArray.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -34,7 +42,7 @@ export function Footer() {
           </nav>
 
           <div className="flex items-center gap-4">
-            {SOCIAL_LINKS.map((social) => (
+            {socialLinksArray.map((social) => (
               <motion.a
                 key={social.name}
                 href={social.url}
