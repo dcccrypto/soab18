@@ -36,7 +36,8 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.161.0",
-    "three-mesh-bvh": "^0.7.0"
+    "three-mesh-bvh": "^0.7.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",

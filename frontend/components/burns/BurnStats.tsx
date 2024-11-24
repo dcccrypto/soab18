@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useWebSocket } from '@/services/websocket'
-import { useBurnStore } from '@/store/burnStore'
+import useWebSocket from '../../services/websocket'
+import useBurnStore from '../../store/burnStore'
 import { formatNumber, formatDateTime } from '@/lib/utils'
 import { Flame, DollarSign, Users, TrendingUp, LucideIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
