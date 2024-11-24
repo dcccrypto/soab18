@@ -1,4 +1,5 @@
-import { create, StateCreator } from 'zustand'
+import { create } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 interface WebSocketStore {
@@ -9,12 +10,7 @@ interface WebSocketStore {
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://api.soba18.com/ws'
 
-type WebSocketState = StateCreator<
-  WebSocketStore,
-  [["zustand/devtools", never]],
-  [],
-  WebSocketStore
->
+type WebSocketState = StateCreator<WebSocketStore>
 
 const createWebSocketStore: WebSocketState = (set, get) => ({
   socket: null,
@@ -39,11 +35,4 @@ const createWebSocketStore: WebSocketState = (set, get) => ({
   }
 })
 
-export const useWebSocket = create<WebSocketStore>()(
-  devtools(
-    createWebSocketStore,
-    {
-      name: 'websocket-store'
-    }
-  )
-)
+export const useWebSocket = create<WebSocketStore>()(devtools(createWebSocketStore))

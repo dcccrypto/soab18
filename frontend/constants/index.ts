@@ -13,7 +13,7 @@ export const mergeConstants = (dynamicData: DynamicConstants) => ({
     BURNED_TOKENS: dynamicData.tokenMetrics.burnedTokens,
     DECIMALS: 9,
     SYMBOL: 'SOBA',
-    NAME: 'SOBA Token',
+    NAME: 'Sol Bastard',
     MINT_ADDRESS: '25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH',
   },
   BURN_INFO: dynamicData.burnInfo,
