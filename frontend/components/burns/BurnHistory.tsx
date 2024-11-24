@@ -2,12 +2,10 @@ import { Table } from '@/components/ui/table'
 import { formatNumber, formatDate } from '@/lib/utils'
 import { BURN_INFO } from '@/constants'
 import { ExternalLink } from 'lucide-react'
+import { BurnTransaction } from '@/constants/types'
 
-// Define the type for a burn record
-interface BurnRecord {
-  date: string
-  amount: number
-  txHash: string
+// Extend BurnTransaction for additional properties
+interface BurnRecord extends BurnTransaction {
   cumulative?: number
 }
 
@@ -28,7 +26,7 @@ export const BurnHistory = ({ burnHistory }: BurnHistoryProps) => {
       <tbody>
         {burnHistory.map((burn) => (
           <tr 
-            key={burn.txHash}
+            key={burn.txId}
             className="border-b border-orange-500/10 hover:bg-orange-500/5 transition-colors"
           >
             <td className="p-4 text-gray-300">
@@ -39,14 +37,14 @@ export const BurnHistory = ({ burnHistory }: BurnHistoryProps) => {
             </td>
             <td className="p-4">
               <a
-                href={`https://solscan.io/tx/${burn.txHash}`}
+                href={`https://solscan.io/tx/${burn.txId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors"
-                aria-label={`View transaction ${burn.txHash} on Solscan`}
+                aria-label={`View transaction ${burn.txId} on Solscan`}
               >
                 <span className="font-mono">
-                  {burn.txHash.slice(0, 8)}...{burn.txHash.slice(-8)}
+                  {burn.txId.slice(0, 8)}...{burn.txId.slice(-8)}
                 </span>
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -56,4 +54,4 @@ export const BurnHistory = ({ burnHistory }: BurnHistoryProps) => {
       </tbody>
     </Table>
   )
-} 
+}

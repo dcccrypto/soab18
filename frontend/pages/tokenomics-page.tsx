@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic'
 import { ClientOnly } from '@/components/client-only'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
@@ -59,6 +58,8 @@ const DynamicDialogDescription = dynamic(
   { ssr: false }
 )
 
+const COLORS = ['#FF6B00', '#FFB800', '#FF3D00']
+
 export default function TokenomicsPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null)
@@ -87,9 +88,56 @@ export default function TokenomicsPage() {
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
+  // Fetch real-time data
   const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
-    refreshInterval: 30000
+    refreshInterval: 30000, // Refresh every 30 seconds
+    dedupingInterval: 15000 // Dedupe requests within 15 seconds
   })
+
+  const isLoading = !tokenStats && !error
+  
+  // Calculate supply distribution
+  const getSupplyData = () => {
+    if (!tokenStats?.tokenMetrics) return []
+    
+    const { circulatingSupply, burnedTokens, founderHolding } = tokenStats.tokenMetrics
+
+    return [
+      {
+        name: 'Circulating Supply',
+        value: circulatingSupply,
+        icon: Users,
+        color: COLORS[0]
+      },
+      {
+        name: 'Founder Holding',
+        value: founderHolding || 0,
+        icon: Lock,
+        color: COLORS[1]
+      },
+      {
+        name: 'Burned Supply',
+        value: burnedTokens,
+        icon: Flame,
+        color: COLORS[2]
+      }
+    ]
+  }
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+      return (
+        <div className="bg-black/90 p-4 rounded-lg border border-orange-500/20">
+          <p className="text-orange-500 font-semibold">{data.name}</p>
+          <p className="text-white">
+            {new Intl.NumberFormat().format(data.value)} 
+          </p>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -151,44 +199,42 @@ export default function TokenomicsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={[...TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA]}
+                        data={getSupplyData()}
                         cx="50%"
                         cy="50%"
-                        labelLine={false}
-                        outerRadius={150}
-                        innerRadius={100}
-                        paddingAngle={2}
+                        innerRadius={80}
+                        outerRadius={140}
+                        paddingAngle={5}
                         dataKey="value"
-                        onMouseEnter={(_, index) => setActiveIndex(index)}
-                        onMouseLeave={() => setActiveIndex(null)}
                       >
-                        {TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
+                        {getSupplyData().map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
                             fill={entry.color}
-                            opacity={activeIndex === null || activeIndex === index ? 1 : 0.5}
-                            stroke={activeIndex === index ? '#fff' : 'none'}
-                            strokeWidth={2}
+                            stroke="transparent"
                           />
                         ))}
                       </Pie>
-                      <Tooltip
-                        content={({ payload }) => {
-                          if (payload && payload[0]) {
-                            const data = payload[0].payload
-                            return (
-                              <div className="bg-[#111] border border-orange-900/50 p-3 rounded-lg shadow-xl">
-                                <p className="text-orange-500 font-bold">{data.name}</p>
-                                <p className="text-orange-300">{formatNumber(data.value)} tokens</p>
-                                <p className="text-orange-300">{formatPercent(data.value)}</p>
-                              </div>
-                            )
-                          }
-                          return null
-                        }}
-                      />
+                      <Tooltip content={<CustomTooltip />} />
                     </PieChart>
                   </ResponsiveContainer>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 mt-8">
+                  {getSupplyData().map((item, index) => (
+                    <div 
+                      key={item.name}
+                      className="flex items-center justify-between p-4 rounded-lg bg-black/20 border border-orange-500/10"
+                    >
+                      <div className="flex items-center gap-3">
+                        <item.icon className="w-5 h-5 text-orange-500" />
+                        <span className="text-gray-300">{item.name}</span>
+                      </div>
+                      <span className="text-orange-500 font-mono">
+                        {new Intl.NumberFormat().format(item.value)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -198,9 +244,9 @@ export default function TokenomicsPage() {
         {/* Legend */}
         <div className="container mx-auto px-4">
           <div className="flex justify-center gap-8 mb-12">
-            {TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA.map((entry, index) => (
+            {getSupplyData().map((entry, index) => (
               <motion.div
-                key={entry.label}
+                key={entry.name}
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 animate={{ opacity: activeIndex === null || activeIndex === index ? 1 : 0.5 }}
@@ -212,7 +258,7 @@ export default function TokenomicsPage() {
                   style={{ backgroundColor: entry.color }}
                 />
                 <span className="text-orange-300">
-                  {entry.label}: {entry.value}%
+                  {entry.name}: {entry.value}%
                 </span>
               </motion.div>
             ))}

@@ -13,8 +13,6 @@ import { Text, Box, OrbitControls } from '@react-three/drei'
 import { Button } from "@/components/ui/button"
 import { ButtonBase } from '@/components/ui/button-base'
 import { useScroll, useTransform } from 'framer-motion'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants'
 
 interface RoadmapPhase {
@@ -288,153 +286,151 @@ export default function Roadmap() {
 
   return (
     <div className="min-h-screen gradient-dark text-white">
-      <Header />
-      
-      <main>
-        <section className="min-h-[70vh] pt-16 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
-          <motion.div 
-            className="absolute inset-0 z-[1]"
-            style={{ y: heroY }}
-          >
-            <div className="relative w-full h-full">
-              <Image
-                src="/roadmapbg.png"
-                alt="Roadmap background"
-                fill
-                priority
-                className="object-cover object-center opacity-70 transition-opacity duration-700"
-                quality={100}
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/90 transition-all duration-700" />
-            </div>
-          </motion.div>
-
-          <div className="container mx-auto px-4 text-center relative z-10">
-            <motion.div
-              variants={fadeInUpVariant}
-              initial="hidden"
-              animate="visible"
-              className="max-w-4xl mx-auto space-y-6"
+      <main className="min-h-screen bg-background">
+        <div className="relative">
+          <section className="min-h-[70vh] pt-16 flex items-center justify-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
+            <motion.div 
+              className="absolute inset-0 z-[1]"
+              style={{ y: heroY }}
             >
-              <h1 className="text-5xl font-bold mb-6 text-center gradient-text">$SOBA Roadmap</h1>
-              <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
-                Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
-              </p>
-              <div className="flex justify-center gap-4">
-                <ButtonBase
-                  size="lg"
-                  className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    View Progress
-                    <ArrowRight className="w-5 h-5" />
-                  </span>
-                </ButtonBase>
-                <ButtonBase
-                  size="lg"
-                  variant="outline"
-                  className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
-                >
-                  Learn More
-                </ButtonBase>
+              <div className="relative w-full h-full">
+                <Image
+                  src="/roadmapbg.png"
+                  alt="Roadmap background"
+                  fill
+                  priority
+                  className="object-cover object-center opacity-70 transition-opacity duration-700"
+                  quality={100}
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/90 transition-all duration-700" />
               </div>
             </motion.div>
-          </div>
-        </section>
 
-        <section className="min-h-screen relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
-          
-          {/* Roadmap Content */}
-          <div className="container mx-auto px-4 py-12 relative z-10">
-            {/* Simplified Progress Bar */}
-            <SimplifiedProgressBar progress={progress} />
-
-            <div className="h-[800px] mb-12 overflow-hidden card-base">
-              <Canvas>
-                <RoadmapScene setSelectedPhase={handlePhaseClick} />
-              </Canvas>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {roadmapData.map((phase) => (
-                <motion.div
-                  key={phase.phase}
-                  className={`card-base p-6 cursor-pointer
-                    ${phase.status === 'Completed' 
-                      ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
-                      : 'bg-black/40 hover:bg-black/50'}`}
-                  onClick={() => handlePhaseClick(phase)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center mb-4">
-                    <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
-                    <h3 className="text-xl font-bold">{phase.title}</h3>
-                  </div>
-                  <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
-                  <p className="text-base text-gray-300">{phase.description}</p>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* CTA Section */}
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4 gradient-text">Ready to Join the $SOBA Revolution?</h2>
-              <p className="text-xl mb-8 text-gray-300">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
-              <div className="flex justify-center gap-4">
-                <ButtonBase
-                  size="lg"
-                  className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    Buy $SOBA Now
-                    <ArrowRight className="w-5 h-5" />
-                  </span>
-                </ButtonBase>
-                <ButtonBase
-                  size="lg"
-                  variant="outline"
-                  className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
-                >
-                  Join Our Community
-                </ButtonBase>
-              </div>
-            </div>
-
-            {/* Phase Details Dialog */}
-            <ClientOnly>
-              <DynamicDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DynamicDialogContent className="bg-black/95 text-white border-orange-500">
-                  <DynamicDialogHeader>
-                    <DynamicDialogTitle className="text-2xl font-bold gradient-text">
-                      {selectedPhase?.title}
-                    </DynamicDialogTitle>
-                    <DynamicDialogDescription>
-                      <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
-                      <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
-                      <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
-                      <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
-                      <p className="text-gray-300">{selectedPhase?.details}</p>
-                    </DynamicDialogDescription>
-                  </DynamicDialogHeader>
-                  <ButtonBase 
-                    onClick={() => setIsDialogOpen(false)} 
-                    className="bg-orange-500 hover:bg-orange-600 text-white"
+            <div className="container mx-auto px-4 text-center relative z-10">
+              <motion.div
+                variants={fadeInUpVariant}
+                initial="hidden"
+                animate="visible"
+                className="max-w-4xl mx-auto space-y-6"
+              >
+                <h1 className="text-5xl font-bold mb-6 text-center gradient-text">$SOBA Roadmap</h1>
+                <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
+                  Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
+                </p>
+                <div className="flex justify-center gap-4">
+                  <ButtonBase
+                    size="lg"
+                    className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
                   >
-                    Close
+                    <span className="flex items-center gap-2">
+                      View Progress
+                      <ArrowRight className="w-5 h-5" />
+                    </span>
                   </ButtonBase>
-                </DynamicDialogContent>
-              </DynamicDialog>
-            </ClientOnly>
-          </div>
-        </section>
-      </main>
+                  <ButtonBase
+                    size="lg"
+                    variant="outline"
+                    className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
+                  >
+                    Learn More
+                  </ButtonBase>
+                </div>
+              </motion.div>
+            </div>
+          </section>
 
+          <section className="min-h-screen relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
+            
+            {/* Roadmap Content */}
+            <div className="container mx-auto px-4 py-12 relative z-10">
+              {/* Simplified Progress Bar */}
+              <SimplifiedProgressBar progress={progress} />
+
+              <div className="h-[800px] mb-12 overflow-hidden card-base">
+                <Canvas>
+                  <RoadmapScene setSelectedPhase={handlePhaseClick} />
+                </Canvas>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {roadmapData.map((phase) => (
+                  <motion.div
+                    key={phase.phase}
+                    className={`card-base p-6 cursor-pointer
+                      ${phase.status === 'Completed' 
+                        ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
+                        : 'bg-black/40 hover:bg-black/50'}`}
+                    onClick={() => handlePhaseClick(phase)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center mb-4">
+                      <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
+                      <h3 className="text-xl font-bold">{phase.title}</h3>
+                    </div>
+                    <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
+                    <p className="text-base text-gray-300">{phase.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* CTA Section */}
+              <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold mb-4 gradient-text">Ready to Join the $SOBA Revolution?</h2>
+                <p className="text-xl mb-8 text-gray-300">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
+                <div className="flex justify-center gap-4">
+                  <ButtonBase
+                    size="lg"
+                    className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
+                  >
+                    <span className="flex items-center gap-2">
+                      Buy $SOBA Now
+                      <ArrowRight className="w-5 h-5" />
+                    </span>
+                  </ButtonBase>
+                  <ButtonBase
+                    size="lg"
+                    variant="outline"
+                    className="text-orange-500 border-orange-500 hover:bg-orange-500 hover:text-white"
+                  >
+                    Join Our Community
+                  </ButtonBase>
+                </div>
+              </div>
+
+              {/* Phase Details Dialog */}
+              <ClientOnly>
+                <DynamicDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DynamicDialogContent className="bg-black/95 text-white border-orange-500">
+                    <DynamicDialogHeader>
+                      <DynamicDialogTitle className="text-2xl font-bold gradient-text">
+                        {selectedPhase?.title}
+                      </DynamicDialogTitle>
+                      <DynamicDialogDescription>
+                        <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
+                        <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
+                        <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
+                        <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
+                        <p className="text-gray-300">{selectedPhase?.details}</p>
+                      </DynamicDialogDescription>
+                    </DynamicDialogHeader>
+                    <ButtonBase 
+                      onClick={() => setIsDialogOpen(false)} 
+                      className="bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                      Close
+                    </ButtonBase>
+                  </DynamicDialogContent>
+                </DynamicDialog>
+              </ClientOnly>
+            </div>
+          </section>
+        </div>
+      </main>
       <div className="h-32 bg-gradient-to-b from-transparent via-neutral-900/50 to-neutral-900 transition-all duration-700" />
-      <Footer />
     </div>
   )
 }

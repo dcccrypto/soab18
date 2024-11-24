@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BURN_HISTORY } from '@/constants/static'
+import { BURN_INFO } from '@/constants/static'
 import axios from 'axios'
 
 interface BurnWalletStats {
@@ -30,7 +30,7 @@ export const useBurnWallet = (): BurnWalletStats => {
           method: 'getTokenAccounts',
           id: 'burn-wallet-query',
           params: {
-            owner: BURN_HISTORY.WALLET_ADDRESS,
+            owner: BURN_INFO.BURN_WALLET,
             mint: SOBA_MINT
           }
         })
@@ -53,20 +53,21 @@ export const useBurnWallet = (): BurnWalletStats => {
           error: null
         })
       } catch (error) {
-        console.error('Error fetching burn wallet stats:', error)
         setStats(prev => ({
           ...prev,
           isLoading: false,
-          error: error instanceof Error ? error : new Error('Failed to fetch burn wallet stats')
+          error: error as Error
         }))
       }
     }
 
     fetchBurnWalletBalance()
-    const interval = setInterval(fetchBurnWalletBalance, BURN_HISTORY.UPDATE_INTERVAL)
-
+    
+    // Set up polling interval
+    const interval = setInterval(fetchBurnWalletBalance, 60000) // Update every minute
+    
     return () => clearInterval(interval)
   }, [])
 
   return stats
-} 
+}

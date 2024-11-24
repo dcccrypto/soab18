@@ -1,3 +1,5 @@
+import type { BurnTransaction, BurnInfo } from './types'
+
 // Static constants that don't need updates
 export const ICON_SIZES = {
   SOCIAL: {
@@ -11,6 +13,10 @@ export const ICON_SIZES = {
   TRACKING: {
     width: 24,
     height: 24
+  },
+  LOGO: {
+    width: 32,
+    height: 32
   }
 } as const
 
@@ -23,8 +29,21 @@ export const NAV_LINKS = {
   ROADMAP: '/3d-roadmap'
 } as const
 
+export const ROUTES = {
+  HOME: '/',
+  ABOUT: '/about',
+  BURNS: '/burns-page',
+  TOKENOMICS: '/tokenomics-page',
+  ROADMAP: '/3d-roadmap'
+} as const
+
 export const ASSETS = {
-  LOGO: '/images/logo.svg',
+  LOGO: {
+    src: '/images/assets/icons/logo.svg',
+    alt: 'SOBA Logo',
+    width: 32,
+    height: 32
+  },
   HERO: '/images/hero.png',
   ABOUT: '/images/about.png',
   LOGO_DIMENSIONS: {
@@ -33,29 +52,49 @@ export const ASSETS = {
   }
 } as const
 
-export const BURN_HISTORY = {
-  WALLET_ADDRESS: '7wtbTXc7Lyxt1enezJa7eNyNxenaLYsmBeiZTsA3KvwL',
-  BURNS: [
-    {
-      date: "2024-02-01T00:00:00Z",
-      amount: 1000000,
-      txHash: "xxxxx"
-    },
-    {
-      date: "2024-01-15T00:00:00Z",
-      amount: 923939.833,
-      txHash: "xxxxx"
-    },
-    {
-      date: "2024-01-01T00:00:00Z",
-      amount: 1000000,
-      txHash: "xxxxx"
-    }
-  ],
-  TOTAL_STATIC_BURNS: 2923939.833, // Sum of all historical burns
-  DISPLAY_DECIMALS: 3,
-  UPDATE_INTERVAL: 30000
-} as const
+export const BURN_HISTORY: BurnTransaction[] = [
+  {
+    txId: '5rAonRA58uCnMYz3bek3M3RCf8j31GHsb2AeuMrcYSdCogSN5EUzXA5pCZJZi4tHDDXtd2URM4uxCM7AmtQc9VxL',
+    amount: 11090000,
+    date: '2024-07-23T14:24:55Z'
+  },
+  {
+    txId: '2YJddGWGfJ6wmk5DjjB5jmLonZvB8GBLv4gzJA4QZEGM9TTj38r68AgvMEN9QWCiPcDV57JfoNv2CDjBcUEWo7yZ',
+    amount: 22000000,
+    date: '2024-08-01T13:53:14Z'
+  },
+  {
+    txId: '5a5AztHHBSXYcsxoc17bKQhyJCytdimPmSaWVhrApG99xhJSWtVWExcvwKPp4XmWVbdQJDgY8VKhVZU6mEGeLUUu',
+    amount: 21420000,
+    date: '2024-08-25T03:17:07Z'
+  },
+  {
+    txId: '3PLRtU2i3KLwA7FMPL1KuZozbFeNyyqkHJVznqNBpqKFNJ6A7iUDxWXjHL8hRxh7rycZUNxUFFAjfiego7oVF9HN',
+    amount: 3280000,
+    date: '2024-10-01T14:57:06Z'
+  },
+  {
+    txId: '4s4EyPN8SSicrbRx9mc3ECAjbZQU1azGtfGtXUao3kE3UW6LRdTvdwXwDamRLxNvGt2iGHX7SvbWt9kGuyNSNX9A',
+    amount: 15970000,
+    date: '2024-10-30T04:25:21Z'
+  }
+]
+
+export const BURN_INFO: BurnInfo = {
+  BURN_WALLET: '7wtbTXc7Lyxt1enezJa7eNyNxenaLYsmBeiZTsA3KvwL',
+  TOTAL_BURNED: BURN_HISTORY.reduce((acc, burn) => acc + burn.amount, 0),
+  LATEST_BURN: BURN_HISTORY[BURN_HISTORY.length - 1],
+  BURN_RATE: 2,
+  BURN_HISTORY: BURN_HISTORY,
+  NEXT_BURN: {
+    TARGET_DATE: '2024-03-01T00:00:00Z',
+    ESTIMATED_AMOUNT: 1000000,
+    DESCRIPTION: 'Monthly token burn',
+    EVENT_NAME: 'March 2024 Burn',
+    CURRENT_USD_VALUE: 0,
+    LAST_BURN_DATE: BURN_HISTORY[BURN_HISTORY.length - 1].date
+  }
+}
 
 export const BURN_SECTIONS = {
   HERO: {
@@ -123,7 +162,7 @@ export const TOKEN_INFO = {
   DECIMALS: 9,
   TOTAL_SUPPLY: 1000000000,
   CIRCULATING_SUPPLY: 750000000,
-  BURNED_TOKENS: BURN_HISTORY.TOTAL_STATIC_BURNS,
+  BURNED_TOKENS: BURN_INFO.TOTAL_BURNED,
   FOUNDER_HOLDINGS: 40800000, // 4.08% held by Crypto Bastard
   MINT_ADDRESS: '25p2BoNp6qrJH5As6ek6H7Ei495oSkyZd3tGb97sqFmH'
 } as const
@@ -169,7 +208,7 @@ export const SOCIAL_FEED_DATA = {
   X_UPDATES: [
     {
       id: '1',
-      content: 'SOBA Token is revolutionizing DeFi! 🚀',
+      content: 'SOBA Token is revolutionizing DeFi!',
       timestamp: '2024-02-01T12:00:00Z',
       engagement: 1650,
       username: 'sobatoken',
@@ -178,7 +217,7 @@ export const SOCIAL_FEED_DATA = {
     },
     {
       id: '2',
-      content: 'Join our growing community! 🌟',
+      content: 'Join our growing community!',
       timestamp: '2024-01-28T15:30:00Z',
       engagement: 1210,
       username: 'sobatoken',
@@ -266,21 +305,6 @@ export const TEAM_MEMBERS = [
   }
 ] as const
 
-export const BURN_INFO = {
-  BURN_WALLET: '7wtbTXc7Lyxt1enezJa7eNyNxenaLYsmBeiZTsA3KvwL',
-  BURN_HISTORY: BURN_HISTORY.BURNS,
-  TOTAL_BURNED: BURN_HISTORY.TOTAL_STATIC_BURNS,
-  BURN_RATE: 2, // 2% monthly burn rate
-  NEXT_BURN: {
-    TARGET_DATE: '2024-03-01T00:00:00Z',
-    ESTIMATED_AMOUNT: 1000000,
-    DESCRIPTION: 'Monthly token burn',
-    EVENT_NAME: 'March 2024 Burn',
-    CURRENT_USD_VALUE: 0, // This will be calculated dynamically
-    LAST_BURN_DATE: BURN_HISTORY.BURNS[0].date
-  }
-} as const
-
 export const TOKENOMICS_CONTENT = {
   TITLE: 'SOBA Tokenomics',
   DESCRIPTION: 'Understanding the economic model of SOBA Token',
@@ -337,7 +361,7 @@ export const TOKENOMICS_CONTENT = {
       },
       BURNED: {
         TITLE: 'Burned Tokens',
-        VALUE: BURN_HISTORY.TOTAL_STATIC_BURNS,
+        VALUE: BURN_INFO.TOTAL_BURNED,
         DESCRIPTION: 'Permanently removed from supply',
         DISPLAY_TYPE: 'number'
       },
@@ -385,7 +409,7 @@ export const TOKENOMICS_CONTENT = {
       items: [
         { label: 'Burn Rate', value: '2% monthly' },
         { label: 'Burn Schedule', value: 'Monthly' },
-        { label: 'Total Burned', value: `${BURN_HISTORY.TOTAL_STATIC_BURNS.toLocaleString()} SOBA` }
+        { label: 'Total Burned', value: `${BURN_INFO.TOTAL_BURNED.toLocaleString()} SOBA` }
       ]
     }
   ],
@@ -408,4 +432,4 @@ export const TOKENOMICS_CONTENT = {
 // Re-export everything
 export * from './types'
 
-// Other static content... 
+// Other static content...

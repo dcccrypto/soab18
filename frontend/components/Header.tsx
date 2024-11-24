@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -20,16 +22,15 @@ export const Header = ({ isDarkMode = true, toggleTheme }: HeaderProps) => {
         <div className="container mx-auto px-4 h-full">
           <div className="flex items-center justify-between h-full">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/" className="flex items-center">
               <Image
-                src="/images/assets/icons/logo.svg"
-                alt="SOBA Logo"
-                width={32}
-                height={32}
-                className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
+                src="/images/logo.png"
+                alt="Logo"
+                width={40}
+                height={40}
                 priority
+                className="w-10 h-10"
               />
-              <span className="text-xl font-bold gradient-text drop-shadow-sm">$SOBA</span>
             </Link>
 
             {/* Desktop Navigation */}

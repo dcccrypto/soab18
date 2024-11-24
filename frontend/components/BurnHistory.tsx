@@ -2,8 +2,14 @@ import { BURN_HISTORY } from '@/constants/static'
 import { formatDate } from '@/lib/utils'
 import { ExternalLink } from 'lucide-react'
 import { motion } from 'framer-motion'
+import type { BurnTransaction } from '@/constants/types'
 
 export const BurnHistory = () => {
+  // Sort burns by date in descending order (newest first)
+  const sortedBurns = [...BURN_HISTORY].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -15,9 +21,9 @@ export const BurnHistory = () => {
           </tr>
         </thead>
         <tbody>
-          {BURN_HISTORY.BURNS.map((burn, index) => (
+          {sortedBurns.map((burn, index) => (
             <motion.tr 
-              key={burn.txHash}
+              key={burn.txId}
               className="border-t border-gray-800 hover:bg-gray-800/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -27,18 +33,18 @@ export const BurnHistory = () => {
                 {formatDate(new Date(burn.date))}
               </td>
               <td className="px-6 py-4 text-orange-300">
-                {burn.amount.toLocaleString()} SOBA
+                {(burn.amount / 1000000).toFixed(2)}M SOBA
               </td>
               <td className="px-6 py-4">
                 <a
-                  href={`https://solscan.io/tx/${burn.txHash}`}
+                  href={`https://solscan.io/tx/${burn.txId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-orange-400 hover:text-orange-300 flex items-center gap-2"
                   tabIndex={0}
-                  aria-label={`View transaction ${burn.txHash}`}
+                  aria-label={`View transaction ${burn.txId}`}
                 >
-                  {burn.txHash.slice(0, 8)}...{burn.txHash.slice(-8)}
+                  {burn.txId.slice(0, 8)}...{burn.txId.slice(-8)}
                   <ExternalLink className="w-4 h-4" />
                 </a>
               </td>
@@ -48,4 +54,4 @@ export const BurnHistory = () => {
       </table>
     </div>
   )
-} 
+}

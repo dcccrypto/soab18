@@ -2,29 +2,31 @@ export interface TokenMetrics {
   totalSupply: number
   circulatingSupply: number
   burnedTokens: number
-  burnRate: number
-  nextBurnDate: string
-  currentPrice: number
-  marketCap: number
+  founderHolding: number
+  price: number
+  holders: number
+}
+
+export interface BurnTransaction {
+  txId: string
+  amount: number
+  date: string
 }
 
 export interface BurnInfo {
-  totalBurned: number
-  burnWallet: string
-  burnRate: number
-  nextBurn: {
-    targetDate: string
-    estimatedAmount: number
-    description: string
-    eventName: string
-    currentUsdValue: number
-    lastBurnDate: string
+  BURN_WALLET: string
+  TOTAL_BURNED: number
+  LATEST_BURN: BurnTransaction
+  BURN_RATE: number
+  BURN_HISTORY: BurnTransaction[]
+  NEXT_BURN: {
+    TARGET_DATE: string
+    ESTIMATED_AMOUNT: number
+    DESCRIPTION: string
+    EVENT_NAME: string
+    CURRENT_USD_VALUE: number
+    LAST_BURN_DATE: string
   }
-  burnHistory: Array<{
-    date: string
-    amount: number
-    txHash: string
-  }>
 }
 
 export interface SocialStats {
@@ -46,4 +48,4 @@ export interface DynamicConstants {
   tokenMetrics: TokenMetrics
   burnInfo: BurnInfo
   socialStats: SocialStats
-} 
+}

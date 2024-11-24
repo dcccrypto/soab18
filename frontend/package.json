@@ -39,9 +39,13 @@
     "three-mesh-bvh": "^0.7.0"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.41",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",
+    "@types/react-chartjs-2": "^2.0.2",
     "@types/react-dom": "^18.2.19",
+    "@types/recharts": "^1.8.29",
+    "@types/three": "^0.170.0",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",

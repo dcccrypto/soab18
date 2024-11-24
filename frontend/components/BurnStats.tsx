@@ -10,14 +10,12 @@ export const BurnStats = () => {
     nextBurnDate: new Date(BURN_INFO.NEXT_BURN.TARGET_DATE)
   });
 
-  const totalBurnedValue = BURN_INFO.BURN_HISTORY.reduce((acc, burn) => acc + burn.amount, 0);
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="p-4 rounded-lg bg-black/20 border border-orange-500/20">
         <h3 className="text-lg font-semibold text-orange-400">Total Burned</h3>
         <AnimatedValue
-          value={formatNumber(totalBurnedValue)}
+          value={formatNumber(burnStats.totalBurned)}
           suffix=" SOBA"
           className="text-2xl font-bold"
         />
@@ -38,4 +36,4 @@ export const BurnStats = () => {
       </div>
     </div>
   );
-}; 
+};
