@@ -13,4 +13,17 @@ export const fetchDynamicConstants = async (): Promise<DynamicConstants> => {
     console.error('Error fetching dynamic constants:', error)
     throw error
   }
-} 
+}
+
+export const fetchTokenStats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/token-stats`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch token stats')
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching token stats:', error)
+    throw error
+  }
+}

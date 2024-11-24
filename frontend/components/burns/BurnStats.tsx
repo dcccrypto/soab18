@@ -1,54 +1,74 @@
-import { useEffect, useState } from 'react'
-import { useBurnWallet } from '@/hooks/useBurnWallet'
-import { BURN_INFO, TOKEN_INFO } from '@/constants/static'
-import { formatNumber } from '@/lib/utils'
-import { Flame, DollarSign, LucideIcon } from 'lucide-react'
+import { useEffect } from 'react'
+import { useWebSocket } from '@/services/websocket'
+import { useBurnStore } from '@/store/burnStore'
+import { formatNumber, formatDateTime } from '@/lib/utils'
+import { Flame, DollarSign, Users, TrendingUp, LucideIcon } from 'lucide-react'
 import { Card } from '@/components/ui/card'
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper'
 
 interface StatItem {
   icon: LucideIcon
   title: string
   description: string
   value: string
+  subValue?: string
   color: string
 }
 
 export const BurnStats = () => {
-  const { balance, usdValue, isLoading } = useBurnWallet()
-  const [totalBurned, setTotalBurned] = useState<number>(BURN_INFO.TOTAL_BURNED)
-  const [burnRate, setBurnRate] = useState<number>(BURN_INFO.BURN_RATE)
+  const { connect, disconnect } = useWebSocket()
+  const { 
+    totalBurned, 
+    burnRate, 
+    price, 
+    marketCap,
+    holderCount,
+    volume24h,
+    tokenMetrics 
+  } = useBurnStore()
 
   useEffect(() => {
-    if (!isLoading) {
-      // Calculate total burned including current wallet balance
-      const newTotalBurned = BURN_INFO.TOTAL_BURNED + balance
-      setTotalBurned(newTotalBurned)
-
-      // Update burn rate
-      const newBurnRate = (newTotalBurned / TOKEN_INFO.TOTAL_SUPPLY) * 100
-      setBurnRate(newBurnRate)
-    }
-  }, [balance, isLoading])
+    connect()
+    return () => disconnect()
+  }, [])
 
   const stats: StatItem[] = [
     {
       icon: Flame,
       title: "Total Burned",
       description: "Total SOBA tokens permanently removed from circulation",
-      value: isLoading ? 'Loading...' : `${formatNumber(totalBurned)} SOBA`,
+      value: `${formatNumber(totalBurned)} SOBA`,
+      subValue: `${formatNumber(burnRate, 2)}% of total supply`,
       color: "text-orange-500"
     },
     {
       icon: DollarSign,
-      title: "Current Value",
-      description: "USD value of burned tokens",
-      value: isLoading ? 'Loading...' : `$${formatNumber(usdValue)}`,
+      title: "Market Data",
+      description: "Current market statistics",
+      value: `$${formatNumber(price)}`,
+      subValue: `MC: $${formatNumber(marketCap)}`,
       color: "text-green-500"
+    },
+    {
+      icon: Users,
+      title: "Holders",
+      description: "Total number of SOBA token holders",
+      value: formatNumber(holderCount),
+      subValue: `24h Volume: $${formatNumber(volume24h)}`,
+      color: "text-blue-500"
+    },
+    {
+      icon: TrendingUp,
+      title: "Supply Metrics",
+      description: "Token supply distribution",
+      value: `${formatNumber(tokenMetrics.circulatingSupply)} SOBA`,
+      subValue: `Total: ${formatNumber(tokenMetrics.totalSupply)}`,
+      color: "text-purple-500"
     }
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat) => (
         <Card 
           key={stat.title}
@@ -60,12 +80,16 @@ export const BurnStats = () => {
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
               <div>
-                <h3 className={`text-lg font-semibold ${stat.color}`}>
-                  {stat.title}
-                </h3>
-                <p className="text-sm text-gray-400">
-                  {stat.description}
-                </p>
+                <TooltipWrapper content={stat.description}>
+                  <h3 className={`text-lg font-semibold ${stat.color} cursor-help`}>
+                    {stat.title}
+                  </h3>
+                </TooltipWrapper>
+                {stat.subValue && (
+                  <p className="text-sm text-gray-400">
+                    {stat.subValue}
+                  </p>
+                )}
               </div>
             </div>
             <div className="text-2xl font-bold text-white">

@@ -1,8 +1,9 @@
 import { Table } from '@/components/ui/table'
-import { formatNumber, formatDate } from '@/lib/utils'
+import { formatNumber, formatDateTime, getRelativeTime } from '@/lib/utils'
 import { BURN_INFO } from '@/constants'
 import { ExternalLink } from 'lucide-react'
 import { BurnTransaction } from '@/constants/types'
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper'
 
 // Extend BurnTransaction for additional properties
 interface BurnRecord extends BurnTransaction {
@@ -30,7 +31,11 @@ export const BurnHistory = ({ burnHistory }: BurnHistoryProps) => {
             className="border-b border-orange-500/10 hover:bg-orange-500/5 transition-colors"
           >
             <td className="p-4 text-gray-300">
-              {formatDate(new Date(burn.date))}
+              <TooltipWrapper content={formatDateTime(burn.date)}>
+                <span className="cursor-help">
+                  {getRelativeTime(burn.date)}
+                </span>
+              </TooltipWrapper>
             </td>
             <td className="p-4 text-gray-300">
               {formatNumber(burn.amount)} SOBA

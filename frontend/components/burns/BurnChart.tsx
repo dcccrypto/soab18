@@ -16,7 +16,7 @@ import {
 } from 'chart.js'
 import { ExternalLink, TrendingUp, Flame, Calendar } from 'lucide-react'
 import { BURN_HISTORY, BURN_INFO } from '@/constants'
-import { formatDate, formatNumber } from '@/lib/utils'
+import { formatDate, formatNumber, isValidDate } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { BurnTransaction } from '@/constants/types'
 
@@ -59,6 +59,7 @@ export const BurnChart = () => {
   // Sort burn history by date and calculate cumulative burns
   const sortedBurns = [...BURN_HISTORY]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .filter(burn => isValidDate(burn.date)) // Filter out invalid dates
   
   let cumulativeBurns = 0
   const cumulativeData: ChartBurnData[] = sortedBurns.map(burn => {
@@ -70,13 +71,13 @@ export const BurnChart = () => {
   }).reverse() // Reverse for chronological order in chart
 
   const chartData: ChartData<'line'> = {
-    labels: cumulativeData.map(item => formatDate(new Date(item.date))),
+    labels: cumulativeData.map(item => formatDate(item.date)),
     datasets: [
       {
         label: chartView === 'cumulative' ? 'Total Burned' : 'Burn Amount',
         data: chartView === 'cumulative' 
-          ? cumulativeData.map(item => item.cumulative / 1000000)
-          : cumulativeData.map(item => item.amount / 1000000),
+          ? cumulativeData.map(item => Number((item.cumulative / 1000000).toFixed(2)))
+          : cumulativeData.map(item => Number((item.amount / 1000000).toFixed(2))),
         borderColor: '#f97316',
         backgroundColor: (context: any) => {
           const ctx = context.chart.ctx
