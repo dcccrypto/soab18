@@ -1,5 +1,4 @@
-import create from 'zustand'
-import type { StateCreator } from 'zustand'
+import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { TokenMetrics, BurnInfo, BurnTransaction } from '../constants/types'
 
@@ -52,61 +51,63 @@ interface HolderUpdate {
   holderCount: number
 }
 
-type BurnState = StateCreator<BurnStore>
-
-const createBurnStore: BurnState = (set) => ({
-  // Initial State
-  totalBurned: 0,
-  burnRate: 0,
-  burnHistory: [],
-  nextBurn: {
-    date: '',
-    amount: 0,
-    event: '',
-    description: ''
-  },
-  
-  tokenMetrics: {
-    totalSupply: 0,
-    circulatingSupply: 0,
-    burnedTokens: 0,
-    founderHolding: 0,
-    price: 0,
-    holders: 0
-  },
-  
-  price: 0,
-  marketCap: 0,
-  holderCount: 0,
-  volume24h: 0,
-  
-  // Update Actions
-  updateBurnData: (data: Partial<BurnUpdate>) => 
-    set((state) => ({
-      ...state,
-      totalBurned: data.totalBurned ?? state.totalBurned,
-      burnRate: data.burnRate ?? state.burnRate,
-      burnHistory: data.burnHistory ?? state.burnHistory,
-      nextBurn: data.nextBurn ?? state.nextBurn
-    })),
-  
-  updateMarketData: (data: Partial<MarketUpdate>) =>
-    set((state) => ({
-      ...state,
-      price: data.price ?? state.price,
-      marketCap: data.marketCap ?? state.marketCap,
-      volume24h: data.volume24h ?? state.volume24h
-    })),
-  
-  updateHolderData: (data: Partial<HolderUpdate>) =>
-    set((state) => ({
-      ...state,
-      holderCount: data.holderCount ?? state.holderCount,
+const useBurnStore = create<BurnStore>()(
+  devtools(
+    (set) => ({
+      // Initial State
+      totalBurned: 0,
+      burnRate: 0,
+      burnHistory: [],
+      nextBurn: {
+        date: '',
+        amount: 0,
+        event: '',
+        description: ''
+      },
+      
       tokenMetrics: {
-        ...state.tokenMetrics,
-        holders: data.holderCount ?? state.tokenMetrics.holders
-      }
-    }))
-})
+        totalSupply: 0,
+        circulatingSupply: 0,
+        burnedTokens: 0,
+        founderHolding: 0,
+        price: 0,
+        holders: 0
+      },
+      
+      price: 0,
+      marketCap: 0,
+      holderCount: 0,
+      volume24h: 0,
+      
+      // Update Actions
+      updateBurnData: (data: Partial<BurnUpdate>) => 
+        set((state) => ({
+          ...state,
+          totalBurned: data.totalBurned ?? state.totalBurned,
+          burnRate: data.burnRate ?? state.burnRate,
+          burnHistory: data.burnHistory ?? state.burnHistory,
+          nextBurn: data.nextBurn ?? state.nextBurn
+        })),
+      
+      updateMarketData: (data: Partial<MarketUpdate>) =>
+        set((state) => ({
+          ...state,
+          price: data.price ?? state.price,
+          marketCap: data.marketCap ?? state.marketCap,
+          volume24h: data.volume24h ?? state.volume24h
+        })),
+      
+      updateHolderData: (data: Partial<HolderUpdate>) =>
+        set((state) => ({
+          ...state,
+          holderCount: data.holderCount ?? state.holderCount,
+          tokenMetrics: {
+            ...state.tokenMetrics,
+            holders: data.holderCount ?? state.tokenMetrics.holders
+          }
+        }))
+    })
+  )
+)
 
-export const useBurnStore = create<BurnStore>()(devtools(createBurnStore))
+export { useBurnStore }
