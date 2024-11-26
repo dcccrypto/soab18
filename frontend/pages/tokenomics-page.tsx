@@ -107,12 +107,12 @@ export default function TokenomicsPage() {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
         VALUE: totalSupply
       },
-      CIRCULATING_SUPPLY: {
-        ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING_SUPPLY,
+      CIRCULATING: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING,
         VALUE: circulatingSupply
       },
-      BURNED_SUPPLY: {
-        ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED_SUPPLY,
+      BURNED: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED,
         VALUE: burnedTokens
       },
       HOLDERS: {
