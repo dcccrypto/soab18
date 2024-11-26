@@ -16,6 +16,7 @@ export interface MetricItems {
 export interface TokenStats {
   price: number
   totalSupply: number
+  circulatingSupply: number
   founderBalance: number
   holders: number
   lastUpdated: string
@@ -24,4 +25,4 @@ export interface TokenStats {
 export interface TokenStatsResponse extends TokenStats {
   cached?: boolean
   cacheAge?: number
-} 
+}
