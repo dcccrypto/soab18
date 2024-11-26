@@ -1,34 +1,16 @@
-import { useState, useEffect } from 'react'
-import { formatNumber } from '@/lib/utils'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/services/api'
+import { TokenStatsResponse } from '@/types'
 
-export const useTokenStats = () => {
-  const [stats, setStats] = useState({
-    totalSupply: 0,
-    circulatingSupply: 0,
-    burnedTokens: 0,
-    price: 0,
-    holders: 0
+export function useTokenStats() {
+  return useQuery<TokenStatsResponse>({
+    queryKey: ['tokenStats'],
+    queryFn: api.getTokenStats,
+    refetchInterval: 60000, // Refetch every minute
+    select: (data) => ({
+      ...data,
+      circulatingSupply: data.totalSupply - data.founderBalance,
+      marketCap: data.price * (data.totalSupply - data.founderBalance)
+    })
   })
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch('/api/token-stats')
-        const data = await response.json()
-        setStats(data)
-      } catch (error) {
-        console.error('Failed to fetch token stats:', error)
-      }
-    }
-
-    // Initial fetch
-    fetchStats()
-
-    // Set up polling every 30 seconds
-    const interval = setInterval(fetchStats, 30000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  return stats
 } 

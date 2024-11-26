@@ -7,7 +7,7 @@ interface WebSocketStore {
   disconnect: () => void
 }
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://api.soba18.com/ws'
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL
 
 const useWebSocket = create<WebSocketStore>()(
   devtools((set, get) => ({
@@ -15,7 +15,7 @@ const useWebSocket = create<WebSocketStore>()(
     connect: () => {
       if (typeof window === 'undefined') return;
       
-      const socket = new WebSocket(WS_URL)
+      const socket = new WebSocket(WS_URL!)
       
       socket.onopen = () => {
         console.log('WebSocket connected')

@@ -23,6 +23,7 @@ import { ButtonBase } from '@/components/ui/button-base'
 import { SubmitMemeModal } from '@/components/SubmitMemeModal'
 import { formatNumber } from '@/lib/utils'
 import fetcher from '@/lib/fetcher'
+import { ApiTest } from '@/components/ApiTest'
 
 interface DexLink {
   name: string
@@ -214,7 +215,9 @@ export default function LandingPage() {
               <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto leading-relaxed drop-shadow-xl">
                 Join the most rebellious and innovative memecoin on Solana
               </p>
-              
+　　 　 　 　 <div className="container mx-auto px-4 py-8">
+                <ApiTest />
+　　 　 　 　 </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 mt-8">
                 <motion.div
                   variants={{
@@ -553,8 +556,7 @@ export default function LandingPage() {
               <h2 className="text-3xl font-bold mb-8 md:mb-10 text-center gradient-text">
                 Community Gallery
               </h2>
-              
-              <div className="relative group">
+　　 　 　 　 <div className="relative group">
                 <div className="overflow-x-auto overflow-y-hidden scrollbar-none">
                   <div className="flex gap-4 md:gap-6 pb-4 min-w-full">
                     {Object.entries(MEME_IMAGES).map(([key, path], index) => (

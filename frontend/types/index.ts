@@ -14,11 +14,14 @@ export interface MetricItems {
 }
 
 export interface TokenStats {
-  price: number;
-  totalSupply: number;
-  founderBalance: number;
-  holders: number;
-  lastUpdated: string;
-  cached?: boolean;
-  cacheAge?: number;
+  price: number
+  totalSupply: number
+  founderBalance: number
+  holders: number
+  lastUpdated: string
+}
+
+export interface TokenStatsResponse extends TokenStats {
+  cached?: boolean
+  cacheAge?: number
 } 

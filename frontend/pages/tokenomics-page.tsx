@@ -70,9 +70,8 @@ export default function TokenomicsPage() {
     return new Intl.NumberFormat('en-US').format(num)
   }
 
-  const formatPercent = (value: number) => {
-    const totalSupply = TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE
-    return ((value / totalSupply) * 100).toFixed(2) + '%'
+  const formatPercent = (value: number, total: number) => {
+    return ((value / total) * 100).toFixed(2) + '%'
   }
 
   const getMetricDetails = (metric: MetricKey) => {
@@ -95,44 +94,75 @@ export default function TokenomicsPage() {
   })
 
   const isLoading = !tokenStats && !error
+
+  // Get the latest metrics from API or fallback to static content
+  const getMetrics = () => {
+    if (!tokenStats?.tokenMetrics) return TOKENOMICS_CONTENT.METRICS.ITEMS;
+
+    const { totalSupply, circulatingSupply, burnedTokens, holders, price, founderHolding } = tokenStats.tokenMetrics;
+    
+    return {
+      ...TOKENOMICS_CONTENT.METRICS.ITEMS,
+      TOTAL_SUPPLY: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
+        VALUE: totalSupply
+      },
+      CIRCULATING_SUPPLY: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING_SUPPLY,
+        VALUE: circulatingSupply
+      },
+      BURNED_SUPPLY: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED_SUPPLY,
+        VALUE: burnedTokens
+      },
+      HOLDERS: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
+        VALUE: holders
+      },
+      PRICE: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.PRICE,
+        VALUE: price
+      }
+    };
+  };
   
   // Calculate supply distribution
   const getSupplyData = () => {
-    if (!tokenStats?.tokenMetrics) return []
+    if (!tokenStats?.tokenMetrics) return TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA;
     
-    const { circulatingSupply, burnedTokens, founderHolding } = tokenStats.tokenMetrics
+    const { totalSupply, circulatingSupply, burnedTokens, founderHolding } = tokenStats.tokenMetrics;
 
     return [
       {
         name: 'Circulating Supply',
         value: circulatingSupply,
         icon: Users,
-        color: COLORS[0]
+        color: '#FF6B00'
       },
       {
         name: 'Founder Holding',
         value: founderHolding || 0,
         icon: Lock,
-        color: COLORS[1]
+        color: '#FF8A00'
       },
       {
         name: 'Burned Supply',
         value: burnedTokens,
         icon: Flame,
-        color: COLORS[2]
+        color: '#FFA500'
       }
     ]
   }
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload
+      const data = payload[0].payload;
+      const total = tokenStats?.tokenMetrics?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
       return (
         <div className="bg-black/90 p-4 rounded-lg border border-orange-500/20">
           <p className="text-orange-500 font-semibold">{data.name}</p>
-          <p className="text-white">
-            {new Intl.NumberFormat().format(data.value)} 
-          </p>
+          <p className="text-white">{formatNumber(data.value)}</p>
+          <p className="text-orange-400/80">{formatPercent(data.value, total)}</p>
         </div>
       )
     }
@@ -265,52 +295,38 @@ export default function TokenomicsPage() {
           </div>
         </div>
 
-        {/* Metrics Cards */}
+        {/* Token Metrics Grid */}
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-              {Object.entries(TOKENOMICS_CONTENT.METRICS.ITEMS).map(([key, value]) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+              {Object.entries(getMetrics()).map(([key, metric]) => (
                 <motion.div
                   key={key}
+                  variants={fadeInUpVariant}
                   whileHover={{ scale: 1.02 }}
-                  onHoverStart={() => setHoveredMetric(key as MetricKey)}
-                  onHoverEnd={() => setHoveredMetric(null)}
+                  className={`relative p-6 rounded-xl bg-black/20 border border-orange-500/20 transition-colors duration-300
+                    ${hoveredMetric === key ? 'bg-black/30' : ''}`}
+                  onMouseEnter={() => setHoveredMetric(key)}
+                  onMouseLeave={() => setHoveredMetric(null)}
                 >
-                  <Card className="bg-[#111] border-orange-900/50 relative overflow-hidden">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-orange-500 capitalize">
-                        {value.TITLE}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {value.DISPLAY_TYPE === "number" && (
-                          <p className="text-2xl font-bold text-orange-400">
-                            {formatNumber(value.VALUE)}
-                          </p>
-                        )}
-                        <div className="text-sm text-orange-300/80">
-                          {value.DESCRIPTION}
-                        </div>
-                      </div>
-
-                      <AnimatePresence>
-                        {hoveredMetric === key && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 20 }}
-                            className="absolute inset-0 bg-[#111]/95 p-4 flex items-center justify-center"
-                          >
-                            <div className="text-center space-y-2">
-                              <Info className="w-6 h-6 text-orange-500 mx-auto" />
-                              <p className="text-orange-300 text-sm">{value.DESCRIPTION}</p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </CardContent>
-                  </Card>
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold text-orange-400">{metric.LABEL}</h3>
+                    {metric.DESCRIPTION && (
+                      <ButtonBase
+                        variant="ghost"
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => openDialog(metric.LABEL, metric.DESCRIPTION)}
+                      >
+                        <Info className="w-4 h-4 text-orange-500/70" />
+                      </ButtonBase>
+                    )}
+                  </div>
+                  <AnimatedValue
+                    value={formatNumber(metric.VALUE)}
+                    suffix={metric.SUFFIX}
+                    className="text-2xl font-bold"
+                  />
                 </motion.div>
               ))}
             </div>

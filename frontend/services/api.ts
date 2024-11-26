@@ -1,66 +1,26 @@
-import axios, { AxiosError } from 'axios';
-import { BurnTransaction, TokenMetrics } from '@/constants/types';
+import axios from 'axios'
+import { TokenStatsResponse } from '@/types'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://soba-api.herokuapp.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
-export interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message?: string;
-}
-
-export interface ApiError {
-  message: string;
-  code: string;
-  status: number;
-}
-
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  timeout: 10000 // 10 second timeout
-});
-
-// Add response interceptor for error handling
-api.interceptors.response.use(
-  response => response,
-  (error: AxiosError<ApiError>) => {
-    const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-    console.error(`[API Error] ${errorMessage}:`, error);
-    throw error;
-  }
-);
-
-export const tokenService = {
-  async getBurnHistory(): Promise<ApiResponse<BurnTransaction[]>> {
+export const api = {
+  async getTokenStats(): Promise<TokenStatsResponse> {
     try {
-      const response = await api.get<ApiResponse<BurnTransaction[]>>('/api/burn-history');
-      return response.data;
+      const response = await axios.get<TokenStatsResponse>(`${API_BASE_URL}/api/token-stats`)
+      return response.data
     } catch (error) {
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message : 'Failed to fetch burn history');
+      console.error('Error fetching token stats:', error)
+      throw error
     }
   },
 
-  async getTokenStats(): Promise<ApiResponse<TokenMetrics>> {
+  async getHealth(): Promise<{ status: string }> {
     try {
-      const response = await api.get<ApiResponse<TokenMetrics>>('/api/token-stats');
-      return response.data;
+      const response = await axios.get(`${API_BASE_URL}/api/health`)
+      return response.data
     } catch (error) {
-      throw new Error(error instanceof AxiosError ? error.response?.data?.message : 'Failed to fetch token stats');
+      console.error('Error checking health:', error)
+      throw error
     }
   }
-};
-
-export const checkApiHealth = async (): Promise<boolean> => {
-  try {
-    const response = await api.get('/health');
-    return response.status === 200;
-  } catch (error) {
-    console.error('[API Error] Health check failed:', error);
-    return false;
-  }
-};
-
-export default api;
+}
