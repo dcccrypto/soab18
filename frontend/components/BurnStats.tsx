@@ -18,8 +18,7 @@ export const BurnStats = () => {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await api.getTokenStats();
-        const stats = response.data;
+        const stats = await api.getTokenStats();
         setBurnStats({
           totalBurned: stats.totalSupply - stats.circulatingSupply,
           burnRate: ((stats.totalSupply - stats.circulatingSupply) / stats.totalSupply) * 100,
