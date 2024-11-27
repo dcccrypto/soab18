@@ -25,8 +25,8 @@ export default async function handler(
       marketCap: Number(data.marketCap),
       totalValue: Number(data.totalValue),
       founderValue: Number(data.founderValue),
-      burnedTokens: Number(data.burnedTokens),
-      burnedValue: Number(data.burnedValue),
+      toBeBurnedTokens: Number(data.toBeBurnedTokens),
+      toBeBurnedValue: Number(data.toBeBurnedValue),
       lastUpdated: data.lastUpdated,
       cached: data.cached,
       cacheAge: data.cacheAge ? Number(data.cacheAge) : undefined
@@ -45,8 +45,8 @@ export default async function handler(
       marketCap: 0,
       totalValue: 0,
       founderValue: 0,
-      burnedTokens: 0,
-      burnedValue: 0,
+      toBeBurnedTokens: 0,
+      toBeBurnedValue: 0,
       lastUpdated: new Date().toISOString(),
       cached: false
     });

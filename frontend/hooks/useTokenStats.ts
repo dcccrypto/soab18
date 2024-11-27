@@ -23,8 +23,8 @@ export const useTokenStats = () => {
         marketCap: Number(data.marketCap),
         totalValue: Number(data.totalValue),
         founderValue: Number(data.founderValue),
-        burnedTokens: Number(data.burnedTokens),
-        burnedValue: Number(data.burnedValue)
+        toBeBurnedTokens: Number(data.toBeBurnedTokens),
+        toBeBurnedValue: Number(data.toBeBurnedValue)
       };
       console.log('[Hook] Processed token stats:', processed);
       return processed;

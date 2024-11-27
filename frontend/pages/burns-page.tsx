@@ -407,9 +407,9 @@ export default function BurnsPage() {
           </ScrollAnimatedSection>
           <div className="stats-container">
             <div className="stat-box">
-              <h3>Burned SOBA Tokens</h3>
-              <p className="value">{formatNumber(tokenStats?.burnedTokens || 0)} SOBA</p>
-              <p className="usd-value">${formatNumber(tokenStats?.burnedValue || 0, 2)} USD</p>
+              <h3>SOBA Tokens To Be Burned</h3>
+              <p className="value">{formatNumber(tokenStats?.toBeBurnedTokens || 0)} SOBA</p>
+              <p className="usd-value">${formatNumber(tokenStats?.toBeBurnedValue || 0, 2)} USD</p>
             </div>
             <div className="stat-box">
               <h3>Current SOBA Price</h3>
