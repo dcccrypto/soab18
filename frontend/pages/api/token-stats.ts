@@ -1,70 +1,53 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { BURN_INFO, TOKEN_INFO } from '@/constants'
-import type { TokenMetrics } from '@/constants/types'
-
-// Force the correct backend URL
-const BACKEND_API = 'https://soba-api-v1-127255a88636.herokuapp.com'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { TokenStatsResponse } from '@/constants/types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<TokenStatsResponse>
 ) {
   try {
-    console.log('Token stats request received')
-    console.log('Backend URL:', BACKEND_API)
-    console.log('Environment variables:', {
-      NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-      VERCEL_URL: process.env.VERCEL_URL
-    })
-
-    // Fetch token stats from backend
-    const response = await fetch(`${BACKEND_API}/api/token-stats`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': process.env.VERCEL_URL || 'https://gyevw.vercel.app'
-      }
-    })
-    
-    console.log('Backend response status:', response.status)
-    console.log('Backend response headers:', Object.fromEntries(response.headers.entries()))
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/token-stats`);
     
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Backend response error:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url,
-        body: errorText
-      })
-      throw new Error(`Failed to fetch token stats: ${response.status} ${errorText}`)
+      throw new Error(`API responded with status: ${response.status}`);
     }
-    
-    const data = await response.json()
-    console.log('Successfully fetched token stats:', data)
-    
-    res.status(200).json(data)
+
+    const data = await response.json();
+
+    // Ensure all numeric values are properly formatted
+    const formattedData: TokenStatsResponse = {
+      price: Number(data.price),
+      totalSupply: Number(data.totalSupply),
+      circulatingSupply: Number(data.circulatingSupply),
+      founderBalance: Number(data.founderBalance),
+      holders: Number(data.holders),
+      marketCap: Number(data.marketCap),
+      totalValue: Number(data.totalValue),
+      founderValue: Number(data.founderValue),
+      burnedTokens: Number(data.burnedTokens),
+      burnedValue: Number(data.burnedValue),
+      lastUpdated: data.lastUpdated,
+      cached: data.cached,
+      cacheAge: data.cacheAge ? Number(data.cacheAge) : undefined
+    };
+
+    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=59');
+    res.status(200).json(formattedData);
   } catch (error) {
-    console.error('Error in token stats handler:', error)
-    if (error instanceof Error) {
-      console.error('Error stack:', error.stack)
-    }
-    
-    // Return fallback data with error
-    res.status(500).json({ 
-      tokenMetrics: {
-        totalSupply: TOKEN_INFO.TOTAL_SUPPLY,
-        circulatingSupply: TOKEN_INFO.CIRCULATING_SUPPLY,
-        burnedTokens: BURN_INFO.TOTAL_BURNED,
-        founderHolding: 0,
-        price: 0,
-        holders: 0
-      },
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch token stats',
-      timestamp: new Date().toISOString()
-    })
+    console.error('[Token Stats API Error]:', error);
+    res.status(500).json({
+      price: 0,
+      totalSupply: 0,
+      circulatingSupply: 0,
+      founderBalance: 0,
+      holders: 0,
+      marketCap: 0,
+      totalValue: 0,
+      founderValue: 0,
+      burnedTokens: 0,
+      burnedValue: 0,
+      lastUpdated: new Date().toISOString(),
+      cached: false
+    });
   }
 }

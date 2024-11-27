@@ -13,19 +13,20 @@ import { BurnChart } from '@/components/burns/BurnChart'
 import { BURN_INFO, BURN_SECTIONS } from '@/constants'
 import { formatNumber, formatDate } from '@/lib/utils'
 import { useBurnStats } from '@/hooks/useBurnStats'
+import { useTokenStats } from '@/hooks/useTokenStats'
 import Image from 'next/image'
 import { Header } from '@/components/Header'
 import useSWR from 'swr'
 import fetcher from '@/lib/fetcher'
 
 const SOBA_QUOTES = [
-  "Time to make SOBA more scarce! 🔥",
-  "Every burn makes SOBA stronger! 💪",
+  "Time to make SOBA more scarce! ",
+  "Every burn makes SOBA stronger! ",
   "Join the burn revolution! ",
-  "SOBA getting rarer by the minute! ⏰",
-  "Less SOBA = More Value! 📈",
-  "December Mega Burn incoming! 🔥",
-  "December 1st - Mark your calendars! 📅"
+  "SOBA getting rarer by the minute! ",
+  "Less SOBA = More Value! ",
+  "December Mega Burn incoming! ",
+  "December 1st - Mark your calendars! "
 ] as const
 
 const fadeInUpVariant = {
@@ -52,12 +53,13 @@ const TooltipProviderComponent = dynamic(
 )
 
 export default function BurnsPage() {
-  const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
+  const { data: tokenStats } = useTokenStats()
+  const { data: tokenStatsSWR, error } = useSWR('/api/token-stats', fetcher, {
     refreshInterval: 30000
   })
 
   // Add loading state
-  if (!tokenStats) {
+  if (!tokenStatsSWR) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <motion.div
@@ -289,7 +291,7 @@ export default function BurnsPage() {
                         <p className="text-sm text-gray-400 mb-1">Tokens Collected</p>
                         <div className="flex items-end gap-2">
                           <p className="text-xl font-bold text-orange-500">
-                            <AnimatedNumber value={tokenStats.burnedTokens} />
+                            <AnimatedNumber value={tokenStatsSWR?.burnedTokens || 0} />
                             <span className="ml-2">SOBA</span>
                           </p>
                         </div>
@@ -297,7 +299,7 @@ export default function BurnsPage() {
                       <div>
                         <p className="text-sm text-gray-400 mb-1">Current Value</p>
                         <p className="text-xl font-bold text-green-500">
-                          ${formatNumber(BURN_INFO.NEXT_BURN.CURRENT_USD_VALUE)}
+                          ${formatNumber(tokenStatsSWR?.burnedValue || 0, 2)}
                         </p>
                       </div>
                     </div>
@@ -403,6 +405,17 @@ export default function BurnsPage() {
             </div>
           }>
           </ScrollAnimatedSection>
+          <div className="stats-container">
+            <div className="stat-box">
+              <h3>Burned SOBA Tokens</h3>
+              <p className="value">{formatNumber(tokenStats?.burnedTokens || 0)} SOBA</p>
+              <p className="usd-value">${formatNumber(tokenStats?.burnedValue || 0, 2)} USD</p>
+            </div>
+            <div className="stat-box">
+              <h3>Current SOBA Price</h3>
+              <p className="value">${formatNumber(tokenStats?.price || 0, 12)}</p>
+            </div>
+          </div>
         </main>
       </div>
     </div>
