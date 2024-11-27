@@ -48,16 +48,16 @@ export interface TokenStatsResponse {
   price: number
   totalSupply: number
   circulatingSupply: number
+  founderBalance: number
   holders: number
-  lastUpdated: string
-  cached?: boolean
-  cacheAge?: number
   marketCap: number
   totalValue: number
-  founderBalance: number
   founderValue: number
   toBeBurnedTokens: number
   toBeBurnedValue: number
+  lastUpdated: string
+  cached: boolean
+  cacheAge?: number
 }
 
 export interface DynamicConstants {
