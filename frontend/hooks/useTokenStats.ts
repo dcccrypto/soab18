@@ -10,19 +10,24 @@ export const useTokenStats = () => {
     staleTime: 15000, // Consider data stale after 15 seconds
     gcTime: 1000 * 60 * 5, // Garbage collection time (formerly cacheTime)
     retry: 3,
-    select: (data) => ({
-      ...data,
-      // Ensure all numeric values are properly formatted
-      price: Number(data.price),
-      totalSupply: Number(data.totalSupply),
-      circulatingSupply: Number(data.circulatingSupply),
-      founderBalance: Number(data.founderBalance),
-      holders: Number(data.holders),
-      marketCap: Number(data.marketCap),
-      totalValue: Number(data.totalValue),
-      founderValue: Number(data.founderValue),
-      burnedTokens: Number(data.burnedTokens),
-      burnedValue: Number(data.burnedValue)
-    })
+    select: (data) => {
+      console.log('[Hook] Processing token stats:', data);
+      const processed = {
+        ...data,
+        // Ensure all numeric values are properly formatted
+        price: Number(data.price),
+        totalSupply: Number(data.totalSupply),
+        circulatingSupply: Number(data.circulatingSupply),
+        founderBalance: Number(data.founderBalance),
+        holders: Number(data.holders),
+        marketCap: Number(data.marketCap),
+        totalValue: Number(data.totalValue),
+        founderValue: Number(data.founderValue),
+        burnedTokens: Number(data.burnedTokens),
+        burnedValue: Number(data.burnedValue)
+      };
+      console.log('[Hook] Processed token stats:', processed);
+      return processed;
+    }
   });
 };
