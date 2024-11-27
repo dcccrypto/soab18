@@ -44,14 +44,20 @@ export interface SocialStats {
   }
 }
 
-export interface TokenStats {
+export interface TokenStatsResponse {
+  price: number
   totalSupply: number
   circulatingSupply: number
-  price: number
   holders: number
   lastUpdated: string
   cached?: boolean
   cacheAge?: number
+  marketCap: number
+  totalValue: number
+  founderBalance: number
+  founderValue: number
+  burnedTokens: number
+  burnedValue: number
 }
 
 export interface DynamicConstants {

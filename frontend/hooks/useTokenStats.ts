@@ -1,16 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
-import { api } from '@/services/api'
-import { TokenStatsResponse } from '@/types'
+import { useQuery } from '@tanstack/react-query';
+import { fetchTokenStats } from '@/constants/api';
+import type { TokenStatsResponse } from '@/constants/types';
 
-export function useTokenStats() {
+export const useTokenStats = () => {
   return useQuery<TokenStatsResponse>({
     queryKey: ['tokenStats'],
-    queryFn: api.getTokenStats,
+    queryFn: fetchTokenStats,
     refetchInterval: 60000, // Refetch every minute
-    select: (data) => ({
-      ...data,
-      circulatingSupply: data.totalSupply - data.founderBalance,
-      marketCap: data.price * (data.totalSupply - data.founderBalance)
-    })
-  })
-} 
+  });
+};
