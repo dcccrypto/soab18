@@ -119,36 +119,35 @@ export default function TokenomicsPage() {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
         VALUE: holders
       },
-      PRICE: {
-        ...TOKENOMICS_CONTENT.METRICS.ITEMS.PRICE,
-        VALUE: price
+      TOKEN_PRICE: {
+        TITLE: 'Token Price',
+        VALUE: price,
+        DESCRIPTION: 'Current token price in USD',
+        DISPLAY_TYPE: 'price'
       }
     };
   };
   
   // Calculate supply distribution
   const getSupplyData = () => {
-    if (!tokenStats?.tokenMetrics) return TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA;
+    if (!tokenStats?.tokenMetrics) return [...TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA];
     
     const { totalSupply, circulatingSupply, burnedTokens, founderHolding } = tokenStats.tokenMetrics;
 
     return [
       {
-        name: 'Circulating Supply',
+        label: 'Circulating Supply',
         value: circulatingSupply,
-        icon: Users,
         color: '#FF6B00'
       },
       {
-        name: 'Founder Holding',
+        label: 'Founder Holding',
         value: founderHolding || 0,
-        icon: Lock,
-        color: '#FF8A00'
+        color: '#FF8C00'
       },
       {
-        name: 'Burned Supply',
+        label: 'Burned Supply',
         value: burnedTokens,
-        icon: Flame,
         color: '#FFA500'
       }
     ]
@@ -160,7 +159,7 @@ export default function TokenomicsPage() {
       const total = tokenStats?.tokenMetrics?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
       return (
         <div className="bg-black/90 p-4 rounded-lg border border-orange-500/20">
-          <p className="text-orange-500 font-semibold">{data.name}</p>
+          <p className="text-orange-500 font-semibold">{data.label}</p>
           <p className="text-white">{formatNumber(data.value)}</p>
           <p className="text-orange-400/80">{formatPercent(data.value, total)}</p>
         </div>
@@ -253,12 +252,15 @@ export default function TokenomicsPage() {
                 <div className="grid grid-cols-1 gap-4 mt-8">
                   {getSupplyData().map((item, index) => (
                     <div 
-                      key={item.name}
+                      key={item.label}
                       className="flex items-center justify-between p-4 rounded-lg bg-black/20 border border-orange-500/10"
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className="w-5 h-5 text-orange-500" />
-                        <span className="text-gray-300">{item.name}</span>
+                        <div 
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-gray-300">{item.label}</span>
                       </div>
                       <span className="text-orange-500 font-mono">
                         {new Intl.NumberFormat().format(item.value)}
@@ -276,7 +278,7 @@ export default function TokenomicsPage() {
           <div className="flex justify-center gap-8 mb-12">
             {getSupplyData().map((entry, index) => (
               <motion.div
-                key={entry.name}
+                key={entry.label}
                 className="flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 animate={{ opacity: activeIndex === null || activeIndex === index ? 1 : 0.5 }}
@@ -288,7 +290,7 @@ export default function TokenomicsPage() {
                   style={{ backgroundColor: entry.color }}
                 />
                 <span className="text-orange-300">
-                  {entry.name}: {entry.value}%
+                  {entry.label}: {entry.value}%
                 </span>
               </motion.div>
             ))}
@@ -310,13 +312,13 @@ export default function TokenomicsPage() {
                   onMouseLeave={() => setHoveredMetric(null)}
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-orange-400">{metric.LABEL}</h3>
+                    <h3 className="text-lg font-semibold text-orange-400">{metric.TITLE}</h3>
                     {metric.DESCRIPTION && (
                       <ButtonBase
                         variant="ghost"
                         size="sm"
                         className="w-8 h-8 p-0"
-                        onClick={() => openDialog(metric.LABEL, metric.DESCRIPTION)}
+                        onClick={() => openDialog(metric.TITLE, metric.DESCRIPTION)}
                       >
                         <Info className="w-4 h-4 text-orange-500/70" />
                       </ButtonBase>
@@ -324,7 +326,7 @@ export default function TokenomicsPage() {
                   </div>
                   <AnimatedValue
                     value={formatNumber(metric.VALUE)}
-                    suffix={metric.SUFFIX}
+                    suffix={metric.DISPLAY_TYPE === 'price' ? ' USD' : ' SOBA'}
                     className="text-2xl font-bold"
                   />
                 </motion.div>

@@ -376,6 +376,12 @@ export const TOKENOMICS_CONTENT = {
         VALUE: 1000,
         DESCRIPTION: 'Unique wallet addresses',
         DISPLAY_TYPE: 'number'
+      },
+      PRICE: {
+        TITLE: 'Token Price',
+        VALUE: 0,
+        DESCRIPTION: 'Current token price in USD',
+        DISPLAY_TYPE: 'price'
       }
     }
   },
