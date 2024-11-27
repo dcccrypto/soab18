@@ -74,9 +74,9 @@ export const TokenStatsDisplay = () => {
       color: "text-red-500"
     },
     {
-      title: "Burned Tokens",
-      value: formatNumber(stats.burnedTokens),
-      description: `$${formatNumber(stats.burnedValue, 2)} USD`,
+      title: "Tokens to be Burned",
+      value: formatNumber(stats.toBeBurnedTokens),
+      description: `$${formatNumber(stats.toBeBurnedValue, 2)} USD`,
       icon: <Flame className="text-orange-500" />,
       color: "text-orange-500"
     },

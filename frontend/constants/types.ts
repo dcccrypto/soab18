@@ -56,8 +56,8 @@ export interface TokenStatsResponse {
   totalValue: number
   founderBalance: number
   founderValue: number
-  burnedTokens: number
-  burnedValue: number
+  toBeBurnedTokens: number
+  toBeBurnedValue: number
 }
 
 export interface DynamicConstants {
