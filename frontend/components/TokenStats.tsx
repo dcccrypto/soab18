@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 import { formatNumber, formatDateTime } from '@/lib/utils';
 import { useTokenStats } from '@/hooks/useTokenStats';
-import { DollarSign, TrendingUp, Users, Flame, Clock } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, Flame, Clock, Wallet } from 'lucide-react';
 
 export const TokenStatsDisplay = () => {
   const { data: stats, isLoading, error } = useTokenStats();
@@ -70,7 +70,7 @@ export const TokenStatsDisplay = () => {
       title: "Founder Balance",
       value: formatNumber(stats.founderBalance),
       description: `$${formatNumber(stats.founderValue, 2)} USD`,
-      icon: <Flame className="text-red-500" />,
+      icon: <Wallet className="text-red-500" />,
       color: "text-red-500"
     },
     {
