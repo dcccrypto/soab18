@@ -6,7 +6,8 @@ export default async function handler(
   res: NextApiResponse<TokenStatsResponse>
 ) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token-stats`);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
+    const response = await fetch(`${apiUrl}/token-stats`);
     
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`);
