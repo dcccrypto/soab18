@@ -9,13 +9,24 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
+    console.log('Attempting to fetch token stats from:', `${BACKEND_API}/api/token-stats`)
     // Fetch token stats from backend
-    const response = await fetch(`${BACKEND_API}/api/token-stats`)
+    const response = await fetch(`${BACKEND_API}/api/token-stats`, {
+      headers: {
+        'Accept': 'application/json',
+        'Origin': process.env.VERCEL_URL || 'https://gyevw.vercel.app'
+      }
+    })
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch token stats from backend')
+      const errorText = await response.text()
+      console.error('Backend response not OK:', response.status, errorText)
+      throw new Error(`Failed to fetch token stats from backend: ${response.status} ${errorText}`)
     }
+    
     const data = await response.json()
-
+    console.log('Successfully fetched token stats')
+    
     res.status(200).json(data)
   } catch (error) {
     console.error('Error fetching token stats:', error)
@@ -29,7 +40,7 @@ export default async function handler(
         holders: 0
       },
       success: false,
-      error: 'Failed to fetch token stats'
+      error: error instanceof Error ? error.message : 'Failed to fetch token stats'
     })
   }
 }
