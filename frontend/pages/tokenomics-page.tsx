@@ -9,7 +9,7 @@ import { Flame, Users, Lock, Eye, Vote, LineChart, Info, ArrowRight } from 'luci
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Header } from '@/components/Header'
-import { TOKENOMICS_CONTENT } from '@/constants'
+import { TOKENOMICS_CONTENT, BURN_INFO } from '@/constants'
 import { ButtonBase } from '@/components/ui/button-base'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { type MetricItems } from '@/types'
@@ -99,13 +99,13 @@ export default function TokenomicsPage() {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
         VALUE: tokenStats.totalSupply
       },
-      CIRCULATING: {
-        ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING,
-        VALUE: tokenStats.circulatingSupply
+      FOUNDER: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.FOUNDER,
+        VALUE: tokenStats.founderBalance
       },
       BURNED: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED,
-        VALUE: tokenStats.toBeBurnedTokens
+        VALUE: BURN_INFO.TOTAL_BURNED
       },
       HOLDERS: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
@@ -137,7 +137,7 @@ export default function TokenomicsPage() {
       },
       {
         label: 'Burned Supply',
-        value: tokenStats.toBeBurnedTokens,
+        value: BURN_INFO.TOTAL_BURNED,
         color: '#FFA500'
       }
     ];
@@ -280,7 +280,7 @@ export default function TokenomicsPage() {
                   style={{ backgroundColor: entry.color }}
                 />
                 <span className="text-orange-300">
-                  {entry.label}: {entry.value}%
+                  {entry.label}: {entry.value}% 
                 </span>
               </motion.div>
             ))}

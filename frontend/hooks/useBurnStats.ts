@@ -14,17 +14,17 @@ export const useBurnStats = (): BurnStats => {
 
   if (!tokenStats) {
     return {
-      burnedTokens: 0,
-      burnRate: 0,
+      burnedTokens: BURN_INFO.TOTAL_BURNED,
+      burnRate: BURN_INFO.BURN_RATE,
       burnedValue: 0,
-      nextBurnDate: new Date()
+      nextBurnDate: new Date(BURN_INFO.NEXT_BURN.TARGET_DATE)
     }
   }
 
   return {
-    burnedTokens: tokenStats.toBeBurnedTokens,
-    burnRate: tokenStats.burnRate || 0,
-    burnedValue: tokenStats.toBeBurnedValue,
-    nextBurnDate: new Date(tokenStats.lastUpdated)
+    burnedTokens: BURN_INFO.TOTAL_BURNED,
+    burnRate: BURN_INFO.BURN_RATE,
+    burnedValue: BURN_INFO.TOTAL_BURNED * tokenStats.price,
+    nextBurnDate: new Date(BURN_INFO.NEXT_BURN.TARGET_DATE)
   }
 }
