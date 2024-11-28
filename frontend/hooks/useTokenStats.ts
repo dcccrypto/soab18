@@ -12,20 +12,38 @@ export const useTokenStats = () => {
     retry: 3,
     select: (data) => {
       console.log('[Hook] Processing token stats:', data);
+      
+      // Ensure all values are valid numbers
+      const ensureNumber = (value: any): number => {
+        const num = Number(value);
+        return isNaN(num) ? 0 : num;
+      };
+
       const processed = {
         ...data,
-        // Ensure all numeric values are properly formatted
-        price: Number(data.price),
-        totalSupply: Number(data.totalSupply),
-        circulatingSupply: Number(data.circulatingSupply),
-        founderBalance: Number(data.founderBalance),
-        holders: Number(data.holders),
-        marketCap: Number(data.marketCap),
-        totalValue: Number(data.totalValue),
-        founderValue: Number(data.founderValue),
-        toBeBurnedTokens: Number(data.toBeBurnedTokens),
-        toBeBurnedValue: Number(data.toBeBurnedValue)
+        price: ensureNumber(data.price),
+        totalSupply: ensureNumber(data.totalSupply),
+        circulatingSupply: ensureNumber(data.circulatingSupply),
+        founderBalance: ensureNumber(data.founderBalance),
+        holders: ensureNumber(data.holders),
+        marketCap: ensureNumber(data.marketCap),
+        totalValue: ensureNumber(data.totalValue),
+        founderValue: ensureNumber(data.founderValue),
+        toBeBurnedTokens: ensureNumber(data.toBeBurnedTokens),
+        toBeBurnedValue: ensureNumber(data.toBeBurnedValue),
+        lastUpdated: data.lastUpdated || new Date().toISOString(),
+        cached: Boolean(data.cached),
+        cacheAge: ensureNumber(data.cacheAge)
       };
+
+      // Validate processed data
+      console.log('[Hook] Validation:', {
+        hasValidPrice: processed.price > 0,
+        hasValidSupply: processed.totalSupply > 0,
+        hasValidCirculating: processed.circulatingSupply >= 0,
+        supplyCheck: processed.totalSupply >= (processed.circulatingSupply + processed.founderBalance + processed.toBeBurnedTokens)
+      });
+
       console.log('[Hook] Processed token stats:', processed);
       return processed;
     }
