@@ -41,6 +41,7 @@ export const useTokenStats = () => {
         founderValue: ensureNumber(data.founderValue),
         toBeBurnedTokens: ensureNumber(data.toBeBurnedTokens),
         toBeBurnedValue: ensureNumber(data.toBeBurnedValue),
+        burnRate: ensureNumber(data.burnRate),
         lastUpdated: data.lastUpdated || new Date().toISOString(),
         cached: Boolean(data.cached),
         cacheAge: ensureNumber(data.cacheAge)

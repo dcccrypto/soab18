@@ -14,8 +14,7 @@ import { ButtonBase } from '@/components/ui/button-base'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { type MetricItems } from '@/types'
 import Image from 'next/image'
-import useSWR from 'swr'
-import fetcher from '@/lib/fetcher'
+import { useTokenStats } from '@/hooks/useTokenStats'
 import { AnimatedValue } from '@/components/AnimatedValue'
 
 // Animation variants
@@ -87,41 +86,34 @@ export default function TokenomicsPage() {
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
-  // Fetch real-time data
-  const { data: tokenStats, error } = useSWR('/api/token-stats', fetcher, {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    dedupingInterval: 15000 // Dedupe requests within 15 seconds
-  })
-
-  const isLoading = !tokenStats && !error
+  // Use our token stats hook
+  const { data: tokenStats, isLoading, error } = useTokenStats()
 
   // Get the latest metrics from API or fallback to static content
   const getMetrics = () => {
-    if (!tokenStats?.tokenMetrics) return TOKENOMICS_CONTENT.METRICS.ITEMS;
+    if (!tokenStats) return TOKENOMICS_CONTENT.METRICS.ITEMS;
 
-    const { totalSupply, circulatingSupply, burnedTokens, holders, price, founderHolding } = tokenStats.tokenMetrics;
-    
     return {
       ...TOKENOMICS_CONTENT.METRICS.ITEMS,
       TOTAL_SUPPLY: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
-        VALUE: totalSupply
+        VALUE: tokenStats.totalSupply
       },
       CIRCULATING: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING,
-        VALUE: circulatingSupply
+        VALUE: tokenStats.circulatingSupply
       },
       BURNED: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED,
-        VALUE: burnedTokens
+        VALUE: tokenStats.toBeBurnedTokens
       },
       HOLDERS: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
-        VALUE: holders
+        VALUE: tokenStats.holders
       },
       TOKEN_PRICE: {
         TITLE: 'Token Price',
-        VALUE: price,
+        VALUE: tokenStats.price,
         DESCRIPTION: 'Current token price in USD',
         DISPLAY_TYPE: 'price'
       }
@@ -130,33 +122,31 @@ export default function TokenomicsPage() {
   
   // Calculate supply distribution
   const getSupplyData = () => {
-    if (!tokenStats?.tokenMetrics) return [...TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA];
+    if (!tokenStats) return [...TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA];
     
-    const { totalSupply, circulatingSupply, burnedTokens, founderHolding } = tokenStats.tokenMetrics;
-
     return [
       {
         label: 'Circulating Supply',
-        value: circulatingSupply,
+        value: tokenStats.circulatingSupply,
         color: '#FF6B00'
       },
       {
         label: 'Founder Holding',
-        value: founderHolding || 0,
+        value: tokenStats.founderBalance,
         color: '#FF8C00'
       },
       {
         label: 'Burned Supply',
-        value: burnedTokens,
+        value: tokenStats.toBeBurnedTokens,
         color: '#FFA500'
       }
-    ]
-  }
+    ];
+  };
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const total = tokenStats?.tokenMetrics?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
+      const total = tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
       return (
         <div className="bg-black/90 p-4 rounded-lg border border-orange-500/20">
           <p className="text-orange-500 font-semibold">{data.label}</p>

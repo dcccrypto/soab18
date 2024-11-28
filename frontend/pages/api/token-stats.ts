@@ -27,6 +27,7 @@ export default async function handler(
       founderValue: Number(data.founderValue),
       toBeBurnedTokens: Number(data.toBeBurnedTokens),
       toBeBurnedValue: Number(data.toBeBurnedValue),
+      burnRate: Number(data.burnRate || 0),
       lastUpdated: data.lastUpdated,
       cached: data.cached,
       cacheAge: data.cacheAge ? Number(data.cacheAge) : undefined
@@ -47,8 +48,10 @@ export default async function handler(
       founderValue: 0,
       toBeBurnedTokens: 0,
       toBeBurnedValue: 0,
+      burnRate: 0,
       lastUpdated: new Date().toISOString(),
-      cached: false
+      cached: false,
+      cacheAge: 0
     });
   }
 }

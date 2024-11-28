@@ -12,7 +12,6 @@ import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { BurnChart } from '@/components/burns/BurnChart'
 import { BURN_INFO, BURN_SECTIONS } from '@/constants'
 import { formatNumber, formatDate } from '@/lib/utils'
-import { useBurnStats } from '@/hooks/useBurnStats'
 import { useTokenStats } from '@/hooks/useTokenStats'
 import Image from 'next/image'
 import { Header } from '@/components/Header'
@@ -53,13 +52,10 @@ const TooltipProviderComponent = dynamic(
 )
 
 export default function BurnsPage() {
-  const { data: tokenStats } = useTokenStats()
-  const { data: tokenStatsSWR, error } = useSWR('/api/token-stats', fetcher, {
-    refreshInterval: 30000
-  })
+  const { data: tokenStats, isLoading } = useTokenStats()
 
   // Add loading state
-  if (!tokenStatsSWR) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <motion.div
@@ -72,7 +68,15 @@ export default function BurnsPage() {
     )
   }
 
-  const { burnedTokens, burnRate, burnedValue, nextBurnDate } = useBurnStats()
+  const burnStats = {
+    burnedTokens: tokenStats?.toBeBurnedTokens || 0,
+    burnRate: tokenStats?.burnRate || 0,
+    burnedValue: tokenStats?.toBeBurnedValue || 0,
+    nextBurnDate: tokenStats?.lastUpdated ? new Date(tokenStats.lastUpdated) : new Date()
+  }
+
+  const { burnedTokens, burnRate, burnedValue, nextBurnDate } = burnStats
+
   const [timeUntilNextBurn, setTimeUntilNextBurn] = useState('')
   const [showQuote, setShowQuote] = useState(false)
   const [currentQuote, setCurrentQuote] = useState(0)
@@ -291,7 +295,7 @@ export default function BurnsPage() {
                         <p className="text-sm text-gray-400 mb-1">Tokens Collected</p>
                         <div className="flex items-end gap-2">
                           <p className="text-xl font-bold text-orange-500">
-                            <AnimatedNumber value={tokenStatsSWR?.burnedTokens || 0} />
+                            <AnimatedNumber value={burnedTokens || 0} />
                             <span className="ml-2">SOBA</span>
                           </p>
                         </div>
@@ -299,7 +303,7 @@ export default function BurnsPage() {
                       <div>
                         <p className="text-sm text-gray-400 mb-1">Current Value</p>
                         <p className="text-xl font-bold text-green-500">
-                          ${formatNumber(tokenStatsSWR?.burnedValue || 0, 2)}
+                          ${formatNumber(burnedValue || 0, 2)}
                         </p>
                       </div>
                     </div>
