@@ -16,11 +16,11 @@ export const useTokenStats = () => {
         throw error;
       }
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 15000, // Consider data stale after 15 seconds
+    refetchInterval: 60000, // Increase from 30s to 60s
+    staleTime: 30000, // Increase from 15s to 30s
     gcTime: 1000 * 60 * 5, // Garbage collection time
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 60000), // Increase max delay to 60s
     select: (data: TokenStatsResponse): TokenStatsResponse => {
       console.log('[Hook] Processing token stats:', data);
       
