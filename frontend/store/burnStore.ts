@@ -1,111 +1,43 @@
-import create from 'zustand'
-import { devtools } from 'zustand/middleware'
-import { TokenMetrics, BurnInfo, BurnTransaction } from '@/types'
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import type { BurnTransaction, TokenStats } from '@/types';
 
-interface BurnStore {
-  // Burn Metrics
-  totalBurned: number
-  burnRate: number
-  burnHistory: BurnTransaction[]
-  nextBurn: {
-    date: string
-    amount: number
-    event: string
-    description: string
-  }
-  
-  // Token Metrics
-  tokenMetrics: TokenMetrics
-  
-  // Market Data
-  price: number
-  marketCap: number
-  holderCount: number
-  volume24h: number
-  
-  // Actions
-  updateBurnData: (data: Partial<BurnUpdate>) => void
-  updateMarketData: (data: Partial<MarketUpdate>) => void
-  updateHolderData: (data: Partial<HolderUpdate>) => void
+interface BurnState {
+  burnTransactions: BurnTransaction[];
+  tokenStats: TokenStats | null;
+  isLoading: boolean;
+  error: string | null;
+  setBurnTransactions: (transactions: BurnTransaction[]) => void;
+  setTokenStats: (stats: TokenStats) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  calculateTotalBurned: () => number;
+  calculateBurnPercentage: () => number;
 }
 
-interface BurnUpdate {
-  totalBurned: number
-  burnRate: number
-  burnHistory: BurnTransaction[]
-  nextBurn: {
-    date: string
-    amount: number
-    event: string
-    description: string
-  }
-}
+const useBurnStore = create<BurnState>()(
+  devtools(
+    (set, get) => ({
+      burnTransactions: [],
+      tokenStats: null,
+      isLoading: false,
+      error: null,
+      setBurnTransactions: (transactions) => set({ burnTransactions: transactions }),
+      setTokenStats: (stats) => set({ tokenStats: stats }),
+      setLoading: (loading) => set({ isLoading: loading }),
+      setError: (error) => set({ error }),
+      calculateTotalBurned: () => {
+        const { tokenStats } = get();
+        return tokenStats?.burnedTokens || 0;
+      },
+      calculateBurnPercentage: () => {
+        const { tokenStats } = get();
+        if (!tokenStats?.totalSupply || !tokenStats?.burnedTokens) return 0;
+        return (tokenStats.burnedTokens / tokenStats.totalSupply) * 100;
+      },
+    }),
+    { name: 'burn-store' }
+  )
+);
 
-interface MarketUpdate {
-  price: number
-  marketCap: number
-  volume24h: number
-}
-
-interface HolderUpdate {
-  holderCount: number
-}
-
-const useBurnStore = create<BurnStore>()(
-  devtools((set) => ({
-    // Initial State
-    totalBurned: 0,
-    burnRate: 0,
-    burnHistory: [],
-    nextBurn: {
-      date: '',
-      amount: 0,
-      event: '',
-      description: ''
-    },
-    
-    tokenMetrics: {
-      totalSupply: 0,
-      circulatingSupply: 0,
-      burnedTokens: 0,
-      founderHolding: 0,
-      price: 0,
-      holders: 0
-    },
-    
-    price: 0,
-    marketCap: 0,
-    holderCount: 0,
-    volume24h: 0,
-    
-    // Update Actions
-    updateBurnData: (data: Partial<BurnUpdate>) => 
-      set((state) => ({
-        ...state,
-        totalBurned: data.totalBurned ?? state.totalBurned,
-        burnRate: data.burnRate ?? state.burnRate,
-        burnHistory: data.burnHistory ?? state.burnHistory,
-        nextBurn: data.nextBurn ?? state.nextBurn
-      })),
-    
-    updateMarketData: (data: Partial<MarketUpdate>) =>
-      set((state) => ({
-        ...state,
-        price: data.price ?? state.price,
-        marketCap: data.marketCap ?? state.marketCap,
-        volume24h: data.volume24h ?? state.volume24h
-      })),
-    
-    updateHolderData: (data: Partial<HolderUpdate>) =>
-      set((state) => ({
-        ...state,
-        holderCount: data.holderCount ?? state.holderCount,
-        tokenMetrics: {
-          ...state.tokenMetrics,
-          holders: data.holderCount ?? state.tokenMetrics.holders
-        }
-      }))
-  }))
-)
-
-export default useBurnStore
+export default useBurnStore;

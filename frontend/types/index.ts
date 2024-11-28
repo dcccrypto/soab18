@@ -14,23 +14,25 @@ export interface MetricItems {
 }
 
 export interface TokenStats {
-  price: number
-  totalSupply: number
-  circulatingSupply: number
-  founderBalance: number
-  holders: number
-  marketCap: number
-  totalValue: number
-  founderValue: number
-  toBeBurnedTokens: number
-  toBeBurnedValue: number
-  burnRate: number
-  lastUpdated: string
+  price: number;
+  totalSupply: number;
+  circulatingSupply: number;
+  burnedTokens: number;
+  founderBalance: number;
+  holders: number;
+  marketCap: number;
+  totalValue: number;
+  burnedValue: number;
+  founderValue: number;
+  toBeBurnedTokens: number;
+  toBeBurnedValue: number;
+  burnRate: number;
+  lastUpdated: string;
 }
 
 export interface TokenStatsResponse extends TokenStats {
-  cached?: boolean
-  cacheAge?: number
+  cached?: boolean;
+  cacheAge?: number;
 }
 
 export interface BurnTransaction {

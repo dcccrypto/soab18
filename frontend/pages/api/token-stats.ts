@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { TokenStatsResponse } from '@/types';
+import type { TokenStatsResponse } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TokenStatsResponse>
 ) {
+  if (req.method !== 'GET') {
+    res.status(405).end();
+    return;
+  }
+
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
     const response = await fetch(`${apiUrl}/token-stats`);
@@ -20,16 +25,18 @@ export default async function handler(
       price: Number(data.price),
       totalSupply: Number(data.totalSupply),
       circulatingSupply: Number(data.circulatingSupply),
+      burnedTokens: Number(data.burnedTokens),
       founderBalance: Number(data.founderBalance),
       holders: Number(data.holders),
       marketCap: Number(data.marketCap),
       totalValue: Number(data.totalValue),
+      burnedValue: Number(data.burnedValue),
       founderValue: Number(data.founderValue),
       toBeBurnedTokens: Number(data.toBeBurnedTokens),
       toBeBurnedValue: Number(data.toBeBurnedValue),
-      burnRate: Number(data.burnRate || 0),
+      burnRate: Number(data.burnRate),
       lastUpdated: data.lastUpdated,
-      cached: data.cached,
+      cached: Boolean(data.cached),
       cacheAge: data.cacheAge ? Number(data.cacheAge) : undefined
     };
 
@@ -39,12 +46,14 @@ export default async function handler(
     console.error('[Token Stats API Error]:', error);
     res.status(500).json({
       price: 0,
-      totalSupply: 0,
+      totalSupply: 1_000_000_000,
       circulatingSupply: 0,
+      burnedTokens: 0,
       founderBalance: 0,
       holders: 0,
       marketCap: 0,
       totalValue: 0,
+      burnedValue: 0,
       founderValue: 0,
       toBeBurnedTokens: 0,
       toBeBurnedValue: 0,
