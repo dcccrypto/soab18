@@ -18,7 +18,7 @@ import { ExternalLink, TrendingUp, Flame, Calendar } from 'lucide-react'
 import { BURN_HISTORY, BURN_INFO } from '@/constants'
 import { formatDate, formatNumber, isValidDate } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import { BurnTransaction } from '@/constants/types'
+import { BurnTransaction } from '@/types'
 
 // Register ChartJS components
 ChartJS.register(

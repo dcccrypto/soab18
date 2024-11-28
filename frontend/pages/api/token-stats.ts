@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { TokenStatsResponse } from '@/constants/types';
+import { TokenStatsResponse } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,

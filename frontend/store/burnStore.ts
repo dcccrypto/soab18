@@ -1,6 +1,6 @@
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { TokenMetrics, BurnInfo, BurnTransaction } from '../constants/types'
+import { TokenMetrics, BurnInfo, BurnTransaction } from '@/types'
 
 interface BurnStore {
   // Burn Metrics

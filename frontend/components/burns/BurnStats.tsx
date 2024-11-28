@@ -2,7 +2,7 @@ import { useTokenStats } from '@/hooks/useTokenStats';
 import { formatNumber } from '@/lib/utils';
 import { Flame, Percent, DollarSign } from 'lucide-react';
 import { Card } from '../ui/card';
-import type { TokenStatsResponse } from '@/constants/types';
+import type { TokenStatsResponse } from '@/types';
 
 export function BurnStats() {
   const { data: stats, isLoading, error } = useTokenStats();

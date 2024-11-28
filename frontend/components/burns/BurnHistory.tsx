@@ -2,7 +2,7 @@ import { Table } from '@/components/ui/table'
 import { formatNumber, formatDateTime, getRelativeTime } from '@/lib/utils'
 import { BURN_INFO } from '@/constants'
 import { ExternalLink } from 'lucide-react'
-import { BurnTransaction } from '@/constants/types'
+import { BurnTransaction } from '@/types'
 import { TooltipWrapper } from '@/components/ui/tooltip-wrapper'
 
 // Extend BurnTransaction for additional properties

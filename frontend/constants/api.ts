@@ -1,6 +1,6 @@
-import { DynamicConstants, TokenStatsResponse } from './types'
+import { DynamicConstants, TokenStatsResponse } from '@/types'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://soba-api-v1-127255a88636.herokuapp.com'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://soba-api-v1.herokuapp.com'
 
 export const fetchDynamicConstants = async (): Promise<DynamicConstants> => {
   try {

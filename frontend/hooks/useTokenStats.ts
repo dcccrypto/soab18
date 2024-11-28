@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchTokenStats } from '@/constants/api';
-import type { TokenStatsResponse } from '@/constants/types';
+import type { TokenStatsResponse } from '@/types';
 
 export const useTokenStats = () => {
   return useQuery<TokenStatsResponse, Error, TokenStatsResponse>({

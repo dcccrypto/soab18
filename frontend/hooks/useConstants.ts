@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchDynamicConstants } from '@/constants/api'
-import type { DynamicConstants } from '@/constants/types'
+import type { DynamicConstants } from '@/types'
 
 export const useConstants = () => {
   const [state, setState] = useState<{
@@ -59,4 +59,4 @@ export const useConstants = () => {
     ...state,
     refetch
   }
-} 
+}
