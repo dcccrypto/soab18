@@ -3,15 +3,25 @@ import { fetchTokenStats } from '@/constants/api';
 import type { TokenStatsResponse } from '@/constants/types';
 
 export const useTokenStats = () => {
-  return useQuery<TokenStatsResponse, Error>({
+  return useQuery<TokenStatsResponse, Error, TokenStatsResponse>({
     queryKey: ['tokenStats'],
-    queryFn: fetchTokenStats,
+    queryFn: async () => {
+      try {
+        console.log('[Hook] Fetching token stats...');
+        const data = await fetchTokenStats();
+        console.log('[Hook] Token stats fetched:', data);
+        return data;
+      } catch (error) {
+        console.error('[Hook] Error fetching token stats:', error);
+        throw error;
+      }
+    },
     refetchInterval: 30000, // Refetch every 30 seconds
     staleTime: 15000, // Consider data stale after 15 seconds
     gcTime: 1000 * 60 * 5, // Garbage collection time
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    select: (data) => {
+    select: (data: TokenStatsResponse): TokenStatsResponse => {
       console.log('[Hook] Processing token stats:', data);
       
       // Ensure all values are valid numbers
@@ -20,8 +30,7 @@ export const useTokenStats = () => {
         return isNaN(num) ? 0 : num;
       };
 
-      const processed = {
-        ...data,
+      const processed: TokenStatsResponse = {
         price: ensureNumber(data.price),
         totalSupply: ensureNumber(data.totalSupply),
         circulatingSupply: ensureNumber(data.circulatingSupply),
@@ -47,12 +56,6 @@ export const useTokenStats = () => {
 
       console.log('[Hook] Processed token stats:', processed);
       return processed;
-    },
-    onError: (error) => {
-      console.error('[Hook] Error fetching token stats:', error);
-    },
-    onSuccess: (data) => {
-      console.log('[Hook] Successfully fetched token stats:', data);
     }
   });
 };
