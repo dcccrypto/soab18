@@ -41,44 +41,44 @@ export const TokenStatsDisplay = () => {
     {
       title: "Market Cap",
       value: `$${formatNumber(stats.marketCap, 2)}`,
-      description: "Total market value of circulating supply",
+      description: "Total value of circulating tokens",
       icon: <DollarSign className="text-blue-500" />,
       color: "text-blue-500"
     },
     {
       title: "Total Value",
       value: `$${formatNumber(stats.totalValue, 2)}`,
-      description: "Total value of all tokens",
+      description: "Value of total supply at current price",
       icon: <DollarSign className="text-purple-500" />,
       color: "text-purple-500"
     },
     {
       title: "Circulating Supply",
       value: formatNumber(stats.circulatingSupply),
-      description: `$${formatNumber(stats.marketCap, 2)} USD`,
+      description: `Available tokens: $${formatNumber(stats.marketCap, 2)} USD`,
       icon: <TrendingUp className="text-orange-500" />,
       color: "text-orange-500"
     },
     {
-      title: "Total Supply",
-      value: formatNumber(stats.totalSupply),
-      description: `$${formatNumber(stats.totalValue, 2)} USD`,
-      icon: <TrendingUp className="text-yellow-500" />,
-      color: "text-yellow-500"
+      title: "Burned Tokens",
+      value: formatNumber(stats.burnedTokens),
+      description: `Burned value: $${formatNumber(stats.burnedValue, 2)} USD`,
+      icon: <Flame className="text-red-500" />,
+      color: "text-red-500"
+    },
+    {
+      title: "Burn Rate",
+      value: `${formatNumber(stats.burnRate, 2)}%`,
+      description: "Percentage of total supply burned",
+      icon: <Flame className="text-orange-500" />,
+      color: "text-orange-500"
     },
     {
       title: "Founder Balance",
       value: formatNumber(stats.founderBalance),
-      description: `$${formatNumber(stats.founderValue, 2)} USD`,
-      icon: <Wallet className="text-red-500" />,
-      color: "text-red-500"
-    },
-    {
-      title: "Tokens to be Burned",
-      value: formatNumber(stats.toBeBurnedTokens),
-      description: `$${formatNumber(stats.toBeBurnedValue, 2)} USD`,
-      icon: <Flame className="text-orange-500" />,
-      color: "text-orange-500"
+      description: `Value: $${formatNumber(stats.founderValue, 2)} USD`,
+      icon: <Wallet className="text-yellow-500" />,
+      color: "text-yellow-500"
     },
     {
       title: "Holders",
