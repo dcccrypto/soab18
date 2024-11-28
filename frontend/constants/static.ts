@@ -82,17 +82,17 @@ export const BURN_HISTORY: BurnTransaction[] = [
 
 export const BURN_INFO: BurnInfo = {
   BURN_WALLET: '7wtbTXc7Lyxt1enezJa7eNyNxenaLYsmBeiZTsA3KvwL',
-  TOTAL_BURNED: BURN_HISTORY.reduce((acc, burn) => acc + burn.amount, 0),
+  TOTAL_BURNED: 73990072.23,
   LATEST_BURN: BURN_HISTORY[BURN_HISTORY.length - 1],
   BURN_RATE: 2,
   BURN_HISTORY: BURN_HISTORY,
   NEXT_BURN: {
-    TARGET_DATE: '2024-03-01T00:00:00Z',
+    TARGET_DATE: '2024-11-01T00:00:00Z',
     ESTIMATED_AMOUNT: 1000000,
     DESCRIPTION: 'Monthly token burn',
-    EVENT_NAME: 'March 2024 Burn',
+    EVENT_NAME: 'November 2024 Burn',
     CURRENT_USD_VALUE: 0,
-    LAST_BURN_DATE: BURN_HISTORY[BURN_HISTORY.length - 1].date
+    LAST_BURN_DATE: '2024-10-30T04:25:21Z'
   }
 }
 
