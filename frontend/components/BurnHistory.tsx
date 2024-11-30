@@ -10,6 +10,14 @@ export const BurnHistory = () => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
+  const formatAmount = (amount: number) => {
+    return amount >= 1000000 
+      ? `${(amount / 1000000).toFixed(2)}M` 
+      : amount >= 1000 
+        ? `${(amount / 1000).toFixed(2)}K`
+        : amount.toString()
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -33,7 +41,7 @@ export const BurnHistory = () => {
                 {formatDate(new Date(burn.date))}
               </td>
               <td className="px-6 py-4 text-orange-300">
-                {(burn.amount / 1000000).toFixed(2)}M SOBA
+                {formatAmount(burn.amount)} SOBA
               </td>
               <td className="px-6 py-4">
                 <a

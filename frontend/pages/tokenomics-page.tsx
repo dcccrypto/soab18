@@ -93,8 +93,7 @@ export default function TokenomicsPage() {
   const getMetrics = () => {
     if (!tokenStats) return TOKENOMICS_CONTENT.METRICS.ITEMS;
 
-    return {
-      ...TOKENOMICS_CONTENT.METRICS.ITEMS,
+    const metrics = {
       TOTAL_SUPPLY: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
         VALUE: tokenStats.totalSupply
@@ -111,13 +110,14 @@ export default function TokenomicsPage() {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
         VALUE: tokenStats.holders
       },
-      TOKEN_PRICE: {
-        TITLE: 'Token Price',
-        VALUE: tokenStats.price,
-        DESCRIPTION: 'Current token price in USD',
-        DISPLAY_TYPE: 'price'
-      }
+      PRICE: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.PRICE,
+        VALUE: tokenStats.price
+      },
     };
+
+    
+    return metrics;
   };
   
   // Calculate supply distribution

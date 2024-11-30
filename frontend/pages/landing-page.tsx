@@ -299,35 +299,8 @@ export default function LandingPage() {
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-            <div className="card-base p-4 sm:p-8 max-w-4xl mx-auto bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 relative z-10">
-              <div className="flex flex-col items-center space-y-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-orange-400 mb-2">Contract Address</h2>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 w-full">
-                  <div className="flex items-center justify-center bg-black/20 rounded-xl px-3 sm:px-6 py-3 w-full sm:w-auto">
-                    <span className="font-mono text-sm sm:text-lg text-gray-200 break-all">
-                      {CONTRACT_ADDRESS}
-                    </span>
-                  </div>
-                  <ButtonBase 
-                    variant="outline"
-                    size="lg"
-                    onClick={handleCopyAddress}
-                    className="flex items-center justify-center gap-2 min-w-[160px] hover:bg-orange-500/10 transition-all duration-300"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span className="text-green-500">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        <span>Copy Address</span>
-                      </>
-                    )}
-                  </ButtonBase>
-                </div>
-              </div>
+            <div className="relative z-10">
+              <ContractAddress address={CONTRACT_ADDRESS} />
             </div>
           </div>
         </ScrollAnimatedSection>

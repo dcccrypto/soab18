@@ -1,3 +1,5 @@
+export type Timeframe = '1M' | '3M' | '6M' | '1Y' | 'ALL'
+
 export interface TokenMetrics {
   totalSupply: number
   circulatingSupply: number
@@ -14,17 +16,12 @@ export interface BurnTransaction {
 }
 
 export interface BurnInfo {
-  BURN_WALLET: string
   TOTAL_BURNED: number
-  LATEST_BURN: BurnTransaction
   BURN_RATE: number
-  BURN_HISTORY: BurnTransaction[]
+  BURN_SCHEDULE: string
+  BURN_WALLET: string
   NEXT_BURN: {
     TARGET_DATE: string
-    ESTIMATED_AMOUNT: number
-    DESCRIPTION: string
-    EVENT_NAME: string
-    CURRENT_USD_VALUE: number
     LAST_BURN_DATE: string
   }
 }

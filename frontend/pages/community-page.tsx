@@ -155,17 +155,17 @@ export default function CommunityPage() {
       animate={{ opacity: 1, y: 0 }}
       className="p-6 rounded-xl bg-black/40 border border-orange-500/20"
     >
-      <h4 className="text-lg font-semibold text-orange-400 mb-2">{proposal.title}</h4>
-      <p className="text-orange-300 mb-4">{proposal.description}</p>
+      <h4 className="text-lg font-semibold text-[#FF6B00] mb-2">{proposal.title}</h4>
+      <p className="text-white/90 leading-relaxed mb-4">{proposal.description}</p>
       
       <div className="space-y-4">
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <span className="text-green-400">For: {proposal.votes.for.toLocaleString()}</span>
-            <span className="text-gray-500">|</span>
+            <span className="text-white/50">|</span>
             <span className="text-red-400">Against: {proposal.votes.against.toLocaleString()}</span>
           </div>
-          <span className="text-orange-300">
+          <span className="text-white/80">
             {getRemainingDays(proposal.endDate)} days remaining
           </span>
         </div>
@@ -273,8 +273,8 @@ export default function CommunityPage() {
               animate="visible"
               className="max-w-4xl mx-auto space-y-6"
             >
-              <h1 className="text-5xl font-bold mb-6 text-center gradient-text">Join the $SOBA Cult!</h1>
-              <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
+              <h1 className="text-5xl font-bold mb-6 text-center text-[#FF6B00]">Join the $SOBA Cult!</h1>
+              <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-white/90 leading-relaxed">
                 The $SOBA community is all about fun, engagement, and supporting each other. Become part of an adventure inspired by Crypto Bastard's energy, where laughs meet innovation and everyone benefits.
               </p>
             </motion.div>
@@ -284,19 +284,24 @@ export default function CommunityPage() {
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-            <Card className="card-base p-6 md:p-8 lg:p-10 relative z-10">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold text-orange-500">Our Mission</CardTitle>
-                <CardDescription className="text-orange-300/80">
-                  Building a lively, supportive network of crypto enthusiasts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-orange-300">
-                  At $SOBA, we're dedicated to creating a vibrant community that goes beyond just holding tokens. We believe in the power of collective growth, shared knowledge, and the thrill of being part of something revolutionary. Our mission is to foster an environment where every member feels valued, heard, and excited about the future of crypto.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative z-10">
+              <Card className="p-6 md:p-8 lg:p-10 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_8px_32px_rgba(255,165,0,0.1)] hover:shadow-[0_8px_32px_rgba(255,165,0,0.15)]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.03)_0%,transparent_70%)] rounded-xl" />
+                <div className="relative z-10">
+                  <CardHeader>
+                    <CardTitle className="text-2xl font-bold text-[#FF6B00]">Our Mission</CardTitle>
+                    <CardDescription className="text-white/80">
+                      Building a lively, supportive network of crypto enthusiasts
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-white/90 leading-relaxed">
+                      At $SOBA, we're dedicated to creating a vibrant community that goes beyond just holding tokens. We believe in the power of collective growth, shared knowledge, and the thrill of being part of something revolutionary. Our mission is to foster an environment where every member feels valued, heard, and excited about the future of crypto.
+                    </p>
+                  </CardContent>
+                </div>
+              </Card>
+            </div>
           </div>
         </ScrollAnimatedSection>
 
@@ -318,9 +323,9 @@ export default function CommunityPage() {
                       height={ICON_SIZES.SOCIAL.height / 3}
                       className="mr-3"
                     />
-                    <h3 className="text-xl font-bold text-orange-400">{item.name}</h3>
+                    <h3 className="text-xl font-bold text-[#FF6B00]">{item.name}</h3>
                   </div>
-                  <p className="text-orange-300 mb-4">{item.description}</p>
+                  <p className="text-white/90 leading-relaxed mb-4">{item.description}</p>
                   <ButtonBase 
                     className="w-full bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
                     onClick={() => handleSocialLink(item.url)}
@@ -338,10 +343,10 @@ export default function CommunityPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 gradient-text">
+                <h2 className="text-3xl font-bold mb-4 text-[#FF6B00]">
                   Upcoming Community Events
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-white/80">
                   Don't miss out on these exciting $SOBA community activities
                 </p>
               </div>
@@ -356,11 +361,11 @@ export default function CommunityPage() {
                     className="p-6 rounded-xl bg-black/40 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300"
                   >
                     <div className="flex items-center gap-3 mb-4">
-                      <Calendar className="w-6 h-6 text-orange-500" />
-                      <h3 className="text-xl font-semibold text-orange-400">{event.name}</h3>
+                      <Calendar className="w-6 h-6 text-[#FF6B00]" />
+                      <h3 className="text-xl font-semibold text-[#FF6B00]">{event.name}</h3>
                     </div>
-                    <p className="text-orange-300 mb-2">{event.description}</p>
-                    <p className="text-sm text-orange-400/80">{event.date}</p>
+                    <p className="text-white/90 leading-relaxed mb-2">{event.description}</p>
+                    <p className="text-sm text-white/80">{event.date}</p>
                   </motion.div>
                 ))}
               </div>
@@ -373,10 +378,10 @@ export default function CommunityPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 gradient-text">
+                <h2 className="text-3xl font-bold mb-4 text-[#FF6B00]">
                   Community Governance
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-white/80">
                   Shape the future of $SOBA through active participation
                 </p>
               </div>
@@ -384,8 +389,8 @@ export default function CommunityPage() {
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <Vote className="w-6 h-6 text-orange-500" />
-                    <h3 className="text-xl font-semibold text-orange-400">Active Proposals</h3>
+                    <Vote className="w-6 h-6 text-[#FF6B00]" />
+                    <h3 className="text-xl font-semibold text-[#FF6B00]">Active Proposals</h3>
                   </div>
                   <ButtonBase
                     variant="outline"
@@ -410,10 +415,10 @@ export default function CommunityPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 gradient-text">
+                <h2 className="text-3xl font-bold mb-4 text-[#FF6B00]">
                   Featured Community Member
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-white/80">
                   Recognizing outstanding contributions to the $SOBA community
                 </p>
               </div>
@@ -425,12 +430,12 @@ export default function CommunityPage() {
               >
                 <div className="flex items-start gap-6">
                   <div className="flex-shrink-0">
-                    <UserCircle className="w-20 h-20 text-orange-500" aria-hidden="true" />
+                    <UserCircle className="w-20 h-20 text-[#FF6B00]" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-semibold text-orange-400 mb-2">@SobaMaster</h3>
-                    <p className="text-sm text-orange-300 mb-4">Member since January 2024</p>
-                    <p className="text-orange-300 leading-relaxed">
+                    <h3 className="text-2xl font-semibold text-[#FF6B00] mb-2">@SobaMaster</h3>
+                    <p className="text-sm text-white/80 mb-4">Member since January 2024</p>
+                    <p className="text-white/90 leading-relaxed">
                       SobaMaster has been an outstanding contributor to our community, creating hilarious memes and helping newcomers navigate the world of $SOBA. Their dedication and creativity inspire us all!
                     </p>
                     <div className="flex gap-4 mt-6">
@@ -465,18 +470,17 @@ export default function CommunityPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 gradient-text">
+                <h2 className="text-3xl font-bold mb-4 text-[#FF6B00]">
                   Community Updates
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-white/80">
                   Latest news and highlights from our social channels
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* X Updates */}
                 <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-orange-400 mb-4">Latest X Updates</h3>
+                  <h3 className="text-xl font-semibold text-[#FF6B00] mb-4">Latest X Updates</h3>
                   {SOCIAL_FEED_DATA.X_UPDATES.map((update, index) => (
                     <motion.div
                       key={index}
@@ -485,8 +489,8 @@ export default function CommunityPage() {
                       transition={{ delay: index * 0.1 }}
                       className="p-4 rounded-lg bg-black/40 border border-orange-500/20"
                     >
-                      <p className="text-orange-300 mb-2">{update.content}</p>
-                      <div className="flex justify-between text-sm text-orange-400">
+                      <p className="text-white/90 leading-relaxed mb-2">{update.content}</p>
+                      <div className="flex justify-between text-sm text-white/80">
                         <span>{update.timestamp}</span>
                         <span>{update.engagement} interactions</span>
                       </div>
@@ -494,9 +498,8 @@ export default function CommunityPage() {
                   ))}
                 </div>
 
-                {/* Telegram Highlights */}
                 <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-orange-400 mb-4">Telegram Highlights</h3>
+                  <h3 className="text-xl font-semibold text-[#FF6B00] mb-4">Telegram Highlights</h3>
                   {SOCIAL_FEED_DATA.TELEGRAM_HIGHLIGHTS.map((highlight, index) => (
                     <motion.div
                       key={index}
@@ -505,8 +508,8 @@ export default function CommunityPage() {
                       transition={{ delay: index * 0.1 }}
                       className="p-4 rounded-lg bg-black/40 border border-orange-500/20"
                     >
-                      <p className="text-orange-300 mb-2">{highlight.content}</p>
-                      <div className="flex justify-between text-sm text-orange-400">
+                      <p className="text-white/90 leading-relaxed mb-2">{highlight.content}</p>
+                      <div className="flex justify-between text-sm text-white/80">
                         <span>{highlight.author}</span>
                         <span>{highlight.timestamp}</span>
                       </div>
@@ -522,8 +525,8 @@ export default function CommunityPage() {
           <DynamicDialog open={isProposalsOpen} onOpenChange={setIsProposalsOpen}>
             <DynamicDialogContent className="sm:max-w-[600px] bg-[#111] border border-orange-500/20">
               <DynamicDialogHeader>
-                <DynamicDialogTitle className="text-2xl font-bold text-orange-500">Active Proposals</DynamicDialogTitle>
-                <DynamicDialogDescription className="text-orange-300">
+                <DynamicDialogTitle className="text-2xl font-bold text-[#FF6B00]">Active Proposals</DynamicDialogTitle>
+                <DynamicDialogDescription className="text-white/80">
                   Review and vote on current community proposals
                 </DynamicDialogDescription>
               </DynamicDialogHeader>

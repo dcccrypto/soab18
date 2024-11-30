@@ -21,10 +21,13 @@ const WhitepaperSection = ({ title, children, id }: { title: string; children: R
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="card-base p-6 md:p-8 lg:p-10 relative z-10 bg-black/50 rounded-lg shadow-lg scroll-mt-20 border border-orange-500/20"
+      className="card-base p-6 md:p-8 lg:p-10 relative z-10 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl shadow-[0_8px_32px_rgba(255,165,0,0.1)] border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 scroll-mt-20"
     >
-      <h2 className="text-3xl font-bold mb-6 gradient-text border-b border-orange-500/20 pb-2">{title}</h2>
-      {children}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.03)_0%,transparent_70%)] rounded-xl" />
+      <div className="relative z-10">
+        <h2 className="text-3xl font-bold mb-6 text-[#FF6B00] pb-4 border-b border-orange-500/20">{title}</h2>
+        {children}
+      </div>
     </motion.div>
   )
 }
@@ -32,20 +35,25 @@ const WhitepaperSection = ({ title, children, id }: { title: string; children: R
 const TeamMember = ({ name, role, description, imageUrl }: { name: string; role: string; description: string; imageUrl: string }) => (
   <motion.div 
     whileHover={{ scale: 1.02 }}
-    className="card-base p-6 flex items-center space-x-4 bg-black/40 border border-orange-500/20 hover:border-orange-500/40 transition-colors duration-300"
+    className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
   >
-    <Image 
-      src={imageUrl} 
-      alt={name} 
-      width={64} 
-      height={64} 
-      className="rounded-full object-cover"
-      unoptimized
-    />
-    <div>
-      <h3 className="font-bold text-orange-400">{name}</h3>
-      <p className="text-orange-300/90">{role}</p>
-      <p className="text-sm text-orange-300/70">{description}</p>
+    <div className="flex items-center space-x-4">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-500/10 rounded-full" />
+        <Image 
+          src={imageUrl} 
+          alt={name} 
+          width={64} 
+          height={64} 
+          className="rounded-full object-cover relative z-10"
+          unoptimized
+        />
+      </div>
+      <div>
+        <h3 className="font-bold text-[#FF6B00]">{name}</h3>
+        <p className="text-white/90 text-sm">{role}</p>
+        <p className="text-white/80 text-sm mt-1">{description}</p>
+      </div>
     </div>
   </motion.div>
 )
@@ -84,8 +92,8 @@ export default function WhitePaper() {
   ]
 
   return (
-    <div className="min-h-screen gradient-dark text-white">
-      <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-white">
+      <main className="min-h-screen">
         <div className="relative">
           <section className="min-h-[70vh] pt-16 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
@@ -144,13 +152,13 @@ export default function WhitePaper() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="Table of Contents" id="toc">
                 <nav>
-                  <ol className="list-decimal list-inside space-y-3 text-orange-300">
+                  <ol className="list-decimal list-inside space-y-3">
                     {sections.map((section) => (
                       <li key={section.id}>
                         <button
                           onClick={() => scrollToSection(section.id)}
-                          className={`hover:text-orange-500 transition-colors ${
-                            activeSection === section.id ? 'text-orange-500 font-bold' : ''
+                          className={`hover:text-[#FF6B00] transition-colors duration-300 ${
+                            activeSection === section.id ? 'text-[#FF6B00] font-bold' : 'text-white/90'
                           }`}
                         >
                           {section.title}
@@ -168,24 +176,24 @@ export default function WhitePaper() {
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="1. Introduction to $SOBA" id="introduction">
-                <div className="space-y-6 text-orange-300">
-                  <p>
+                <div className="space-y-6">
+                  <p className="text-white/90 leading-relaxed">
                     $SOBA represents a new era in memecoins, combining the fun and engagement of meme culture with real utility and community value. Born on the Solana blockchain, $SOBA aims to revolutionize how we think about community-driven cryptocurrencies.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <motion.div
                       whileHover={{ scale: 1.02 }}
-                      className="p-6 bg-black/30 rounded-lg border border-orange-500/20"
+                      className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
                     >
-                      <h3 className="text-xl font-bold mb-2 text-orange-400">Our Mission</h3>
-                      <p>To create a vibrant, engaged community that benefits from both the entertainment value of memecoins and the practical utility of DeFi.</p>
+                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">Our Mission</h3>
+                      <p className="text-white/90 leading-relaxed">To create a vibrant, engaged community that benefits from both the entertainment value of memecoins and the practical utility of DeFi.</p>
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.02 }}
-                      className="p-6 bg-black/30 rounded-lg border border-orange-500/20"
+                      className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
                     >
-                      <h3 className="text-xl font-bold mb-2 text-orange-400">Our Vision</h3>
-                      <p>To become the leading community-driven memecoin on Solana, setting new standards for transparency and community engagement.</p>
+                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">Our Vision</h3>
+                      <p className="text-white/90 leading-relaxed">To become the leading community-driven memecoin on Solana, setting new standards for transparency and community engagement.</p>
                     </motion.div>
                   </div>
                 </div>
@@ -198,32 +206,37 @@ export default function WhitePaper() {
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="2. Tokenomics" id="tokenomics">
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-3 text-orange-400">Token Distribution</h3>
-                  <ul className="list-disc list-inside space-y-2 text-gray-300">
-                    <li>Total Supply: {TOKEN_INFO.TOTAL_SUPPLY} $SOBA tokens</li>
-                    <li>Current Circulating Supply: {TOKEN_INFO.CIRCULATING_SUPPLY} tokens</li>
-                    <li>Burned Tokens: {TOKEN_INFO.BURNED_TOKENS} tokens</li>
-                    <li>Founder Holdings: {TOKEN_INFO.FOUNDER_HOLDINGS} tokens (4.08% held by Crypto Bastard)</li>
-                  </ul>
-                </div>
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-3 text-orange-400">Fair Launch</h3>
-                  <p className="text-gray-300">
-                    $SOBA was launched on Pump.fun, ensuring equal opportunity for all investors. This approach aligns with our commitment to fairness and community empowerment.
-                  </p>
-                </div>
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-3 text-orange-400">Liquidity Security</h3>
-                  <p className="text-gray-300">
-                    All liquidity is permanently burned, enhancing stability and fostering community trust. This measure prevents rug pulls and ensures the long-term viability of $SOBA.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-3 text-orange-400">Deflationary Model</h3>
-                  <p className="text-gray-300">
-                    $SOBA implements a deflationary model through regular token burns. This mechanism is designed to increase scarcity and potentially enhance the value of $SOBA over time.
-                  </p>
+                <div className="space-y-8">
+                  <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                    <h3 className="text-xl font-semibold mb-4 text-[#FF6B00]">Token Distribution</h3>
+                    <ul className="list-disc list-inside space-y-3 text-white/90">
+                      <li>Total Supply: <span className="text-white">{TOKEN_INFO.TOTAL_SUPPLY} $SOBA tokens</span></li>
+                      <li>Current Circulating Supply: <span className="text-white">{TOKEN_INFO.CIRCULATING_SUPPLY} tokens</span></li>
+                      <li>Burned Tokens: <span className="text-white">{TOKEN_INFO.BURNED_TOKENS} tokens</span></li>
+                      <li>Founder Holdings: <span className="text-white">{TOKEN_INFO.FOUNDER_HOLDINGS} tokens (4.08% held by Crypto Bastard)</span></li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                    <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Fair Launch</h3>
+                    <p className="text-white/90 leading-relaxed">
+                      $SOBA was launched on Pump.fun, ensuring equal opportunity for all investors. This approach aligns with our commitment to fairness and community empowerment.
+                    </p>
+                  </div>
+                  
+                  <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                    <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Liquidity Security</h3>
+                    <p className="text-white/90 leading-relaxed">
+                      All liquidity is permanently burned, enhancing stability and fostering community trust. This measure prevents rug pulls and ensures the long-term viability of $SOBA.
+                    </p>
+                  </div>
+                  
+                  <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                    <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Deflationary Model</h3>
+                    <p className="text-white/90 leading-relaxed">
+                      $SOBA implements a deflationary model through regular token burns. This mechanism is designed to increase scarcity and potentially enhance the value of $SOBA over time.
+                    </p>
+                  </div>
                 </div>
               </WhitepaperSection>
             </div>
@@ -236,12 +249,15 @@ export default function WhitePaper() {
               <WhitepaperSection title="3. Roadmap" id="roadmap">
                 <div className="space-y-6">
                   {ROADMAP_PHASES.map((phase, index) => (
-                    <div key={index} className="flex items-start space-x-4 bg-gray-700 p-4 rounded-lg">
-                      <Calendar className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                    <div 
+                      key={index} 
+                      className="flex items-start space-x-4 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 p-6 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
+                    >
+                      <Calendar className="w-6 h-6 text-[#FF6B00] flex-shrink-0 mt-1" />
                       <div>
-                        <p className="font-bold text-orange-400">{phase.phase}: {phase.title}</p>
-                        <p className="text-sm text-orange-300 mb-2">{phase.status}</p>
-                        <p className="text-gray-300">{phase.description}</p>
+                        <p className="font-bold text-[#FF6B00]">{phase.phase}: {phase.title}</p>
+                        <p className="text-sm text-white/90 mb-2">{phase.status}</p>
+                        <p className="text-white/90 leading-relaxed">{phase.description}</p>
                       </div>
                     </div>
                   ))}
@@ -255,33 +271,35 @@ export default function WhitePaper() {
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="4. Community Initiatives" id="community">
-                <p className="mb-6 text-gray-300">
+                <div className="space-y-8">
+                  <p className="text-white/90 leading-relaxed">
                   The $SOBA community is the lifeblood of our project. We're committed to fostering a vibrant, engaged, and rewarding environment for all our members.
                 </p>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3 text-orange-400">Social Media Engagement</h3>
-                    <p className="text-gray-300">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Social Media Engagement</h3>
+                      <p className="text-white/90 leading-relaxed">
                       We maintain an active presence on TikTok, Twitter (X), and Telegram, providing real-time updates, hosting AMAs, and encouraging community interaction.
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3 text-orange-400">Meme Contests</h3>
-                    <p className="text-gray-300">
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Meme Contests</h3>
+                      <p className="text-white/90 leading-relaxed">
                       Regular meme contests showcase our community's creativity and humor, with $SOBA tokens awarded to the best entries.
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3 text-orange-400">Charitable Initiatives</h3>
-                    <p className="text-gray-300">
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Charitable Initiatives</h3>
+                      <p className="text-white/90 leading-relaxed">
                       A portion of $SOBA funds is allocated to community-chosen charitable causes, amplifying our positive impact beyond the crypto sphere.
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-3 text-orange-400">Governance Participation</h3>
-                    <p className="text-gray-300">
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Governance Participation</h3>
+                      <p className="text-white/90 leading-relaxed">
                       $SOBA holders have a voice in key project decisions through our governance system, ensuring the community shapes the future of $SOBA.
                     </p>
+                    </div>
                   </div>
                 </div>
               </WhitepaperSection>
@@ -313,25 +331,35 @@ export default function WhitePaper() {
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="6. Vision and Future Plans" id="vision">
-                <p className="mb-6 text-gray-300">
+                <div className="space-y-8">
+                  <p className="text-white/90 leading-relaxed">
                   $SOBA aims to redefine the memecoin landscape by combining humor with real utility and community value. Our vision extends beyond just being a token; we're building an ecosystem that rewards creativity, engagement, and loyalty.
                 </p>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2  text-orange-400">NFT Integration</h3>
-                    <p className="text-gray-300">Launching unique NFT collections that offer exclusive benefits to $SOBA holders.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">NFT Integration</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        Launching unique NFT collections that offer exclusive benefits to $SOBA holders.
+                      </p>
+                    </div>
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">DeFi Features</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        Developing staking and yield farming opportunities to provide additional value to our community.
+                      </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2 text-orange-400">DeFi Features</h3>
-                    <p className="text-gray-300">Developing staking and yield farming opportunities to provide additional value to our community.</p>
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Cross-Chain Expansion</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        Exploring opportunities to expand $SOBA's presence across multiple blockchain networks.
+                      </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2 text-orange-400">Cross-Chain Expansion</h3>
-                    <p className="text-gray-300">Exploring opportunities to expand $SOBA's presence across multiple blockchain networks.</p>
+                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Real-World Partnerships</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        Forging alliances with businesses to increase $SOBA's utility in everyday transactions.
+                      </p>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2 text-orange-400">Real-World Partnerships</h3>
-                    <p className="text-gray-300">Forging alliances with businesses to increase $SOBA's utility in everyday transactions.</p>
                   </div>
                 </div>
               </WhitepaperSection>
@@ -343,14 +371,14 @@ export default function WhitePaper() {
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="7. Legal Disclaimer" id="disclaimer">
-                <div className="space-y-4 text-orange-300/80">
-                  <p>
+                <div className="space-y-4 p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
+                  <p className="text-white/90 leading-relaxed">
                     This whitepaper is for informational purposes only and does not constitute financial advice. $SOBA tokens are not securities and do not represent ownership in any company.
                   </p>
-                  <p>
+                  <p className="text-white/90 leading-relaxed">
                     Cryptocurrency investments carry high risk, and you should consult with a financial advisor before making any investment decisions.
                   </p>
-                  <p>
+                  <p className="text-white/90 leading-relaxed">
                     The $SOBA team is not responsible for any losses incurred from trading or holding $SOBA tokens. By participating in the $SOBA ecosystem, you acknowledge that you have read, understood, and agree to abide by all terms and conditions set forth by the project.
                   </p>
                 </div>
