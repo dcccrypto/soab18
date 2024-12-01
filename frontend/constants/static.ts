@@ -245,7 +245,7 @@ export const SOCIAL_FEED_DATA = {
     {
       id: '1',
       content: 'SOBA Token is revolutionizing DeFi!',
-      timestamp: '2024-02-01T12:00:00Z',
+      timestamp: '15/03/2024',
       engagement: 1650,
       username: 'sobatoken',
       author: 'SOBA Team',
@@ -254,7 +254,7 @@ export const SOCIAL_FEED_DATA = {
     {
       id: '2',
       content: 'Join our growing community!',
-      timestamp: '2024-01-28T15:30:00Z',
+      timestamp: '12/03/2024',
       engagement: 1210,
       username: 'sobatoken',
       author: 'SOBA Team',
@@ -265,7 +265,7 @@ export const SOCIAL_FEED_DATA = {
     {
       id: '1',
       content: 'New burn mechanism announcement coming soon!',
-      timestamp: '2024-02-02T10:00:00Z',
+      timestamp: '14/03/2024',
       engagement: 567,
       username: 'SOBA Official',
       author: 'SOBA Team',
@@ -274,7 +274,7 @@ export const SOCIAL_FEED_DATA = {
     {
       id: '2',
       content: 'Community AMA session this weekend!',
-      timestamp: '2024-02-01T15:00:00Z',
+      timestamp: '13/03/2024',
       engagement: 432,
       username: 'SOBA Official',
       author: 'SOBA Team',
@@ -470,5 +470,7 @@ export const TOKENOMICS_CONTENT = {
     }
   }
 } as const
+
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // Other static content...

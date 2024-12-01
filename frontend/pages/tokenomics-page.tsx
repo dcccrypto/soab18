@@ -73,11 +73,11 @@ export default function TokenomicsPage() {
   const [dialogContent, setDialogContent] = useState({ title: '', description: '' })
 
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US').format(num)
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(num)
   }
 
   const formatPercent = (value: number, total: number) => {
-    return ((value / total) * 100).toFixed(2) + '%'
+    return Math.round((value / total) * 100) + '%'
   }
 
   const getMetricDetails = (metric: MetricKey) => {
@@ -180,11 +180,8 @@ export default function TokenomicsPage() {
     const totalSupply = tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
     
     if (metric === 'PRICE') {
-      // Format price with more decimals
-      const formattedPrice = new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 12,
-        maximumFractionDigits: 12
-      }).format(value);
+      // Format price with 12 decimals and remove trailing zeros
+      const formattedPrice = value.toFixed(12).replace(/\.?0+$/, '');
       return `$${formattedPrice}`;
     }
     
@@ -346,27 +343,26 @@ export default function TokenomicsPage() {
               {Object.entries(getMetrics()).map(([key, metric]) => (
                 <Card 
                   key={key}
-                  className="bg-black/40 border-orange-500/20 relative overflow-hidden group"
+                  className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 relative overflow-hidden group hover:border-orange-500/40 transition-all duration-300"
                   onMouseEnter={() => setHoveredMetric(key)}
                   onMouseLeave={() => setHoveredMetric(null)}
                   onClick={() => openDialog(metric.TITLE, getMetricDetails(key as MetricKey))}
                 >
                   <CardHeader>
-                    <CardTitle className="text-gray-300 flex items-center gap-2">
-                      {metric.ICON && <metric.ICON className={metric.ICON_COLOR || 'text-orange-500'} />}
-                      {metric.TITLE}
+                    <CardTitle className="text-orange-400 flex items-center gap-2">
+                      {metric.ICON && <metric.ICON className="text-orange-500" />}{metric.TITLE}
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-gray-300">
                       {metric.DESCRIPTION}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold text-orange-400">
+                    <div className="text-3xl font-bold text-white">
                       {metric.PREFIX}{formatNumber(metric.VALUE)}{metric.SUFFIX}
                     </div>
                     {metric.PERCENTAGE && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        {metric.PERCENTAGE}% of total supply
+                      <div className="text-sm text-orange-400/80 mt-1">
+                        {formatPercent(metric.VALUE, tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE)} of total supply
                       </div>
                     )}
                   </CardContent>
@@ -385,73 +381,73 @@ export default function TokenomicsPage() {
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Flame className="text-orange-500" />
-                    <span className="text-orange-500">Deflationary Model</span>
+                    <span className="text-orange-400">Deflationary Model</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Regular token burns reduce supply and increase scarcity
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="text-orange-500" />
-                    <span className="text-orange-500">Fair Distribution</span>
+                    <span className="text-orange-400">Fair Distribution</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Transparent allocation across different segments
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="text-orange-500" />
-                    <span className="text-orange-500">Liquidity Security</span>
+                    <span className="text-orange-400">Liquidity Security</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Permanently locked liquidity for stability
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Vote className="text-orange-500" />
-                    <span className="text-orange-500">Community Driven</span>
+                    <span className="text-orange-400">Community Driven</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Governance and decision making by token holders
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Flame className="text-orange-500" />
-                    <span className="text-orange-500">Regular Burns</span>
+                    <span className="text-orange-400">Regular Burns</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Monthly burns to maintain deflationary pressure
                   </CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="bg-black/40 border-orange-500/20">
+              <Card className="bg-gradient-to-br from-black/60 to-neutral-900/80 border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <LineChart className="text-orange-500" />
-                    <span className="text-orange-500">Transparent Supply</span>
+                    <span className="text-orange-400">Transparent Supply</span>
                   </CardTitle>
-                  <CardDescription className="text-orange-400/80">
+                  <CardDescription className="text-gray-300">
                     Real-time tracking of token metrics
                   </CardDescription>
                 </CardHeader>

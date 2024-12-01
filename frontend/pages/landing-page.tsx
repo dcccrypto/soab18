@@ -1,3 +1,4 @@
+import * as React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
@@ -23,6 +24,22 @@ import { ButtonBase } from '@/components/ui/button-base'
 import { SubmitMemeModal } from '@/components/SubmitMemeModal'
 import { formatNumber } from '@/lib/utils'
 import fetcher from '@/lib/fetcher'
+
+interface MemeData {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  uploadDate: string;
+  url: string;
+}
+
+interface MemeResponse {
+  success: boolean;
+  message: string;
+  data: MemeData[];
+}
 
 interface DexLink {
   name: string
@@ -79,9 +96,11 @@ export default function LandingPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [copied, setCopied] = useState(false)
-  const { scrollY } = useScroll()
   const [isMemeModalOpen, setIsMemeModalOpen] = useState(false)
-  
+  const [selectedMeme, setSelectedMeme] = useState<string | null>(null);
+  const { scrollY } = useScroll()
+  const { data: memeResponse, mutate } = useSWR<MemeResponse>('/api/memes', fetcher)
+
   // Parallax effect for hero section
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
@@ -188,6 +207,14 @@ export default function LandingPage() {
       console.error('Failed to copy:', err)
     }
   }
+
+  const handleMemeClick = (url: string) => {
+    setSelectedMeme(url);
+  };
+
+  const handleCloseFullView = () => {
+    setSelectedMeme(null);
+  };
 
   return (
     <div className="min-h-screen gradient-dark text-white">
@@ -416,6 +443,54 @@ export default function LandingPage() {
         </ScrollAnimatedSection>
 
         <ScrollAnimatedSection>
+          <section className="py-24 relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.1)_0%,transparent_70%)] z-0" />
+            
+            <div className="container mx-auto px-4 relative z-10">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUpVariant}
+                className="text-center mb-12"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+                  AI-Powered PFP Generator
+                </h2>
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+                  Get ready to create your unique Sol Bastard profile picture! Our AI-powered PFP generator is under development and will be available soon.
+                </p>
+              </motion.div>
+
+              <div className="max-w-3xl mx-auto">
+                <motion.div
+                  className="card-base p-8 relative overflow-hidden"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/10" />
+                  <div className="relative z-10">
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center border border-orange-500/30">
+                        <ImageIcon className="w-12 h-12 text-orange-500/70" />
+                      </div>
+                      <ButtonBase
+                        variant="default"
+                        size="lg"
+                        disabled={true}
+                        className="w-full sm:w-auto opacity-75 cursor-not-allowed"
+                      >
+                        Generate PFP (Coming Soon)
+                      </ButtonBase>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+        </ScrollAnimatedSection>
+
+        <ScrollAnimatedSection>
           <div className="container mx-auto px-4 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
@@ -616,40 +691,54 @@ export default function LandingPage() {
               <div className="relative group">
                 <div className="overflow-x-auto overflow-y-hidden scrollbar-none">
                   <div className="flex gap-4 md:gap-6 pb-4 min-w-full">
-                    {Object.entries(MEME_IMAGES).map(([key, path], index) => (
-                      <motion.div
-                        key={key}
-                        whileHover={{ scale: 1.02 }}
-                        className="flex-shrink-0 w-[280px] md:w-[320px] aspect-square rounded-xl overflow-hidden bg-neutral-900/50 border border-orange-500/20"
-                      >
-                        <div className="relative w-full h-full group">
-                          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/5" />
-                          <Image
-                            src={path}
-                            alt={`Community Meme ${index + 1}`}
-                            width={400}
-                            height={400}
-                            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                            unoptimized
-                          />
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity duration-300 flex items-center justify-center">
-                            <ButtonBase
-                              variant="ghost"
-                              size="sm"
-                              className="text-white hover:text-orange-400 transition-colors duration-300"
-                              onClick={() => window.open(path, '_blank')}
-                              aria-label={`View meme ${index + 1}`}
-                            >
-                              View Full Size
-                            </ButtonBase>
+                    {memeResponse?.data ? (
+                      [...Object.entries(MEME_IMAGES).map(([key, path]) => ({
+                        id: key,
+                        url: path,
+                        isStatic: true
+                      })),
+                      ...memeResponse.data.map(meme => ({
+                        id: meme.id,
+                        url: meme.url,
+                        isStatic: false
+                      }))].map((meme, index) => (
+                        <motion.div
+                          key={meme.id}
+                          whileHover={{ scale: 1.02 }}
+                          className="flex-shrink-0 w-[280px] md:w-[320px] aspect-square rounded-xl overflow-hidden bg-neutral-900/50 border border-orange-500/20"
+                        >
+                          <div className="relative w-full h-full group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/5" />
+                            <Image
+                              src={meme.url}
+                              alt={`Community Meme ${index + 1}`}
+                              width={400}
+                              height={400}
+                              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                              unoptimized
+                            />
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity duration-300 flex items-center justify-center">
+                              <ButtonBase
+                                variant="ghost"
+                                size="sm"
+                                className="text-white hover:text-orange-400 transition-colors duration-300"
+                                onClick={() => handleMemeClick(meme.url)}
+                                aria-label={`View meme ${index + 1}`}
+                              >
+                                View Full Size
+                              </ButtonBase>
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="flex justify-center items-center h-full">
+                        <p className="text-gray-400">Loading...</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Scroll Indicators */}
                 <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <ButtonBase
                     variant="ghost"
@@ -705,9 +794,28 @@ export default function LandingPage() {
           </div>
         </ScrollAnimatedSection>
 
+        {selectedMeme && (
+          <div
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={handleCloseFullView}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] w-full h-full">
+              <Image
+                src={selectedMeme}
+                alt="Full size meme"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
+        )}
+
         <SubmitMemeModal 
           isOpen={isMemeModalOpen}
           onClose={() => setIsMemeModalOpen(false)}
+          onSuccess={() => {
+            mutate();
+          }}
         />
 
         <ScrollAnimatedSection>

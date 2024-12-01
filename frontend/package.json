@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-progress": "^1.1.0",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
@@ -32,6 +34,7 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
     "recharts": "^2.13.3",
     "sonner": "^1.7.0",
     "swr": "^2.2.5",
@@ -43,10 +46,10 @@
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",
-    "@types/node": "^20.11.19",
-    "@types/react": "^18.2.55",
+    "@types/node": "^20.17.9",
+    "@types/react": "^18.3.12",
     "@types/react-chartjs-2": "^2.0.2",
-    "@types/react-dom": "^18.2.19",
+    "@types/react-dom": "^18.3.1",
     "@types/recharts": "^1.8.29",
     "@types/three": "^0.170.0",
     "autoprefixer": "^10.4.16",

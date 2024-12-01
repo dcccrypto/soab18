@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from 'react'
 import dynamic from 'next/dynamic'
 import { ClientOnly } from '@/components/client-only'
 import { useState, useEffect, useRef } from 'react'
@@ -43,6 +44,7 @@ const fadeInUpVariant = {
 
 const TooltipProviderComponent = dynamic(
   () => import('@/components/ui/tooltip').then(mod => ({
+
     default: ({ children, ...props }: any) => (
       <ClientOnly>
         <mod.TooltipProvider {...props}>{children}</mod.TooltipProvider>
