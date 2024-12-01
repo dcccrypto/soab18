@@ -2,7 +2,7 @@ export interface MetricItem {
   TITLE: string
   VALUE: number
   DESCRIPTION: string
-  DISPLAY_TYPE: 'number' | 'percent'
+  DISPLAY_TYPE: 'number' | 'percent' | 'price'
 }
 
 export interface MetricItems {
@@ -39,22 +39,30 @@ export interface BurnTransaction {
   txId: string
   amount: number
   date: string
+  value?: number
 }
 
 export interface BurnInfo {
   BURN_WALLET: string
   TOTAL_BURNED: number
-  LATEST_BURN: BurnTransaction
   BURN_RATE: number
-  BURN_HISTORY: BurnTransaction[]
+  BURN_SCHEDULE: string
+  LATEST_BURN: {
+    date: string
+    amount: number
+    txId: string
+  }
   NEXT_BURN: {
     TARGET_DATE: string
-    ESTIMATED_AMOUNT: number
-    DESCRIPTION: string
-    EVENT_NAME: string
-    CURRENT_USD_VALUE: number
     LAST_BURN_DATE: string
+    EVENT_NAME: string
+    DESCRIPTION: string
+    AMOUNT: number
   }
+  PROGRESS: number
+  START_DATE: string
+  END_DATE: string
+  NEXT_BURN_DATE: string
 }
 
 export interface TokenMetrics {

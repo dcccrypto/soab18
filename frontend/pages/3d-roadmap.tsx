@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { ClientOnly } from '@/components/client-only'
 import Image from 'next/image'
@@ -8,12 +8,13 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Rocket, Users, Megaphone, LineChart, Building, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
 import * as THREE from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Text, Box, OrbitControls } from '@react-three/drei'
 import { Button } from "@/components/ui/button"
 import { ButtonBase } from '@/components/ui/button-base'
 import { useScroll, useTransform } from 'framer-motion'
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants'
+import { DragControls } from '@react-three/drei'
 
 interface RoadmapPhase {
   phase: number
@@ -160,37 +161,96 @@ const roadmapData: RoadmapPhase[] = [
 ]
 
 const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) => {
-  const mesh = useRef<THREE.Mesh>(null)
-  const [hovered, setHovered] = useState(false)
+  const groupRef = useRef<THREE.Group>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [hover, setHover] = useState(false)
+  const [localPosition, setLocalPosition] = useState<[number, number, number]>(position)
+  const [rotationX, setRotationX] = useState(0)
+  const [rotationY, setRotationY] = useState(0)
 
-  useFrame(() => {
-    if (mesh.current) {
-      mesh.current.rotation.x += 0.005
-      mesh.current.rotation.y += 0.005
+  // Idle animation
+  useFrame((state) => {
+    if (groupRef.current && !isDragging) {
+      // Gentle floating animation
+      const time = state.clock.getElapsedTime()
+      groupRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.1
+      
+      if (hover) {
+        // Additional hover animation
+        groupRef.current.rotation.y += 0.01
+        groupRef.current.scale.setScalar(1.1)
+      } else {
+        // Reset scale when not hovering
+        groupRef.current.scale.setScalar(1)
+      }
     }
   })
 
+  const onPointerMove = useCallback((event: ThreeEvent<PointerEvent>) => {
+    if (isDragging && groupRef.current) {
+      event.stopPropagation()
+      const { movementX, movementY } = event
+      setRotationX((prev) => prev + movementY * 0.01)
+      setRotationY((prev) => prev + movementX * 0.01)
+    }
+  }, [isDragging])
+
+  const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const onPointerUp = () => {
+    setIsDragging(false)
+  }
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(...localPosition)
+    }
+  }, [localPosition])
+
   return (
-    <Box
-      args={[2, 2, 2]}
-      ref={mesh}
-      position={position}
-      scale={hovered ? [1.1, 1.1, 1.1] : [1, 1, 1]}
-      onClick={onClick}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
+    <group 
+      ref={groupRef}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerMove={onPointerMove}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => {
+        setHover(false)
+        setIsDragging(false)
+      }}
+      rotation-x={rotationX}
+      rotation-y={rotationY}
     >
-      <meshStandardMaterial color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} />
+      <mesh onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial 
+          color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} 
+          roughness={0.5}
+          metalness={0.5}
+          opacity={hover ? 0.9 : 1}
+          transparent
+          emissive={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'}
+          emissiveIntensity={hover ? 0.5 : 0}
+        />
+      </mesh>
       <Text
-        position={[0, 0, 1.01]}
+        position={[0, 0, 1.2]}
         fontSize={0.5}
         color="#FFFFFF"
         anchorX="center"
         anchorY="middle"
+        rotation-x={-rotationX}
+        rotation-y={-rotationY}
       >
         {phase.phase}
       </Text>
-    </Box>
+    </group>
   )
 }
 
@@ -198,19 +258,32 @@ const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
   const { camera } = useThree()
 
   useEffect(() => {
-    camera.position.set(0, 10, 30)
+    camera.position.set(0, 8, 20) // Adjusted camera position
   }, [camera])
+
+  const calculatePosition = (index: number): [number, number, number] => {
+    const spacing = 5 // Increased spacing between boxes
+    const totalWidth = (roadmapData.length - 1) * spacing
+    const xPos = (index * spacing) - (totalWidth / 2)
+    return [xPos, -3, 0] // Moved boxes closer to progress bar
+  }
 
   return (
     <>
       <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <OrbitControls enableZoom={false} enablePan={false} />
+      <pointLight position={[10, 10, 10]} intensity={0.8} />
+      <OrbitControls 
+        enableZoom={true}
+        enablePan={true}
+        minPolarAngle={Math.PI / 4}
+        maxPolarAngle={Math.PI / 2}
+        makeDefault
+      />
       {roadmapData.map((phase, index) => (
         <RoadmapCube
           key={phase.phase}
           phase={phase}
-          position={[(index % 4 - 1.5) * 5, -Math.floor(index / 4) * 5 + 8, 0]}
+          position={calculatePosition(index)}
           onClick={() => setSelectedPhase(phase)}
         />
       ))}
@@ -315,9 +388,9 @@ export default function Roadmap() {
                 animate="visible"
                 className="max-w-4xl mx-auto space-y-6"
               >
-                <h1 className="text-5xl font-bold mb-6 text-center gradient-text">$SOBA Roadmap</h1>
-                <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
-                  Embark on an exciting journey with $SOBA as we revolutionize the crypto landscape. Our roadmap outlines our ambitious plans and milestones, showcasing our commitment to innovation and community growth.
+                <h1 className="text-5xl font-bold mb-6 gradient-text">$SOBA Roadmap</h1>
+                <p className="text-gray-400 max-w-2xl mx-auto">
+                  Our journey to revolutionize the meme coin space
                 </p>
                 <div className="flex justify-center gap-4">
                   <ButtonBase
@@ -372,7 +445,7 @@ export default function Roadmap() {
                       <h3 className="text-xl font-bold">{phase.title}</h3>
                     </div>
                     <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
-                    <p className="text-base text-gray-300">{phase.description}</p>
+                    <p className="text-base text-gray-400">{phase.description}</p>
                   </motion.div>
                 ))}
               </div>
@@ -380,7 +453,7 @@ export default function Roadmap() {
               {/* CTA Section */}
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-bold mb-4 gradient-text">Ready to Join the $SOBA Revolution?</h2>
-                <p className="text-xl mb-8 text-gray-300">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
+                <p className="text-xl mb-8 text-gray-400">Don't miss out on the opportunity to be part of something extraordinary. Join our community today!</p>
                 <div className="flex justify-center gap-4">
                   <ButtonBase
                     size="lg"
@@ -412,9 +485,9 @@ export default function Roadmap() {
                       <DynamicDialogDescription>
                         <p className="text-orange-400 mb-4 text-lg">{selectedPhase?.status}</p>
                         <h4 className="text-xl font-semibold mb-2 text-orange-300">Objective:</h4>
-                        <p className="mb-4 text-gray-300">{selectedPhase?.objective}</p>
+                        <p className="mb-4 text-gray-400">{selectedPhase?.objective}</p>
                         <h4 className="text-xl font-semibold mb-2 text-orange-300">Details:</h4>
-                        <p className="text-gray-300">{selectedPhase?.details}</p>
+                        <p className="text-gray-400">{selectedPhase?.details}</p>
                       </DynamicDialogDescription>
                     </DynamicDialogHeader>
                     <ButtonBase 

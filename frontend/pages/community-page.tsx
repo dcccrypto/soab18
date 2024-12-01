@@ -22,6 +22,8 @@ import {
 } from '@/constants'
 import dynamic from 'next/dynamic'
 import { ClientOnly } from '@/components/client-only'
+import { AnimatedCard } from '@/components/AnimatedCard'
+import { formatDateNew } from '@/lib/utils'
 
 // Dynamic imports for Dialog components
 const DynamicDialog = dynamic(
@@ -353,20 +355,18 @@ export default function CommunityPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {upcomingEvents.map((event, index) => (
-                  <motion.div
+                  <AnimatedCard
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="p-6 rounded-xl bg-black/40 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300"
+                    delay={index * 0.1}
+                    className="p-6 rounded-xl bg-black/40 border border-orange-500/20 hover:border-orange-500/40 hover:bg-black/60 transition-colors duration-300"
                   >
                     <div className="flex items-center gap-3 mb-4">
                       <Calendar className="w-6 h-6 text-[#FF6B00]" />
                       <h3 className="text-xl font-semibold text-[#FF6B00]">{event.name}</h3>
                     </div>
                     <p className="text-white/90 leading-relaxed mb-2">{event.description}</p>
-                    <p className="text-sm text-white/80">{event.date}</p>
-                  </motion.div>
+                    <p className="text-sm text-white/80">{formatDateNew(event.date)}</p>
+                  </AnimatedCard>
                 ))}
               </div>
             </div>
@@ -491,8 +491,8 @@ export default function CommunityPage() {
                     >
                       <p className="text-white/90 leading-relaxed mb-2">{update.content}</p>
                       <div className="flex justify-between text-sm text-white/80">
-                        <span>{update.timestamp}</span>
-                        <span>{update.engagement} interactions</span>
+                        <span>{formatDateNew(update.timestamp)}</span>
+                        <span>{update.engagement.toLocaleString()} interactions</span>
                       </div>
                     </motion.div>
                   ))}
@@ -509,9 +509,13 @@ export default function CommunityPage() {
                       className="p-4 rounded-lg bg-black/40 border border-orange-500/20"
                     >
                       <p className="text-white/90 leading-relaxed mb-2">{highlight.content}</p>
-                      <div className="flex justify-between text-sm text-white/80">
-                        <span>{highlight.author}</span>
-                        <span>{highlight.timestamp}</span>
+                      <div className="flex justify-between items-center text-sm text-white/80">
+                        <div className="flex items-center gap-2">
+                          <span>{highlight.author}</span>
+                          <span>•</span>
+                          <span>{formatDateNew(highlight.timestamp)}</span>
+                        </div>
+                        <span>{highlight.engagement.toLocaleString()} interactions</span>
                       </div>
                     </motion.div>
                   ))}

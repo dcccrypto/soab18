@@ -1,5 +1,5 @@
 import { Table } from '@/components/ui/table'
-import { formatNumber, formatDateTime, getRelativeTime } from '@/lib/utils'
+import { formatNumber, formatDateNew, getRelativeTime } from '@/lib/utils'
 import { BURN_INFO } from '@/constants'
 import { ExternalLink } from 'lucide-react'
 import { BurnTransaction } from '@/types'
@@ -31,9 +31,9 @@ export const BurnHistory = ({ burnHistory }: BurnHistoryProps) => {
             className="border-b border-orange-500/10 hover:bg-orange-500/5 transition-colors"
           >
             <td className="p-4 text-gray-300">
-              <TooltipWrapper content={formatDateTime(burn.date)}>
+              <TooltipWrapper content={formatDateNew(burn.date)}>
                 <span className="cursor-help">
-                  {getRelativeTime(burn.date)}
+                  {formatDateNew(burn.date)}
                 </span>
               </TooltipWrapper>
             </td>

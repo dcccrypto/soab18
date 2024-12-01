@@ -17,6 +17,7 @@ import {
 import { ExternalLink, TrendingUp, Flame, Calendar } from 'lucide-react'
 import { BURN_HISTORY, BURN_INFO } from '@/constants'
 import { formatDate, formatNumber, isValidDate } from '@/lib/utils'
+import { getBurnProgress, getNextBurnDate } from '@/lib/dateUtils'
 import { motion } from 'framer-motion'
 import { BurnTransaction } from '@/types'
 
@@ -38,15 +39,28 @@ interface ChartBurnData extends BurnTransaction {
 
 type ChartViewType = 'cumulative' | 'individual'
 
-export const BurnChart = () => {
+export function BurnChart() {
   const chartRef = useRef<ChartJS<'line'>>(null)
   const [isClient, setIsClient] = useState(false)
-  const [selectedBurn, setSelectedBurn] = useState<number | null>(null)
-  const [chartView, setChartView] = useState<ChartViewType>('cumulative')
+  const [burnProgress, setBurnProgress] = useState(0)
+  const [nextBurnDate, setNextBurnDate] = useState<Date>(new Date())
+  const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
 
   useEffect(() => {
     setIsClient(true)
+    updateProgress()
+    const interval = setInterval(updateProgress, 1000)
+    return () => clearInterval(interval)
   }, [])
+
+  const updateProgress = () => {
+    const progress = getBurnProgress()
+    const nextBurn = getNextBurnDate()
+    
+    setBurnProgress(progress)
+    setNextBurnDate(nextBurn)
+  }
 
   if (!isClient) {
     return (
@@ -58,26 +72,15 @@ export const BurnChart = () => {
 
   // Sort burn history by date and calculate cumulative burns
   const sortedBurns = [...BURN_HISTORY]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .filter(burn => isValidDate(burn.date)) // Filter out invalid dates
-  
-  let cumulativeBurns = 0
-  const cumulativeData: ChartBurnData[] = sortedBurns.map(burn => {
-    cumulativeBurns += burn.amount
-    return {
-      ...burn,
-      cumulative: cumulativeBurns
-    }
-  }).reverse() // Reverse for chronological order in chart
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .filter(burn => isValidDate(burn.date))
 
   const chartData: ChartData<'line'> = {
-    labels: cumulativeData.map(item => formatDate(item.date)),
+    labels: sortedBurns.map(item => formatDate(item.date)),
     datasets: [
       {
-        label: chartView === 'cumulative' ? 'Total Burned' : 'Burn Amount',
-        data: chartView === 'cumulative' 
-          ? cumulativeData.map(item => Number((item.cumulative / 1000000).toFixed(2)))
-          : cumulativeData.map(item => Number((item.amount / 1000000).toFixed(2))),
+        label: 'Burn Amount',
+        data: sortedBurns.map(item => Number((item.amount / 1000000).toFixed(2))),
         borderColor: '#f97316',
         backgroundColor: (context: any) => {
           const ctx = context.chart.ctx
@@ -109,62 +112,79 @@ export const BurnChart = () => {
     },
     scales: {
       x: {
-        grid: {
-          color: 'rgba(249, 115, 22, 0.1)',
-          display: false
+        title: {
+          display: true,
+          text: 'Burn Date',
+          color: '#9CA3AF',
+          font: {
+            size: 12
+          }
         },
         ticks: {
-          color: '#f97316',
+          color: '#9CA3AF',
           maxRotation: 45,
-          minRotation: 45
+          minRotation: 45,
+          callback: function(value, index) {
+            // Show fewer labels on mobile
+            if (window.innerWidth < 768) {
+              return index % 3 === 0 ? sortedBurns[index]?.date : '';
+            }
+            return sortedBurns[index]?.date;
+          }
+        },
+        grid: {
+          display: false
         }
       },
       y: {
-        grid: {
-          color: 'rgba(249, 115, 22, 0.1)',
-          display: false
+        title: {
+          display: true,
+          text: 'Amount (Millions)',
+          color: '#9CA3AF',
+          font: {
+            size: 12
+          }
         },
         ticks: {
-          color: '#f97316',
-          callback: function(this: any, tickValue: number | string): string {
-            const value = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue
-            return `${value}M`
+          color: '#9CA3AF',
+          callback: function(value) {
+            return formatNumber(value) + 'M';
           }
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
         }
       }
     },
     plugins: {
-      legend: {
-        display: false
-      },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        titleColor: '#f97316',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#F97316',
         bodyColor: '#fff',
-        borderColor: 'rgba(249, 115, 22, 0.3)',
+        borderColor: '#F97316',
         borderWidth: 1,
         padding: 12,
         displayColors: false,
         callbacks: {
-          label: function(context: TooltipItem<'line'>) {
-            const dataIndex = context.dataIndex
-            const burn = cumulativeData[dataIndex]
+          title: (items) => {
+            const index = items[0].dataIndex;
+            const burn = sortedBurns[index];
+            return formatDate(burn.date);
+          },
+          label: (item) => {
+            const burn = sortedBurns[item.dataIndex];
             return [
-              `Amount: ${(burn.amount / 1000000).toFixed(2)}M SOBA`,
-              `Total Burned: ${(burn.cumulative / 1000000).toFixed(2)}M SOBA`,
-              'Click to view transaction'
-            ]
+              `Amount: ${formatNumber(burn.amount / 1000000)}M SOBA`,
+              `Value: $${formatNumber(burn.value)}`
+            ];
           }
         }
-      }
-    },
-    onClick: (event, elements) => {
-      if (elements && elements.length > 0) {
-        const index = elements[0].index
-        setSelectedBurn(index)
+      },
+      legend: {
+        display: false
       }
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -172,23 +192,7 @@ export const BurnChart = () => {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setChartView('cumulative')}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              chartView === 'cumulative'
-                ? 'bg-orange-500 text-white'
-                : 'bg-orange-500/10 text-orange-500 hover:bg-orange-500/20'
-            }`}
-          >
-            <TrendingUp className="w-4 h-4" />
-            Cumulative
-          </button>
-          <button
-            onClick={() => setChartView('individual')}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              chartView === 'individual'
-                ? 'bg-orange-500 text-white'
-                : 'bg-orange-500/10 text-orange-500 hover:bg-orange-500/20'
-            }`}
+            className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors bg-orange-500 text-white"
           >
             <Flame className="w-4 h-4" />
             Individual Burns
@@ -203,51 +207,71 @@ export const BurnChart = () => {
 
       {/* Chart */}
       <div className="relative h-[500px] md:h-[600px] w-full p-4 bg-black/40 rounded-xl border border-orange-500/20">
-        <Line ref={chartRef} data={chartData} options={options} />
+        <div className="absolute top-4 right-4 flex gap-2">
+          <div className="text-sm text-gray-400">
+            Next Burn: <span className="text-orange-400">{formatDate(nextBurnDate)}</span>
+          </div>
+        </div>
+        <Line data={chartData} options={options} ref={chartRef} />
+        
+        {/* Progress Bar */}
+        <div className="mt-6 px-4">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-gray-400">Progress to Next Burn</span>
+            <span className="text-orange-400">{burnProgress.toFixed(1)}%</span>
+          </div>
+          <div className="h-2 bg-black/40 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-orange-500 to-orange-600 transition-all duration-1000"
+              style={{ width: `${burnProgress}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs mt-1">
+            <span className="text-gray-500">{formatDate(startDate)}</span>
+            <span className="text-gray-500">{formatDate(endDate)} (10:00 AM)</span>
+          </div>
+        </div>
       </div>
 
       {/* Selected Burn Details */}
-      {selectedBurn !== null && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-black/40 rounded-xl border border-orange-500/20"
-        >
-          <h3 className="text-lg font-semibold text-orange-500 mb-2">Selected Burn Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-gray-400">Date</p>
-              <p className="text-white">{formatDate(new Date(cumulativeData[selectedBurn].date))}</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Amount</p>
-              <p className="text-white">{(cumulativeData[selectedBurn].amount / 1000000).toFixed(2)}M SOBA</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Transaction</p>
-              <a
-                href={`https://solscan.io/tx/${cumulativeData[selectedBurn].txId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-400 hover:text-orange-300 flex items-center gap-2"
-              >
-                View on Solscan
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
+      {/* <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-4 bg-black/40 rounded-xl border border-orange-500/20"
+      >
+        <h3 className="text-lg font-semibold text-white mb-2">Selected Burn Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-gray-300">Date</p>
+            <p className="text-white">{formatDate(new Date(sortedBurns[selectedBurn].date))}</p>
           </div>
-        </motion.div>
-      )}
-      
+          <div>
+            <p className="text-gray-300">Amount</p>
+            <p className="text-white">{(sortedBurns[selectedBurn].amount / 1000000).toFixed(2)}M SOBA</p>
+          </div>
+          <div>
+            <p className="text-gray-300">Transaction</p>
+            <a
+              href={`https://solscan.io/tx/${sortedBurns[selectedBurn].txId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-400 hover:text-orange-300 flex items-center gap-2"
+            >
+              View on Solscan
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </motion.div> */}
+
       {/* Burn History Table */}
       <div className="overflow-x-auto rounded-xl border border-orange-500/20 bg-black/40">
         <table className="w-full">
           <thead>
             <tr className="border-b border-orange-500/20">
-              <th className="p-4 text-left text-orange-500 font-medium">Date</th>
-              <th className="p-4 text-left text-orange-500 font-medium">Amount</th>
-              <th className="p-4 text-left text-orange-500 font-medium">Total Burned</th>
-              <th className="p-4 text-left text-orange-500 font-medium">Transaction</th>
+              <th className="p-4 text-left text-white font-medium">Date</th>
+              <th className="p-4 text-left text-white font-medium">Amount</th>
+              <th className="p-4 text-left text-white font-medium">Transaction</th>
             </tr>
           </thead>
           <tbody>
@@ -264,9 +288,6 @@ export const BurnChart = () => {
                 </td>
                 <td className="p-4 text-gray-300">
                   {(burn.amount / 1000000).toFixed(2)}M SOBA
-                </td>
-                <td className="p-4 text-gray-300">
-                  {(cumulativeData[cumulativeData.length - 1 - index].cumulative / 1000000).toFixed(2)}M SOBA
                 </td>
                 <td className="p-4">
                   <a

@@ -1,4 +1,4 @@
-import type { BurnTransaction, BurnInfo } from './types'
+import type { BurnTransaction, BurnInfo } from '../types'
 
 // Static constants that don't need updates
 export const ICON_SIZES = {
@@ -52,55 +52,83 @@ export const ASSETS = {
   }
 } as const
 
-export const BURN_INFO: BurnInfo = {
-  TOTAL_BURNED: 73990000, // 73.99M total burned
-  BURN_RATE: 10000000, // 10M SOBA per month
-  BURN_SCHEDULE: 'Monthly (1st of each month)',
-  BURN_WALLET: 'BURNSobaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-  NEXT_BURN: {
-    TARGET_DATE: getNextBurnDate().toISOString(),
-    LAST_BURN_DATE: '2024-10-30T04:25:21Z'
-  }
-} as const
-
 // Helper function to get next burn date
-function getNextBurnDate(): Date {
-  const today = new Date()
-  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
-  return nextMonth
+export function getNextBurnDate(): Date {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+  
+  // Set to 1st of next month at 10 AM Central Time
+  const nextBurn = new Date(currentYear, currentMonth + 1, 1, 10, 0, 0)
+  
+  // Adjust for Central Time (UTC-6 or UTC-5 depending on daylight saving)
+  const isCentralDST = isDST(nextBurn)
+  nextBurn.setUTCHours(isCentralDST ? 15 : 16) // 10 AM CT = 15:00/16:00 UTC
+  
+  return nextBurn
 }
+
+function isDST(date: Date): boolean {
+  const jan = new Date(date.getFullYear(), 0, 1).getTimezoneOffset()
+  const jul = new Date(date.getFullYear(), 6, 1).getTimezoneOffset()
+  const stdTimezoneOffset = Math.max(jan, jul)
+  return date.getTimezoneOffset() < stdTimezoneOffset
+}
+
+export const BURN_INFO: BurnInfo = {
+  BURN_WALLET: "7wtbTXc7Lyxt1enezJa7eNyNxenaLYsmBeiZTsA3KvwL",
+  TOTAL_BURNED: 73990000,
+  BURN_RATE: 10000000,
+  BURN_SCHEDULE: "Monthly - 1st of every month at 10:00 AM Central Time",
+  LATEST_BURN: {
+    date: "2024-11-01T15:00:00.000Z", // 10 AM CST
+    amount: 10000000,
+    txId: "5RpUwQ"
+  },
+  NEXT_BURN: {
+    TARGET_DATE: "2024-12-01T16:00:00.000Z", // 10 AM CST
+    LAST_BURN_DATE: "2024-11-01T15:00:00.000Z", // 10 AM CST
+    EVENT_NAME: "December Burn Event",
+    DESCRIPTION: "Monthly token burn for December",
+    AMOUNT: 10000000
+  },
+  PROGRESS: 0,
+  START_DATE: "2024-11-01T15:00:00.000Z", // 10 AM CST
+  END_DATE: "2024-12-01T16:00:00.000Z", // 10 AM CST
+  NEXT_BURN_DATE: "2024-12-01T16:00:00.000Z" // 10 AM CST
+} as const
 
 // Replace the generateBurnHistory function with actual data
 export const BURN_HISTORY: BurnTransaction[] = [
   {
     txId: '5rAonRA58uCnMYz3bek3M3RCf8j31GHsb2AeuMrcYSdCogSN5EUzXA5pCZJZi4tHDDXtd2URM4uxCM7AmtQc9VxL',
     amount: 11090000, // 11.09M
-    date: '2024-07-23T14:24:55Z'
+    date: '2024-07-23T15:00:00.000Z' // 10 AM CST
   },
   {
     txId: '2YJddGWGfJ6wmk5DjjB5jmLonZvB8GBLv4gzJA4QZEGM9TTj38r68AgvMEN9QWCiPcDV57JfoNv2CDjBcUEWo7yZ',
     amount: 22000000, // 22.0M
-    date: '2024-08-01T13:53:14Z'
+    date: '2024-08-01T15:00:00.000Z' // 10 AM CST
   },
   {
     txId: 'apj6z65J7fuG5posHKDMGGpUSjLVbZW8yChBrAZR4Xg8kTjAoL3az5wdU6BanCDVsq7hqxjhP8nKpRJ4fRu2xJ9',
     amount: 215000, // 215k
-    date: '2024-08-19T23:23:29Z'
+    date: '2024-08-19T15:00:00.000Z' // 10 AM CST
   },
   {
     txId: '5a5AztHHBSXYcsxoc17bKQhyJCytdimPmSaWVhrApG99xhJSWtVWExcvwKPp4XmWVbdQJDgY8VKhVZU6mEGeLUUu',
     amount: 21420000, // 21.42M
-    date: '2024-08-25T03:17:07Z'
+    date: '2024-08-25T15:00:00.000Z' // 10 AM CST
   },
   {
     txId: '3PLRtU2i3KLwA7FMPL1KuZozbFeNyyqkHJVznqNBpqKFNJ6A7iUDxWXjHL8hRxh7rycZUNxUFFAjfiego7oVF9HN',
     amount: 3280000, // 3.28M
-    date: '2024-10-01T14:57:06Z'
+    date: '2024-10-01T15:00:00.000Z' // 10 AM CST
   },
   {
     txId: '4s4EyPN8SSicrbRx9mc3ECAjbZQU1azGtfGtXUao3kE3UW6LRdTvdwXwDamRLxNvGt2iGHX7SvbWt9kGuyNSNX9A',
     amount: 15970000, // 15.97M
-    date: '2024-10-30T04:25:21Z'
+    date: '2024-10-30T15:00:00.000Z' // 10 AM CST
   }
 ] as const
 
@@ -442,8 +470,5 @@ export const TOKENOMICS_CONTENT = {
     }
   }
 } as const
-
-// Re-export everything
-export * from './types'
 
 // Other static content...

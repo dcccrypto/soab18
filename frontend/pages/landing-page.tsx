@@ -60,6 +60,19 @@ const BURN_DISPLAY = {
   DISPLAY_DECIMALS: 2
 } as const
 
+const NFT_SHOWCASE = [
+  { id: 1, image: '/nft1.png', name: 'SOBA #001', rarity: 'Legendary' },
+  { id: 2, image: '/nft2.png', name: 'SOBA #002', rarity: 'Epic' },
+  { id: 3, image: '/nft3.png', name: 'SOBA #003', rarity: 'Rare' },
+  { id: 4, image: '/nft4.png', name: 'SOBA #004', rarity: 'Epic' },
+  { id: 5, image: '/nft5.png', name: 'SOBA #005', rarity: 'Legendary' },
+  { id: 6, image: '/nft6.png', name: 'SOBA #006', rarity: 'Rare' },
+  { id: 7, image: '/nft7.png', name: 'SOBA #007', rarity: 'Epic' },
+  { id: 8, image: '/nft8.png', name: 'SOBA #008', rarity: 'Rare' },
+  { id: 9, image: '/nft9.png', name: 'SOBA #009', rarity: 'Legendary' },
+  { id: 10, image: '/nft10.png', name: 'SOBA #010', rarity: 'Epic' },
+]
+
 export default function LandingPage() {
   const { burnedTokens, burnedValue } = useBurnStats()
   const [hoveredDex, setHoveredDex] = useState<string | null>(null)
@@ -325,6 +338,81 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </ScrollAnimatedSection>
+
+        <ScrollAnimatedSection>
+          <section className="py-24 relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.1)_0%,transparent_70%)] z-0" />
+            
+            <div className="container mx-auto px-4 relative z-10">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUpVariant}
+                className="text-center mb-12"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+                  Exclusive NFT Collection
+                </h2>
+                <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+                  Own a piece of the SOBA universe with our limited edition NFTs. Each piece is unique and comes with exclusive benefits.
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
+                {NFT_SHOWCASE.map((nft, index) => (
+                  <motion.div
+                    key={nft.id}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { delay: index * 0.1, duration: 0.5 }
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    className="bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden border border-orange-500/20 group"
+                  >
+                    <div className="relative aspect-square">
+                      <Image
+                        src={nft.image}
+                        alt={nft.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <div className="p-3 w-full">
+                          <p className="text-sm font-semibold">{nft.name}</p>
+                          <p className="text-xs text-orange-400">{nft.rarity}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUpVariant}
+                className="text-center"
+              >
+                <Link 
+                  href="/nft-marketplace"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold py-3 px-8 rounded-full hover:brightness-110 transition-all duration-300 shadow-lg hover:shadow-orange-500/25"
+                >
+                  Buy NFTs
+                  <ArrowRight size={20} />
+                </Link>
+              </motion.div>
+            </div>
+          </section>
         </ScrollAnimatedSection>
 
         <ScrollAnimatedSection>

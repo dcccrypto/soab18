@@ -12,7 +12,7 @@ import { Header } from '@/components/Header'
 import { TOKENOMICS_CONTENT, BURN_INFO } from '@/constants'
 import { ButtonBase } from '@/components/ui/button-base'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
-import { type MetricItems } from '@/types'
+import { type MetricItems, MetricItem } from '@/types'
 import Image from 'next/image'
 import { useTokenStats } from '@/hooks/useTokenStats'
 import { AnimatedValue } from '@/components/AnimatedValue'
@@ -26,10 +26,6 @@ const fadeInUpVariant = {
     transition: { duration: 0.6, ease: "easeOut" }
   }
 }
-
-// Add these type definitions
-type MetricKey = keyof typeof TOKENOMICS_CONTENT.METRICS.ITEMS
-type ChartData = typeof TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA
 
 // Update the dynamic import to handle Dialog components properly
 const DynamicDialog = dynamic(
@@ -58,6 +54,17 @@ const DynamicDialogDescription = dynamic(
 )
 
 const COLORS = ['#FF6B00', '#FFB800', '#FF3D00']
+
+interface MetricsData {
+  TOTAL_SUPPLY: MetricItem
+  CIRCULATING: MetricItem
+  BURNED: MetricItem
+  FOUNDER: MetricItem
+  HOLDERS: MetricItem
+  PRICE: MetricItem
+}
+
+type MetricKey = 'TOTAL_SUPPLY' | 'CIRCULATING' | 'BURNED' | 'FOUNDER' | 'HOLDERS' | 'PRICE'
 
 export default function TokenomicsPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
@@ -90,21 +97,27 @@ export default function TokenomicsPage() {
   const { data: tokenStats, isLoading, error } = useTokenStats()
 
   // Get the latest metrics from API or fallback to static content
-  const getMetrics = () => {
-    if (!tokenStats) return TOKENOMICS_CONTENT.METRICS.ITEMS;
+  const getMetrics = (): MetricsData => {
+    if (!tokenStats) {
+      return TOKENOMICS_CONTENT.METRICS.ITEMS as MetricsData;
+    }
 
-    const metrics = {
+    return {
       TOTAL_SUPPLY: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
         VALUE: tokenStats.totalSupply
       },
-      FOUNDER: {
-        ...TOKENOMICS_CONTENT.METRICS.ITEMS.FOUNDER,
-        VALUE: tokenStats.founderBalance
+      CIRCULATING: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING,
+        VALUE: tokenStats.circulatingSupply
       },
       BURNED: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED,
-        VALUE: BURN_INFO.TOTAL_BURNED
+        VALUE: tokenStats.burnedTokens
+      },
+      FOUNDER: {
+        ...TOKENOMICS_CONTENT.METRICS.ITEMS.FOUNDER,
+        VALUE: tokenStats.founderBalance
       },
       HOLDERS: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
@@ -113,31 +126,36 @@ export default function TokenomicsPage() {
       PRICE: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.PRICE,
         VALUE: tokenStats.price
-      },
+      }
     };
-
-    
-    return metrics;
   };
-  
+
   // Calculate supply distribution
   const getSupplyData = () => {
-    if (!tokenStats) return [...TOKENOMICS_CONTENT.DISTRIBUTION.CHART_DATA];
-    
+    const totalSupply = tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
+    const circulatingSupply = tokenStats?.circulatingSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING.VALUE;
+    const founderBalance = tokenStats?.founderBalance || TOKENOMICS_CONTENT.METRICS.ITEMS.FOUNDER.VALUE;
+    const burnedSupply = tokenStats?.burnedTokens || BURN_INFO.TOTAL_BURNED;
+
+    const calculatePercentage = (value: number) => (value / totalSupply) * 100;
+
     return [
       {
         label: 'Circulating Supply',
-        value: tokenStats.circulatingSupply,
+        value: circulatingSupply,
+        percentage: calculatePercentage(circulatingSupply).toFixed(2),
         color: '#FF6B00'
       },
       {
         label: 'Founder Holding',
-        value: tokenStats.founderBalance,
+        value: founderBalance,
+        percentage: calculatePercentage(founderBalance).toFixed(2),
         color: '#FF8C00'
       },
       {
         label: 'Burned Supply',
-        value: BURN_INFO.TOTAL_BURNED,
+        value: burnedSupply,
+        percentage: calculatePercentage(burnedSupply).toFixed(2),
         color: '#FFA500'
       }
     ];
@@ -146,17 +164,37 @@ export default function TokenomicsPage() {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const total = tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
       return (
         <div className="bg-black/90 p-4 rounded-lg border border-orange-500/20">
           <p className="text-orange-500 font-semibold">{data.label}</p>
-          <p className="text-white">{formatNumber(data.value)}</p>
-          <p className="text-orange-400/80">{formatPercent(data.value, total)}</p>
+          <p className="text-white">{formatNumber(data.value)} SOBA</p>
+          <p className="text-orange-400/80">{data.percentage}% of total supply</p>
         </div>
       )
     }
     return null
   }
+
+  const getMetricValue = (metric: MetricKey) => {
+    const value = getMetrics()[metric].VALUE;
+    const totalSupply = tokenStats?.totalSupply || TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY.VALUE;
+    
+    if (metric === 'PRICE') {
+      // Format price with more decimals
+      const formattedPrice = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 12,
+        maximumFractionDigits: 12
+      }).format(value);
+      return `$${formattedPrice}`;
+    }
+    
+    if (['TOTAL_SUPPLY', 'HOLDERS'].includes(metric)) {
+      return formatNumber(value);
+    }
+    
+    const percentage = ((value / totalSupply) * 100).toFixed(2);
+    return `${formatNumber(value)} (${percentage}%)`;
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -191,10 +229,10 @@ export default function TokenomicsPage() {
               animate="visible"
               className="max-w-4xl mx-auto space-y-6"
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-orange-400 mb-4">
+              <h1 className="text-4xl font-bold mb-4 gradient-text">
                 {TOKENOMICS_CONTENT.HERO.TITLE}
               </h1>
-              <p className="text-xl text-orange-300/80 max-w-3xl mx-auto">
+              <p className="text-gray-400 max-w-3xl mx-auto">
                 {TOKENOMICS_CONTENT.HERO.SUBTITLE}
               </p>
             </motion.div>
@@ -204,12 +242,12 @@ export default function TokenomicsPage() {
         {/* Token Distribution Chart */}
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4">
-            <Card className="mb-12 bg-[#111] border-orange-900/50">
+            <Card className="mb-12 bg-[#111] border-orange-500/20">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-orange-500">
+                <CardTitle className="text-gray-300">
                   {TOKENOMICS_CONTENT.DISTRIBUTION.TITLE}
                 </CardTitle>
-                <CardDescription className="text-orange-300/80">
+                <CardDescription className="text-gray-400">
                   {TOKENOMICS_CONTENT.DISTRIBUTION.SUBTITLE}
                 </CardDescription>
               </CardHeader>
@@ -253,7 +291,7 @@ export default function TokenomicsPage() {
                         <span className="text-gray-300">{item.label}</span>
                       </div>
                       <span className="text-orange-500 font-mono">
-                        {new Intl.NumberFormat().format(item.value)}
+                        {new Intl.NumberFormat().format(item.value)} ({item.percentage}%)
                       </span>
                     </div>
                   ))}
@@ -280,7 +318,7 @@ export default function TokenomicsPage() {
                   style={{ backgroundColor: entry.color }}
                 />
                 <span className="text-orange-300">
-                  {entry.label}: {entry.value}% 
+                  {entry.label}: {entry.value} ({entry.percentage}%) 
                 </span>
               </motion.div>
             ))}
@@ -289,37 +327,55 @@ export default function TokenomicsPage() {
 
         {/* Token Metrics Grid */}
         <ScrollAnimatedSection>
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+          <div className="container mx-auto px-4 py-8">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUpVariant}
+              className="text-center mb-12"
+            >
+              <h1 className="text-4xl font-bold mb-4 gradient-text">
+                SOBA Tokenomics
+              </h1>
+              <p className="text-gray-400 max-w-2xl mx-auto">
+                Understanding the economic model behind SOBA
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               {Object.entries(getMetrics()).map(([key, metric]) => (
-                <motion.div
+                <Card 
                   key={key}
-                  variants={fadeInUpVariant}
-                  whileHover={{ scale: 1.02 }}
-                  className={`relative p-6 rounded-xl bg-black/20 border border-orange-500/20 transition-colors duration-300
-                    ${hoveredMetric === key ? 'bg-black/30' : ''}`}
+                  className="bg-black/40 border-orange-500/20 relative overflow-hidden group"
                   onMouseEnter={() => setHoveredMetric(key)}
                   onMouseLeave={() => setHoveredMetric(null)}
+                  onClick={() => openDialog(metric.TITLE, getMetricDetails(key as MetricKey))}
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-orange-400">{metric.TITLE}</h3>
-                    {metric.DESCRIPTION && (
-                      <ButtonBase
-                        variant="ghost"
-                        size="sm"
-                        className="w-8 h-8 p-0"
-                        onClick={() => openDialog(metric.TITLE, metric.DESCRIPTION)}
-                      >
-                        <Info className="w-4 h-4 text-orange-500/70" />
-                      </ButtonBase>
+                  <CardHeader>
+                    <CardTitle className="text-gray-300 flex items-center gap-2">
+                      {metric.ICON && <metric.ICON className={metric.ICON_COLOR || 'text-orange-500'} />}
+                      {metric.TITLE}
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      {metric.DESCRIPTION}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-orange-400">
+                      {metric.PREFIX}{formatNumber(metric.VALUE)}{metric.SUFFIX}
+                    </div>
+                    {metric.PERCENTAGE && (
+                      <div className="text-sm text-gray-500 mt-1">
+                        {metric.PERCENTAGE}% of total supply
+                      </div>
                     )}
-                  </div>
-                  <AnimatedValue
-                    value={formatNumber(metric.VALUE)}
-                    suffix={metric.DISPLAY_TYPE === 'price' ? ' USD' : ' SOBA'}
-                    className="text-2xl font-bold"
+                  </CardContent>
+                  <motion.div
+                    className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={false}
+                    animate={hoveredMetric === key ? { scale: 1.05 } : { scale: 1 }}
                   />
-                </motion.div>
+                </Card>
               ))}
             </div>
           </div>
@@ -328,26 +384,78 @@ export default function TokenomicsPage() {
         {/* Tokenomics Features */}
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-              {TOKENOMICS_CONTENT.FEATURES.map((feature) => (
-                <motion.div
-                  key={feature.TITLE}
-                  className="p-6 rounded-lg shadow-lg cursor-pointer bg-[#111]"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => openDialog(feature.TITLE, feature.DESCRIPTION)}
-                >
-                  <div className="flex items-center mb-4">
-                    {feature.ICON === 'Flame' && <Flame className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'Users' && <Users className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'Lock' && <Lock className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'Vote' && <Vote className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    {feature.ICON === 'LineChart' && <LineChart className="w-8 h-8 mr-3 text-[#FF6B00]" />}
-                    <h3 className="text-xl font-bold text-orange-400">{feature.TITLE}</h3>
-                  </div>
-                  <p className="text-orange-300">{feature.DESCRIPTION}</p>
-                </motion.div>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Flame className="text-orange-500" />
+                    <span className="text-orange-500">Deflationary Model</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Regular token burns reduce supply and increase scarcity
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="text-orange-500" />
+                    <span className="text-orange-500">Fair Distribution</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Transparent allocation across different segments
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lock className="text-orange-500" />
+                    <span className="text-orange-500">Liquidity Security</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Permanently locked liquidity for stability
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Vote className="text-orange-500" />
+                    <span className="text-orange-500">Community Driven</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Governance and decision making by token holders
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Flame className="text-orange-500" />
+                    <span className="text-orange-500">Regular Burns</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Monthly burns to maintain deflationary pressure
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-black/40 border-orange-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <LineChart className="text-orange-500" />
+                    <span className="text-orange-500">Transparent Supply</span>
+                  </CardTitle>
+                  <CardDescription className="text-orange-400/80">
+                    Real-time tracking of token metrics
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             </div>
           </div>
         </ScrollAnimatedSection>

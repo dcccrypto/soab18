@@ -5,13 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatNumber(number: number | string, decimals = 2): string {
+export function formatNumber(number: number | string, decimals?: number): string {
   const num = typeof number === 'string' ? parseFloat(number) : number
   if (isNaN(num)) return '0'
   
   return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    minimumFractionDigits: decimals ?? 2,
+    maximumFractionDigits: decimals ?? 2
   }).format(num)
 }
 
@@ -44,19 +44,11 @@ export function formatDate(date: Date | string | number): string {
     return 'Yesterday'
   }
   
-  // If the date is within this year, don't show the year
-  if (parsedDate.getFullYear() === today.getFullYear()) {
-    return parsedDate.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-  
-  // Default format for older dates
+  // Format as MMM DD, YYYY (e.g., Dec 01, 2023)
   return parsedDate.toLocaleDateString('en-US', {
-    year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: '2-digit',
+    year: 'numeric'
   })
 }
 
@@ -87,6 +79,67 @@ export function getRelativeTime(date: Date | string | number): string {
   if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`
   
   return formatDate(date)
+}
+
+export function formatDateNew(date: string | Date): string {
+  const d = new Date(date);
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).replace(/\//g, '/');
+}
+
+export function getCurrentMonthDates() {
+  // Get current date in CST/CDT
+  const now = new Date()
+  const cstOffset = -6 * 60 // CST offset in minutes
+  const localOffset = now.getTimezoneOffset()
+  const offsetDiff = localOffset + cstOffset
+  
+  // Adjust to CST
+  const cstNow = new Date(now.getTime() + offsetDiff * 60 * 1000)
+  
+  // Get next burn date (1st of next month at 4 AM CST)
+  const getNextBurnDate = () => {
+    const nextMonth = new Date(cstNow)
+    nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1)
+    nextMonth.setUTCDate(1)
+    nextMonth.setUTCHours(4, 0, 0, 0) // 4 AM CST
+    
+    // If we're past this month's burn date, move to next month
+    if (cstNow >= nextMonth) {
+      nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1)
+    }
+    
+    return nextMonth
+  }
+
+  const nextBurnDate = getNextBurnDate()
+  const monthStart = new Date(cstNow)
+  monthStart.setUTCDate(1)
+  monthStart.setUTCHours(4, 0, 0, 0)
+
+  return {
+    startDate: monthStart.toISOString(),
+    endDate: nextBurnDate.toISOString(),
+    nextBurnDate: nextBurnDate.toISOString()
+  }
+}
+
+// Format a date to CST/CDT timezone
+export function formatDateToCst(date: Date) {
+  return date.toLocaleString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZone: 'America/Chicago',
+    hour12: true
+  })
 }
 
 export const fetcher = async (url: string) => {
