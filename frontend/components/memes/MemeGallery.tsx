@@ -1,37 +1,22 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, Upload } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ButtonBase } from '@/components/ui/button-base';
 import { MEME_IMAGES } from '@/constants';
-import { useMemes } from '@/hooks/useMemes';
 
-interface MemeGalleryProps {
-  onSubmitClick: () => void;
-}
-
-export function MemeGallery({ onSubmitClick }: MemeGalleryProps) {
-  const { memes, isLoading, error } = useMemes();
-
-  // Combine static and uploaded memes
-  const allMemes = [
-    ...Object.entries(MEME_IMAGES).map(([key, path]) => ({
-      id: key,
-      url: path,
-      isStatic: true
-    })),
-    ...(memes || []).map(meme => ({
-      id: meme.id,
-      url: meme.url,
-      isStatic: false
-    }))
-  ];
+export function MemeGallery() {
+  // Only use static memes from constants
+  const memes = Object.entries(MEME_IMAGES).map(([key, path]) => ({
+    id: key,
+    url: path
+  }));
 
   return (
     <div className="relative group">
       <div className="overflow-x-auto overflow-y-hidden scrollbar-none">
         <div className="flex gap-4 md:gap-6 pb-4 min-w-full">
-          {allMemes.map((meme) => (
+          {memes.map((meme) => (
             <motion.div
               key={meme.id}
               whileHover={{ scale: 1.02 }}
@@ -95,24 +80,6 @@ export function MemeGallery({ onSubmitClick }: MemeGalleryProps) {
         >
           <ChevronRight className="w-6 h-6" />
         </ButtonBase>
-      </div>
-
-      <div className="flex flex-col items-center justify-center gap-4 mt-8">
-        <ButtonBase
-          variant="default"
-          size="lg"
-          className="group relative overflow-hidden"
-          onClick={onSubmitClick}
-        >
-          <span className="flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Submit Your Meme
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-        </ButtonBase>
-        <p className="text-sm text-gray-400/90">
-          Share your creativity with the $SOBA community!
-        </p>
       </div>
     </div>
   );

@@ -10,18 +10,35 @@ function isDST(date: Date): boolean {
   return date.getTimezoneOffset() < stdTimezoneOffset
 }
 
-export function getNextBurnDate(): Date {
+export function getCurrentMonthDates() {
   const now = new Date()
-  
-  // Create a date object in CST
   const cstNow = new Date(now.toLocaleString('en-US', { timeZone: BURN_TIMEZONE }))
   const cstYear = cstNow.getFullYear()
   const cstMonth = cstNow.getMonth()
   
-  // Set initial burn date to 1st of current month at 10 AM CST
-  const burnDate = new Date(Date.UTC(cstYear, cstMonth, 1))
+  // Start date is 1st of current month
+  const startDate = new Date(Date.UTC(cstYear, cstMonth, 1))
+  const isDaylightSaving = isDST(startDate)
+  startDate.setUTCHours(BURN_HOUR + (isDaylightSaving ? 5 : 6))
+  startDate.setUTCMinutes(BURN_MINUTE)
+  startDate.setUTCSeconds(0)
+  startDate.setUTCMilliseconds(0)
   
-  // Adjust for CST (UTC-6) or CDT (UTC-5)
+  // End date is 1st of next month
+  const endDate = new Date(startDate)
+  endDate.setUTCMonth(endDate.getUTCMonth() + 1)
+  
+  return { startDate, endDate }
+}
+
+export function getNextBurnDate(): Date {
+  const now = new Date()
+  const cstNow = new Date(now.toLocaleString('en-US', { timeZone: BURN_TIMEZONE }))
+  const cstYear = cstNow.getFullYear()
+  const cstMonth = cstNow.getMonth()
+  
+  // Set initial burn date to 1st of current month
+  const burnDate = new Date(Date.UTC(cstYear, cstMonth, 1))
   const isDaylightSaving = isDST(burnDate)
   burnDate.setUTCHours(BURN_HOUR + (isDaylightSaving ? 5 : 6))
   burnDate.setUTCMinutes(BURN_MINUTE)
@@ -36,17 +53,28 @@ export function getNextBurnDate(): Date {
   return burnDate
 }
 
-export function getCurrentMonthDates() {
-  const nextBurn = getNextBurnDate()
+export function getBurnDates() {
+  const now = new Date()
+  const cstNow = new Date(now.toLocaleString('en-US', { timeZone: BURN_TIMEZONE }))
+  const cstYear = cstNow.getFullYear()
+  const cstMonth = cstNow.getMonth()
   
-  // Start date is the 1st of the current month at burn time
-  const startDate = new Date(nextBurn)
-  startDate.setUTCMonth(startDate.getUTCMonth() - 1)
+  // Current month's burn date (1st of current month)
+  const currentBurnDate = new Date(Date.UTC(cstYear, cstMonth, 1))
+  const isDaylightSaving = isDST(currentBurnDate)
+  currentBurnDate.setUTCHours(BURN_HOUR + (isDaylightSaving ? 5 : 6))
+  currentBurnDate.setUTCMinutes(BURN_MINUTE)
+  currentBurnDate.setUTCSeconds(0)
+  currentBurnDate.setUTCMilliseconds(0)
+  
+  // Next month's burn date
+  const nextBurnDate = new Date(currentBurnDate)
+  nextBurnDate.setUTCMonth(nextBurnDate.getUTCMonth() + 1)
   
   return {
-    startDate: startDate.toISOString(),
-    endDate: nextBurn.toISOString(),
-    nextBurnDate: nextBurn.toISOString()
+    currentBurn: currentBurnDate,
+    nextBurn: nextBurnDate,
+    isAfterCurrentBurn: cstNow > currentBurnDate
   }
 }
 
@@ -67,7 +95,6 @@ export function getTimeUntilNextBurn(): { days: number; hours: number; minutes: 
   const now = new Date()
   const nextBurn = getNextBurnDate()
   
-  // Convert both dates to UTC for comparison
   const diff = nextBurn.getTime() - now.getTime()
   
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))

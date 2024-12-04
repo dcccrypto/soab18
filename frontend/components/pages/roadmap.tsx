@@ -53,110 +53,110 @@ const roadmapData: RoadmapPhase[] = [
   {
     phase: 1,
     icon: Rocket,
-    title: "Fair Launch",
+    title: "Grand Opening",
     status: "Completed",
-    description: "Launch on Pump.fun and Raydium",
-    objective: "Make $SOBA accessible to early adopters, establishing its presence.",
-    details: "Our journey began with a fair launch, ensuring equal opportunity for all participants. This phase marked the birth of $SOBA on the Solana blockchain."
+    description: "Debuted with sophistication on Pump.fun and Raydium",
+    objective: "Establish SOBA as the most distinguished memecoin on Solana.",
+    details: "Launched with style, giving our distinguished early adopters a chance to join the SOBA society."
   },
   {
     phase: 2,
     icon: Users,
-    title: "Community Building",
+    title: "Elite Society",
     status: "Completed",
-    description: "Engagement on TikTok, Twitter (X), Telegram",
-    objective: "Build a loyal, vibrant community to amplify $SOBA's brand.",
-    details: "We focused on creating a strong, engaged community across various social platforms. Meme contests and events helped foster a sense of belonging and excitement around $SOBA."
+    description: "Building our circle of distinguished holders",
+    objective: "Cultivate a community of refined crypto enthusiasts.",
+    details: "Created an exclusive community of sophisticated meme connoisseurs who appreciate the finer things in life."
   },
   {
     phase: 3,
     icon: Megaphone,
-    title: "Marketing Expansion",
+    title: "Brand Elevation",
     status: "Completed",
-    description: "Campaigns featuring Crypto Bastard, influencer partnerships",
-    objective: "Grow brand awareness and reach broader audiences.",
-    details: "Our marketing efforts expanded, leveraging the influence of Crypto Bastard and other key figures in the crypto space to increase $SOBA's visibility."
+    description: "Spreading the SOBA lifestyle across platforms",
+    objective: "Position SOBA as the premium choice in memecoins.",
+    details: "Executed sophisticated marketing campaigns that set us apart from ordinary memecoins."
   },
   {
     phase: 4,
     icon: LineChart,
-    title: "Listings and Growth",
+    title: "Market Recognition",
     status: "Completed",
-    description: "Listings on CoinMarketCap and CoinGecko, community giveaways",
-    objective: "Increase visibility on major tracking platforms.",
-    details: "This phase saw $SOBA listed on major crypto tracking platforms, significantly boosting our credibility and reach. Community giveaways further incentivized participation."
+    description: "Listed on CoinMarketCap and CoinGecko with exclusive rewards",
+    objective: "Establish credibility in the broader crypto market.",
+    details: "Achieved listings on major platforms while maintaining our premium status through strategic holder rewards."
   },
   {
     phase: 5,
     icon: Building,
-    title: "Exchange Listings",
+    title: "Exchange Dominance",
     status: "Completed",
-    description: "Additional exchange listings",
-    objective: "Broaden access to $SOBA for easier trading.",
-    details: "We expanded $SOBA's presence on various cryptocurrency exchanges, making it more accessible to a wider range of traders and investors."
+    description: "Expanding SOBA's presence across premium exchanges",
+    objective: "Make SOBA accessible to sophisticated traders worldwide.",
+    details: "Like a cigar-smoking chimp taking over the finest establishments, SOBA has claimed its place on prestigious trading platforms."
   },
   {
     phase: 6,
     icon: Users,
-    title: "Strategic Partnerships",
+    title: "Power Moves",
     status: "Completed",
-    description: "Collaborations with other projects and influencers",
-    objective: "Strengthen $SOBA's ecosystem through partnerships.",
-    details: "Strategic alliances were formed with complementary projects and influential figures in the crypto space, enhancing $SOBA's ecosystem and reach."
+    description: "High-profile partnerships and collaborations",
+    objective: "Build alliances with fellow crypto aristocrats.",
+    details: "Formed strategic partnerships that would make any cigar lounge proud, establishing SOBA as a force to be reckoned with."
   },
   {
     phase: 7,
     icon: Palette,
-    title: "NFT Launch",
+    title: "Digital Luxuries",
     status: "Completed",
-    description: "Release exclusive $SOBA NFT collection",
-    objective: "Expand the ecosystem with collectible digital assets.",
-    details: "We launched our exclusive NFT collection, providing unique digital assets to our community and adding another layer of value to the $SOBA ecosystem."
+    description: "Launch of exclusive SOBA NFT collection",
+    objective: "Create digital assets worthy of our distinguished chimp.",
+    details: "Released a collection of NFTs that capture SOBA's essence - sophisticated, bold, and unapologetically badass."
   },
   {
     phase: 8,
     icon: Flame,
-    title: "Regular Burns",
+    title: "Smoke & Style",
     status: "Completed",
-    description: "Implement regular burns",
-    objective: "Boost long-term value by reducing supply.",
-    details: "A token burning mechanism was implemented to systematically reduce $SOBA's supply, aiming to increase its scarcity and potential value over time."
+    description: "Implementation of regular token burns",
+    objective: "Enhance SOBA's value through calculated scarcity.",
+    details: "Established our signature burn mechanism - where tokens disappear like smoke from a premium cigar, making SOBA increasingly exclusive."
   },
   {
     phase: 9,
     icon: Cpu,
-    title: "Advanced Features",
+    title: "Premium Features",
     status: "Upcoming",
-    description: "NFT staking, AI-driven PFP Generator, gated content",
-    objective: "Enhance the ecosystem with unique, community-focused features.",
-    details: "This exciting phase will introduce advanced features like NFT staking, an AI-powered profile picture generator, and exclusive gated content for $SOBA holders."
+    description: "Exclusive NFT staking and VIP content access",
+    objective: "Enhance the SOBA ecosystem with distinguished features.",
+    details: "Development of sophisticated features including NFT staking, AI-driven PFP Generator, and exclusive gated content for our distinguished holders."
   },
   {
     phase: 10,
     icon: Gamepad,
-    title: "Gamification",
+    title: "Elite Engagement",
     status: "Upcoming",
-    description: "Leaderboards, achievement system, social sharing",
-    objective: "Drive engagement through interactive experiences.",
-    details: "We plan to gamify the $SOBA experience with leaderboards, an achievement system, and social sharing features to boost community engagement and interaction."
+    description: "Sophisticated social features and rewards",
+    objective: "Create an engaging experience worthy of our refined community.",
+    details: "Implementation of exclusive leaderboards, achievement systems, and sophisticated social sharing features for our distinguished members."
   },
   {
     phase: 11,
     icon: Vote,
-    title: "DAO Transition",
+    title: "Gentleman's DAO",
     status: "Upcoming",
-    description: "Decentralized governance, community voting",
-    objective: "Empower the community to shape $SOBA's direction.",
-    details: "This phase will mark $SOBA's transition to a Decentralized Autonomous Organization (DAO), giving our community direct influence over the project's future direction."
+    description: "Refined governance system",
+    objective: "Establish sophisticated community governance.",
+    details: "Transition to a distinguished DAO structure, enabling our refined community to participate in governance decisions."
   },
   {
     phase: 12,
     icon: Rocket,
-    title: "Expansion",
+    title: "Global Sophistication",
     status: "Upcoming",
-    description: "Strategic alliances, cross-platform engagement, mainstream presence",
-    objective: "Broaden $SOBA's reputation beyond crypto.",
-    details: "The final phase of our current roadmap focuses on expanding $SOBA's influence beyond the crypto sphere, aiming for mainstream recognition and adoption."
+    description: "Strategic expansion and mainstream elegance",
+    objective: "Elevate SOBA to new heights of recognition.",
+    details: "Strategic expansion through sophisticated partnerships and refined cross-platform engagement to establish SOBA in mainstream consciousness."
   }
 ]
 
@@ -507,3 +507,4 @@ export default function Roadmap() {
     </div>
   )
 }
+

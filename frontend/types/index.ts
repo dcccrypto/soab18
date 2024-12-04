@@ -3,6 +3,10 @@ export interface MetricItem {
   VALUE: number
   DESCRIPTION: string
   DISPLAY_TYPE: 'number' | 'percent' | 'price'
+  ICON?: any
+  PREFIX?: string
+  SUFFIX?: string
+  PERCENTAGE?: boolean
 }
 
 export interface MetricItems {
@@ -39,7 +43,7 @@ export interface BurnTransaction {
   txId: string
   amount: number
   date: string
-  value?: number
+  value: number
 }
 
 export interface BurnInfo {
@@ -79,4 +83,14 @@ export interface DynamicConstants {
   WS_URL: string
   HELIUS_API_KEY: string
   JUPITER_API_URL: string
+}
+
+export interface RoadmapPhase {
+  phase: number
+  title: string
+  status: 'Completed' | 'Upcoming'
+  description: string
+  objective: string
+  details: string
+  icon: string
 }

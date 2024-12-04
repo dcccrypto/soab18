@@ -76,6 +76,36 @@ interface Proposal {
   hasVoted?: 'for' | 'against' | null
 }
 
+// Update community section titles and descriptions
+const COMMUNITY_SECTIONS = {
+  HERO: {
+    TITLE: "The SOBA Social Club",
+    SUBTITLE: "Where distinguished meme connoisseurs gather"
+  },
+  FEATURES: [
+    {
+      title: "Premium Discussions",
+      description: "Share thoughts with fellow SOBA enthusiasts in our sophisticated chat lounges",
+      icon: MessageCircle
+    },
+    {
+      title: "Exclusive Events",
+      description: "Join our regular cigar lounge sessions and premium networking events",
+      icon: Calendar
+    },
+    {
+      title: "VIP Recognition",
+      description: "Stand out with special roles and privileges in our distinguished community",
+      icon: Award
+    }
+  ],
+  PROPOSALS: {
+    TITLE: "Gentleman's Agreement",
+    DESCRIPTION: "Review and vote on proposals with fellow SOBA connoisseurs",
+    EMPTY_STATE: "No active proposals at the moment. Enjoy a cigar while you wait."
+  }
+}
+
 export default function CommunityPage() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [isProposalsOpen, setIsProposalsOpen] = useState(false)
@@ -210,15 +240,15 @@ export default function CommunityPage() {
   const socialLinks = [
     {
       ...SOCIAL_LINKS.TWITTER,
-      description: "Stay updated with the latest $SOBA news and engage with our community.",
+      description: "Get the latest $SOBA memes and updates hot off the press!",
     },
     {
       ...SOCIAL_LINKS.TELEGRAM,
-      description: "Join our Telegram group for real-time discussions and community updates.",
+      description: "Join the 24/7 party where all the magic happens!",
     },
     {
       ...SOCIAL_LINKS.TIKTOK,
-      description: "Watch our latest content and viral $SOBA moments.",
+      description: "Watch $SOBA take over the internet, one video at a time!",
     }
   ]
 
@@ -275,34 +305,40 @@ export default function CommunityPage() {
               animate="visible"
               className="max-w-4xl mx-auto space-y-6"
             >
-              <h1 className="text-5xl font-bold mb-6 text-center text-[#FF6B00]">Join the $SOBA Cult!</h1>
+              <h1 className="text-5xl font-bold mb-6 text-center text-[#FF6B00]">Welcome to the $SOBA Squad!</h1>
               <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-white/90 leading-relaxed">
-                The $SOBA community is all about fun, engagement, and supporting each other. Become part of an adventure inspired by Crypto Bastard's energy, where laughs meet innovation and everyone benefits.
+                This isn't just another crypto community - it's a party! Join our cigar-chomping chimp and thousands of others in the most entertaining corner of Solana.
               </p>
             </motion.div>
           </div>
         </section>
 
         <ScrollAnimatedSection>
-          <div className="container mx-auto px-4 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-            <div className="relative z-10">
-              <Card className="p-6 md:p-8 lg:p-10 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_8px_32px_rgba(255,165,0,0.1)] hover:shadow-[0_8px_32px_rgba(255,165,0,0.15)]">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.03)_0%,transparent_70%)] rounded-xl" />
-                <div className="relative z-10">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-[#FF6B00]">Our Mission</CardTitle>
-                    <CardDescription className="text-white/80">
-                      Building a lively, supportive network of crypto enthusiasts
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-white/90 leading-relaxed">
-                      At $SOBA, we're dedicated to creating a vibrant community that goes beyond just holding tokens. We believe in the power of collective growth, shared knowledge, and the thrill of being part of something revolutionary. Our mission is to foster an environment where every member feels valued, heard, and excited about the future of crypto.
-                    </p>
-                  </CardContent>
-                </div>
-              </Card>
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h1 className="text-4xl font-bold mb-4 gradient-text">
+                The SOBA Cigar Lounge
+              </h1>
+              <p className="text-xl text-gray-400 mb-8">
+                Where alpha chimps gather to discuss power moves and premium gains. No paper hands allowed.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <AnimatedCard
+                  icon={<Users className="w-8 h-8 text-orange-500" />}
+                  title="Alpha Society"
+                  description="Join the most sophisticated apes in crypto. We smoke cigars and make gains."
+                />
+                <AnimatedCard
+                  icon={<MessageCircle className="w-8 h-8 text-orange-500" />}
+                  title="Power Networking"
+                  description="Connect with fellow sigma traders. Share alpha, not beta excuses."
+                />
+                <AnimatedCard
+                  icon={<Award className="w-8 h-8 text-orange-500" />}
+                  title="Elite Benefits"
+                  description="Exclusive perks for diamond-handed holders. Paper hands need not apply."
+                />
+              </div>
             </div>
           </div>
         </ScrollAnimatedSection>
@@ -465,66 +501,6 @@ export default function CommunityPage() {
           </div>
         </ScrollAnimatedSection>
 
-        <ScrollAnimatedSection>
-          <div className="container mx-auto px-4 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-            <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 text-[#FF6B00]">
-                  Community Updates
-                </h2>
-                <p className="text-white/80">
-                  Latest news and highlights from our social channels
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-[#FF6B00] mb-4">Latest X Updates</h3>
-                  {SOCIAL_FEED_DATA.X_UPDATES.map((update, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 rounded-lg bg-black/40 border border-orange-500/20"
-                    >
-                      <p className="text-white/90 leading-relaxed mb-2">{update.content}</p>
-                      <div className="flex justify-between text-sm text-white/80">
-                        <span>{formatDateNew(update.timestamp)}</span>
-                        <span>{update.engagement.toLocaleString()} interactions</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-[#FF6B00] mb-4">Telegram Highlights</h3>
-                  {SOCIAL_FEED_DATA.TELEGRAM_HIGHLIGHTS.map((highlight, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="p-4 rounded-lg bg-black/40 border border-orange-500/20"
-                    >
-                      <p className="text-white/90 leading-relaxed mb-2">{highlight.content}</p>
-                      <div className="flex justify-between items-center text-sm text-white/80">
-                        <div className="flex items-center gap-2">
-                          <span>{highlight.author}</span>
-                          <span>•</span>
-                          <span>{formatDateNew(highlight.timestamp)}</span>
-                        </div>
-                        <span>{highlight.engagement.toLocaleString()} interactions</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollAnimatedSection>
-
         <ClientOnly>
           <DynamicDialog open={isProposalsOpen} onOpenChange={setIsProposalsOpen}>
             <DynamicDialogContent className="sm:max-w-[600px] bg-[#111] border border-orange-500/20">
@@ -546,3 +522,4 @@ export default function CommunityPage() {
     </div>
   )
 }
+

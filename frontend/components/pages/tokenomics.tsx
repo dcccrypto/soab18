@@ -105,27 +105,42 @@ export default function TokenomicsPage() {
     return {
       TOTAL_SUPPLY: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.TOTAL_SUPPLY,
-        VALUE: tokenStats.totalSupply
+        VALUE: tokenStats.totalSupply,
+        PREFIX: '',
+        SUFFIX: ' SOBA'
       },
       CIRCULATING: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.CIRCULATING,
-        VALUE: tokenStats.circulatingSupply
+        VALUE: tokenStats.circulatingSupply,
+        PREFIX: '',
+        SUFFIX: ' SOBA',
+        PERCENTAGE: true
       },
       BURNED: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.BURNED,
-        VALUE: tokenStats.burnedTokens
+        VALUE: tokenStats.burnedTokens,
+        PREFIX: '',
+        SUFFIX: ' SOBA',
+        PERCENTAGE: true
       },
       FOUNDER: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.FOUNDER,
-        VALUE: tokenStats.founderBalance
+        VALUE: tokenStats.founderBalance,
+        PREFIX: '',
+        SUFFIX: ' SOBA',
+        PERCENTAGE: true
       },
       HOLDERS: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.HOLDERS,
-        VALUE: tokenStats.holders
+        VALUE: tokenStats.holders,
+        PREFIX: '',
+        SUFFIX: ' holders'
       },
       PRICE: {
         ...TOKENOMICS_CONTENT.METRICS.ITEMS.PRICE,
-        VALUE: tokenStats.price
+        VALUE: tokenStats.price,
+        PREFIX: '$',
+        SUFFIX: ''
       }
     };
   };
@@ -226,11 +241,11 @@ export default function TokenomicsPage() {
               animate="visible"
               className="max-w-4xl mx-auto space-y-6"
             >
-              <h1 className="text-4xl font-bold mb-4 gradient-text">
-                {TOKENOMICS_CONTENT.HERO.TITLE}
+              <h1 className="text-4xl font-bold mb-4 gradient-text text-[#FF6B00]">
+                How $SOBA Works
               </h1>
-              <p className="text-gray-400 max-w-3xl mx-auto">
-                {TOKENOMICS_CONTENT.HERO.SUBTITLE}
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto leading-relaxed drop-shadow-xl">
+                Simple, fair, and fun - just like us!
               </p>
             </motion.div>
           </div>
@@ -358,7 +373,7 @@ export default function TokenomicsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-white">
-                      {metric.PREFIX}{formatNumber(metric.VALUE)}{metric.SUFFIX}
+                      {getMetricValue(key as MetricKey)}
                     </div>
                     {metric.PERCENTAGE && (
                       <div className="text-sm text-orange-400/80 mt-1">
@@ -409,10 +424,10 @@ export default function TokenomicsPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lock className="text-orange-500" />
-                    <span className="text-orange-400">Liquidity Security</span>
+                    <span className="text-orange-400">Liquidity Burnt</span>
                   </CardTitle>
                   <CardDescription className="text-gray-300">
-                    Permanently locked liquidity for stability
+                    All liquidity has been smoked to ashes
                   </CardDescription>
                 </CardHeader>
               </Card>

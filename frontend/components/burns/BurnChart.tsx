@@ -62,6 +62,21 @@ export function BurnChart() {
     setNextBurnDate(nextBurn)
   }
 
+  const formatBurnDate = (dateStr: string) => {
+    try {
+      const [day, month, year] = dateStr.split('/').map(Number)
+      const date = new Date(year, month - 1, day)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+      })
+    } catch (error) {
+      console.error('Error formatting date:', dateStr, error)
+      return dateStr // Return original string instead of 'Invalid Date'
+    }
+  }
+
   if (!isClient) {
     return (
       <div className="relative h-[500px] md:h-[600px] w-full p-4 bg-black/40 rounded-xl border border-orange-500/20 flex items-center justify-center">
@@ -72,11 +87,18 @@ export function BurnChart() {
 
   // Sort burn history by date and calculate cumulative burns
   const sortedBurns = [...BURN_HISTORY]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .filter(burn => isValidDate(burn.date))
+    .sort((a, b) => {
+      const [dayA, monthA, yearA] = a.date.split('/').map(Number);
+      const [dayB, monthB, yearB] = b.date.split('/').map(Number);
+      return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+    })
+    .filter(burn => {
+      const [day, month, year] = burn.date.split('/').map(Number);
+      return !isNaN(day) && !isNaN(month) && !isNaN(year);
+    });
 
   const chartData: ChartData<'line'> = {
-    labels: sortedBurns.map(item => formatDate(item.date)),
+    labels: sortedBurns.map(item => item.date),
     datasets: [
       {
         label: 'Burn Amount',
@@ -169,7 +191,7 @@ export function BurnChart() {
           title: (items) => {
             const index = items[0].dataIndex;
             const burn = sortedBurns[index];
-            return formatDate(burn.date);
+            return burn.date;
           },
           label: (item) => {
             const burn = sortedBurns[item.dataIndex];
@@ -216,16 +238,6 @@ export function BurnChart() {
           </div>
         </div>
         <Line data={chartData} options={options} ref={chartRef} />
-        
-        <div className="mt-6 px-4">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-400">Latest Burn Info</span>
-          </div>
-          <div className="flex justify-between text-xs mt-1">
-            <span className="text-gray-500">{formatDate(startDate)}</span>
-            <span className="text-gray-500">{formatDate(endDate)} (10:00 AM)</span>
-          </div>
-        </div>
       </div>
 
       {/* Selected Burn Details */}
@@ -266,6 +278,7 @@ export function BurnChart() {
             <tr className="border-b border-orange-500/20">
               <th className="p-4 text-left text-white font-medium">Date</th>
               <th className="p-4 text-left text-white font-medium">Amount</th>
+              <th className="p-4 text-left text-white font-medium">Value</th>
               <th className="p-4 text-left text-white font-medium">Transaction</th>
             </tr>
           </thead>
@@ -279,10 +292,13 @@ export function BurnChart() {
                 className="border-b border-orange-500/10 hover:bg-orange-500/5 transition-colors"
               >
                 <td className="p-4 text-gray-300">
-                  {formatDate(new Date(burn.date))}
+                  {formatBurnDate(burn.date)}
                 </td>
                 <td className="p-4 text-gray-300">
                   {(burn.amount / 1000000).toFixed(2)}M SOBA
+                </td>
+                <td className="p-4 text-green-400">
+                  ${formatNumber(burn.value || 0, 2)}
                 </td>
                 <td className="p-4">
                   <a

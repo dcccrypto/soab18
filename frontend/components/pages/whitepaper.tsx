@@ -6,31 +6,44 @@ import Image from 'next/image'
 import { Flame, Users, TrendingUp, Calendar, Download, ExternalLink } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 import { Button } from "@/components/ui/button"
-import { TOKEN_INFO, TEAM_MEMBERS, ROADMAP_PHASES, ASSETS, ICON_SIZES } from '../constants'
+import { TOKEN_INFO, TEAM_MEMBERS, ROADMAP_PHASES, ASSETS, ICON_SIZES } from '@/constants'
 import { ButtonBase } from '@/components/ui/button-base'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { fadeInUpVariant } from '@/lib/animations'
+import html2canvas from 'html2canvas'
+import { useTokenStats } from '@/hooks/useTokenStats'
+import fetcher from '@/lib/fetcher'
+import { type MetricItems, MetricItem } from '@/types'
+import { type RoadmapPhase } from '@/types'
 
-const WhitepaperSection = ({ title, children, id }: { title: string; children: React.ReactNode; id: string }) => {
-  const ref = useRef<HTMLDivElement>(null)
+const PDF_STYLES = {
+  COLORS: {
+    PRIMARY: '#FF6B00',
+    TEXT: '#404040',
+    SECONDARY: '#808080'
+  },
+  FONTS: {
+    TITLE: 24,
+    HEADING: 16,
+    BODY: 12,
+    FOOTER: 10
+  },
+  SPACING: {
+    MARGIN: 40,
+    LINE_HEIGHT: 18,
+    PARAGRAPH_GAP: 10,
+    SECTION_GAP: 20
+  }
+} as const
 
-  return (
-    <motion.div
-      ref={ref}
-      id={id}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="card-base p-6 md:p-8 lg:p-10 relative z-10 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl shadow-[0_8px_32px_rgba(255,165,0,0.1)] border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 scroll-mt-20"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.03)_0%,transparent_70%)] rounded-xl" />
-      <div className="relative z-10">
-        <h2 className="text-3xl font-bold mb-6 text-[#FF6B00] pb-4 border-b border-orange-500/20">{title}</h2>
-        {children}
-      </div>
-    </motion.div>
-  )
-}
+const WhitepaperSection = ({ title, children, id }: { title: string, children: React.ReactNode, id: string }) => (
+  <section id={id} className="py-16">
+    <h2 className="text-3xl font-bold mb-8 text-orange-400">{title}</h2>
+    <div className="space-y-6">
+      {children}
+    </div>
+  </section>
+)
 
 const TeamMember = ({ name, role, description, imageUrl }: { name: string; role: string; description: string; imageUrl: string }) => (
   <motion.div 
@@ -62,15 +75,106 @@ export default function WhitePaper() {
   const [activeSection, setActiveSection] = useState('introduction')
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const { data: tokenStats } = useTokenStats()
 
-  const handleDownload = () => {
-    const doc = new jsPDF()
-    doc.setFontSize(16)
-    doc.text('$SOBA Whitepaper', 20, 20)
-    doc.setFontSize(12)
-    doc.text('This is a sample PDF of the $SOBA Whitepaper.', 20, 30)
-    doc.text('For the full content, please visit our website.', 20, 40)
-    doc.save('soba-whitepaper.pdf')
+  const handleDownload = async () => {
+    setIsGeneratingPDF(true)
+    try {
+      // Create new jsPDF instance - using A4 format
+      const doc = new jsPDF('p', 'pt', 'a4')
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const margin = PDF_STYLES.SPACING.MARGIN
+      
+      // Title page
+      doc.setFontSize(PDF_STYLES.FONTS.TITLE)
+      doc.setTextColor(255, 107, 0) // Orange color
+      doc.text('$SOBA Whitepaper', margin, 80, { align: 'left' })
+      
+      doc.setFontSize(14)
+      doc.setTextColor(128, 128, 128) // Gray color
+      doc.text('The Memecoin with a Mission', margin, 120)
+      
+      // Add sections
+      let y = 180 // Starting y position after title
+      
+      // Process each section
+      for (const section of sections) {
+        // Add section title
+        doc.setFontSize(PDF_STYLES.FONTS.HEADING)
+        doc.setTextColor(255, 107, 0)
+        if (y > 750) { // Check if we need a new page
+          doc.addPage()
+          y = 60
+        }
+        doc.text(section.title, margin, y)
+        y += 30
+
+        // Get section content
+        const sectionElement = document.getElementById(section.id)
+        if (sectionElement) {
+          // Get all paragraphs in the section
+          const paragraphs = sectionElement.getElementsByTagName('p')
+          
+          doc.setFontSize(PDF_STYLES.FONTS.BODY)
+          doc.setTextColor(64, 64, 64)
+          
+          for (const p of Array.from(paragraphs)) {
+            // Split text into lines that fit the page width
+            const lines = doc.splitTextToSize(
+              p.textContent || '', 
+              pageWidth - (margin * 2)
+            ) as string[]
+            
+            // Check if we need a new page
+            if (y + (lines.length * PDF_STYLES.SPACING.LINE_HEIGHT) > 780) {
+              doc.addPage()
+              y = 60
+            }
+            
+            // Add lines to PDF
+            lines.forEach((line: string) => {
+              doc.text(line, margin, y)
+              y += PDF_STYLES.SPACING.LINE_HEIGHT
+            })
+            
+            y += PDF_STYLES.SPACING.PARAGRAPH_GAP // Space between paragraphs
+          }
+        }
+        
+        y += PDF_STYLES.SPACING.SECTION_GAP // Space between sections
+      }
+      
+      // Add footer
+      doc.setFontSize(PDF_STYLES.FONTS.FOOTER)
+      doc.setTextColor(128, 128, 128)
+      const pageCount = (doc as any).internal.pages.length - 1
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.text(
+          `Page ${i} of ${pageCount}`, 
+          pageWidth / 2, 
+          doc.internal.pageSize.getHeight() - 20, 
+          { align: 'center' }
+        )
+      }
+      
+      // Save the PDF
+      doc.save('soba-whitepaper.pdf')
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      // Fallback to simple PDF
+      const doc = new jsPDF()
+      doc.setFontSize(16)
+      doc.text('$SOBA Whitepaper', 20, 20)
+      doc.setFontSize(12)
+      doc.text('Error generating full whitepaper PDF.', 20, 30)
+      doc.text('Please visit our website to view the complete whitepaper.', 20, 40)
+      doc.save('soba-whitepaper.pdf')
+    } finally {
+      setIsGeneratingPDF(false)
+    }
   }
 
   const scrollToSection = (sectionId: string) => {
@@ -82,13 +186,13 @@ export default function WhitePaper() {
   }
 
   const sections = [
-    { id: 'introduction', title: '1. Introduction to $SOBA' },
-    { id: 'tokenomics', title: '2. Tokenomics' },
-    { id: 'roadmap', title: '3. Roadmap' },
-    { id: 'community', title: '4. Community Initiatives' },
-    { id: 'team', title: '5. Team' },
-    { id: 'vision', title: '6. Vision and Future Plans' },
-    { id: 'disclaimer', title: '7. Legal Disclaimer' },
+    { id: 'introduction', title: 'Introduction to $SOBA' },
+    { id: 'tokenomics', title: 'Tokenomics' },
+    { id: 'roadmap', title: 'Roadmap' },
+    { id: 'community', title: 'Community Initiatives' },
+    { id: 'team', title: 'Team' },
+    { id: 'vision', title: 'Vision and Future Plans' },
+    { id: 'disclaimer', title: 'Legal Disclaimer' },
   ]
 
   return (
@@ -134,11 +238,21 @@ export default function WhitePaper() {
                     onClick={handleDownload}
                     variant="default"
                     size="lg"
+                    disabled={isGeneratingPDF}
                     className="group relative overflow-hidden"
                   >
                     <span className="flex items-center gap-2">
+                      {isGeneratingPDF ? (
+                        <>
+                          <span className="animate-spin">⚪</span>
+                          Generating PDF...
+                        </>
+                      ) : (
+                        <>
                       <Download className="w-5 h-5" />
                       Download Full Whitepaper (PDF)
+                        </>
+                      )}
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </ButtonBase>
@@ -175,25 +289,23 @@ export default function WhitePaper() {
           <ScrollAnimatedSection>
             <div className="container mx-auto px-4 relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-              <WhitepaperSection title="1. Introduction to $SOBA" id="introduction">
+              <WhitepaperSection title="1. Introduction to SOBA" id="introduction">
                 <div className="space-y-6">
                   <p className="text-white/90 leading-relaxed">
-                    $SOBA represents a new era in memecoins, combining the fun and engagement of meme culture with real utility and community value. Born on the Solana blockchain, $SOBA aims to revolutionize how we think about community-driven cryptocurrencies.
+                    Welcome to SOBA (SOL Bastard) - where luxury meets memes! Like our cigar-smoking chimp mascot, we believe in living large while keeping it real. We're building something special that combines the flash of success with real community value.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
-                    >
-                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">Our Mission</h3>
-                      <p className="text-white/90 leading-relaxed">To create a vibrant, engaged community that benefits from both the entertainment value of memecoins and the practical utility of DeFi.</p>
+                    <motion.div>
+                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">The SOBA Way</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        To create the most sophisticated yet entertaining crypto community. We're here to show that making money can be both classy and fun!
+                      </p>
                     </motion.div>
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
-                    >
-                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">Our Vision</h3>
-                      <p className="text-white/90 leading-relaxed">To become the leading community-driven memecoin on Solana, setting new standards for transparency and community engagement.</p>
+                    <motion.div>
+                      <h3 className="text-xl font-bold mb-3 text-[#FF6B00]">The Grand Plan</h3>
+                      <p className="text-white/90 leading-relaxed">
+                        To the penthouse suite! We're building premium features, growing our high-class community, and enjoying the finer things in crypto.
+                      </p>
                     </motion.div>
                   </div>
                 </div>
@@ -208,12 +320,12 @@ export default function WhitePaper() {
               <WhitepaperSection title="2. Tokenomics" id="tokenomics">
                 <div className="space-y-8">
                   <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                    <h3 className="text-xl font-semibold mb-4 text-[#FF6B00]">Token Distribution</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-[#FF6B00]">How $SOBA Works</h3>
                     <ul className="list-disc list-inside space-y-3 text-white/90">
-                      <li>Total Supply: <span className="text-white">{TOKEN_INFO.TOTAL_SUPPLY} $SOBA tokens</span></li>
-                      <li>Current Circulating Supply: <span className="text-white">{TOKEN_INFO.CIRCULATING_SUPPLY} tokens</span></li>
-                      <li>Burned Tokens: <span className="text-white">{TOKEN_INFO.BURNED_TOKENS} tokens</span></li>
-                      <li>Founder Holdings: <span className="text-white">{TOKEN_INFO.FOUNDER_HOLDINGS} tokens (4.08% held by Crypto Bastard)</span></li>
+                      <li>Total Supply: <span className="text-white">1 Billion $SOBA (and shrinking!)</span></li>
+                      <li>Tokens in Circulation: <span className="text-white">{tokenStats?.circulatingSupply || 0} tokens</span></li>
+                      <li>Tokens Burned: <span className="text-white">{TOKEN_INFO.BURNED_TOKENS} tokens (gone forever!)</span></li>
+                      <li>Team Holdings: <span className="text-white">{tokenStats?.founderBalance || 0} tokens</span></li>
                     </ul>
                   </div>
                   
@@ -248,9 +360,9 @@ export default function WhitePaper() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
               <WhitepaperSection title="3. Roadmap" id="roadmap">
                 <div className="space-y-6">
-                  {ROADMAP_PHASES.map((phase, index) => (
+                  {ROADMAP_PHASES.map((phase: RoadmapPhase, index: number) => (
                     <div 
-                      key={index} 
+                      key={phase.phase}
                       className="flex items-start space-x-4 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 p-6 rounded-xl border border-orange-500/20 hover:border-orange-500/30 transition-all duration-300 shadow-[0_4px_16px_rgba(255,165,0,0.1)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.15)]"
                     >
                       <Calendar className="w-6 h-6 text-[#FF6B00] flex-shrink-0 mt-1" />
@@ -285,20 +397,20 @@ export default function WhitePaper() {
                     <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
                       <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Meme Contests</h3>
                       <p className="text-white/90 leading-relaxed">
-                      Regular meme contests showcase our community's creativity and humor, with $SOBA tokens awarded to the best entries.
-                    </p>
-                  </div>
+                        Show off your meme-making skills! The best memes win $SOBA tokens, and you get eternal glory in our hall of fame.
+                      </p>
+                    </div>
                     <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Charitable Initiatives</h3>
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Giving Back</h3>
                       <p className="text-white/90 leading-relaxed">
-                      A portion of $SOBA funds is allocated to community-chosen charitable causes, amplifying our positive impact beyond the crypto sphere.
-                    </p>
-                  </div>
+                        We set aside some funds for good causes. The community picks where it goes - because doing good should be part of the fun!
+                      </p>
+                    </div>
                     <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Governance Participation</h3>
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Have Your Say</h3>
                       <p className="text-white/90 leading-relaxed">
-                      $SOBA holders have a voice in key project decisions through our governance system, ensuring the community shapes the future of $SOBA.
-                    </p>
+                        Hold $SOBA, get a voice! Help shape our future through community votes. Your token, your voice!
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -333,33 +445,21 @@ export default function WhitePaper() {
               <WhitepaperSection title="6. Vision and Future Plans" id="vision">
                 <div className="space-y-8">
                   <p className="text-white/90 leading-relaxed">
-                  $SOBA aims to redefine the memecoin landscape by combining humor with real utility and community value. Our vision extends beyond just being a token; we're building an ecosystem that rewards creativity, engagement, and loyalty.
-                </p>
+                    $SOBA isn't your average memecoin - we're a cigar-smoking chimp bastard building an empire. Led by the notorious SOL Bastard, we're creating an ecosystem where only the most alpha traders thrive. No weak hands in our cigar lounge.
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">NFT Integration</h3>
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Alpha NFTs</h3>
                       <p className="text-white/90 leading-relaxed">
-                        Launching unique NFT collections that offer exclusive benefits to $SOBA holders.
+                        Exclusive NFT collections that separate the alphas from the betas. Only diamond-handed holders get access to our premium benefits.
                       </p>
                     </div>
                     <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">DeFi Features</h3>
+                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Sigma DeFi</h3>
                       <p className="text-white/90 leading-relaxed">
-                        Developing staking and yield farming opportunities to provide additional value to our community.
+                        Building the most alpha yield farming and staking platform. While others chase memes, we're building generational wealth.
                       </p>
-                  </div>
-                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Cross-Chain Expansion</h3>
-                      <p className="text-white/90 leading-relaxed">
-                        Exploring opportunities to expand $SOBA's presence across multiple blockchain networks.
-                      </p>
-                  </div>
-                    <div className="p-6 bg-gradient-to-br from-neutral-900/95 via-black/95 to-neutral-900/95 rounded-xl border border-orange-500/20">
-                      <h3 className="text-xl font-semibold mb-3 text-[#FF6B00]">Real-World Partnerships</h3>
-                      <p className="text-white/90 leading-relaxed">
-                        Forging alliances with businesses to increase $SOBA's utility in everyday transactions.
-                      </p>
-                  </div>
+                    </div>
                   </div>
                 </div>
               </WhitepaperSection>
@@ -392,3 +492,4 @@ export default function WhitePaper() {
     </div>
   )
 }
+

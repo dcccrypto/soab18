@@ -1,11 +1,13 @@
+"use client"
+
 import * as React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import { Copy, Flame, TrendingUp, Users, ChevronDown, Image as ImageIcon, BookOpen, ArrowRight, Check, Upload, ChevronLeft, ChevronRight, MessageCircle, Share2 } from 'lucide-react'
+import { Copy, Flame, TrendingUp, Users, ChevronDown, Image as ImageIcon, BookOpen, ArrowRight, Check, Upload, ChevronLeft, ChevronRight, MessageCircle, Share2, X } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { useTheme } from '@/hooks/useTheme'
-import { ErrorBoundary } from '../components/ErrorBoundary'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useBurnStats } from '@/hooks/useBurnStats'
 import useSWR from 'swr'
 import { 
@@ -16,12 +18,12 @@ import {
   ASSETS,
   MEME_IMAGES,
   SOCIAL_FEED_DATA,
-  SOCIAL_LINKS
+  SOCIAL_LINKS,
+  BURN_INFO
 } from '@/constants'
 import { Header } from '@/components/Header'
 import { ContractAddress } from '@/components/ContractAddress'
 import { ButtonBase } from '@/components/ui/button-base'
-import { SubmitMemeModal } from '@/components/SubmitMemeModal'
 import { formatNumber } from '@/lib/utils'
 import fetcher from '@/lib/fetcher'
 
@@ -90,13 +92,40 @@ const NFT_SHOWCASE = [
   { id: 10, image: '/nft10.png', name: 'SOBA #010', rarity: 'Epic' },
 ]
 
+// Add this helper function at the top level
+const downloadImage = async (imageUrl: string) => {
+  try {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `soba-meme-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Failed to download image:', error);
+  }
+};
+
+// Near the top of the file, add this constant
+const STATIC_MEMES = {
+  meme1: '/images/memes/meme1.jpg',
+  meme2: '/images/memes/meme2.jpg',
+  meme3: '/images/memes/meme3.jpg',
+  meme4: '/images/memes/meme4.jpg',
+  meme5: '/images/memes/meme5.jpg',
+  meme6: '/images/memes/meme6.jpg',
+};
+
 export default function LandingPage() {
   const { burnedTokens, burnedValue } = useBurnStats()
   const [hoveredDex, setHoveredDex] = useState<string | null>(null)
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [copied, setCopied] = useState(false)
-  const [isMemeModalOpen, setIsMemeModalOpen] = useState(false)
   const [selectedMeme, setSelectedMeme] = useState<string | null>(null);
   const { scrollY } = useScroll()
   const { data: memeResponse, mutate } = useSWR<MemeResponse>('/api/memes', fetcher)
@@ -177,24 +206,24 @@ export default function LandingPage() {
 
   const faqItems = [
     {
-      question: "What is Sol Bastard ($SOBA)?",
-      answer: "Sol Bastard ($SOBA) is a community-driven memecoin on the Solana blockchain. It combines the fun and engagement of meme culture with the innovative technology of Solana."
+      question: "What's SOBA all about?",
+      answer: "SOBA (SOL Bastard) is the fanciest ape in crypto, puffing premium cigars on Solana. We're building a community that loves the finer things in life - like making money and having fun!"
     },
     {
-      question: "How can I buy $SOBA tokens?",
-      answer: "You can buy $SOBA tokens on various decentralized exchanges (DEXs) that support Solana tokens. Check our 'Buy $SOBA' section for direct links to supported exchanges."
+      question: "How do I get SOBA?",
+      answer: "Simple! Hit the 'Buy $SOBA' button above, pick your exchange, and join the high rollers. Even if you're new to crypto, we've made it easy to become part of the SOBA lifestyle."
     },
     {
-      question: "What makes Sol Bastard unique?",
-      answer: "Sol Bastard stands out with its strong community focus, regular token burns to increase scarcity, and innovative features like the upcoming AI-powered PFP generator."
+      question: "What makes SOBA special?",
+      answer: "Like our cigar-smoking mascot, we've got expensive taste but keep it real. We regularly burn tokens to keep things exclusive, and we're developing some fancy features like an AI tool to turn you into a SOBA-style baller."
     },
     {
-      question: "Is there a maximum supply of $SOBA tokens?",
-      answer: "Yes, the total supply of $SOBA tokens is capped at 1 billion. This fixed supply, combined with our regular burn events, helps maintain the token's value over time."
+      question: "Is there a limit to SOBA tokens?",
+      answer: "You bet! We started with 1 billion tokens, but like a fine cigar, that number keeps getting smaller thanks to our regular burns. Scarcity is luxury, baby!"
     },
     {
-      question: "How can I get involved in the Sol Bastard community?",
-      answer: "Join our vibrant community on Telegram, follow us on X (Twitter), and participate in our TikTok challenges. You can also contribute memes to our community gallery!"
+      question: "How do I join the SOBA lifestyle?",
+      answer: "Roll with us on Telegram, flex on X (Twitter), and show off your meme game on TikTok. The SOBA squad welcomes all aspiring ballers - bring your best memes and your finest virtual cigars!"
     }
   ]
 
@@ -248,11 +277,11 @@ export default function LandingPage() {
               animate="visible"
               className="max-w-4xl mx-auto space-y-6"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold gradient-text drop-shadow-2xl leading-tight">
-                Welcome to the $SOBA Revolution
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold gradient-text drop-shadow-2xl leading-tight text-[#FF6B00]">
+                Meet SOBA: The SOL Bastard!
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto leading-relaxed drop-shadow-xl">
-                Join the most rebellious and innovative memecoin on Solana
+                The richest, smoothest memecoin on Solana, led by a cigar-smoking chimp with expensive taste
               </p>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 mt-8">
                 <motion.div
@@ -380,10 +409,10 @@ export default function LandingPage() {
                 className="text-center mb-12"
               >
                 <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                  Exclusive NFT Collection
+                  $SOBA's Digital Art Club
                 </h2>
                 <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                  Own a piece of the SOBA universe with our limited edition NFTs. Each piece is unique and comes with exclusive benefits.
+                  Get your paws on our exclusive digital collectibles. Each one's unique, just like you!
                 </p>
               </motion.div>
 
@@ -455,10 +484,10 @@ export default function LandingPage() {
                 className="text-center mb-12"
               >
                 <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                  AI-Powered PFP Generator
+                  Turn Yourself into a $SOBA Legend
                 </h2>
                 <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                  Get ready to create your unique Sol Bastard profile picture! Our AI-powered PFP generator is under development and will be available soon.
+                  Our AI-powered profile picture maker is coming soon! Soon you'll be able to create your own $SOBA-style avatar and join our wall of fame.
                 </p>
               </motion.div>
 
@@ -501,10 +530,10 @@ export default function LandingPage() {
                   className="mb-8"
                 >
                   <h2 className="text-3xl font-bold mb-4 gradient-text">
-                    $SOBA Burn Tracker
+                    $SOBA's Shrinking Supply
                   </h2>
                   <p className="text-gray-400">
-                    Tracking our deflationary mechanism in real-time
+                    Watch our token supply get smaller in real-time. Less tokens = more rarity!
                   </p>
                 </motion.div>
 
@@ -520,7 +549,7 @@ export default function LandingPage() {
                     </div>
                     <p className="text-3xl font-bold text-orange-400">
                       {tokenStats ? (
-                        <AnimatedNumber value={tokenStats.burnedTokens} />
+                        <AnimatedNumber value={BURN_INFO.TOTAL_BURNED} />
                       ) : (
                         '...'
                       )} SOBA
@@ -537,7 +566,7 @@ export default function LandingPage() {
                       <h3 className="text-lg font-semibold text-gray-300">Value Burned</h3>
                     </div>
                     <p className="text-3xl font-bold text-green-400">
-                      ${burnedValue.toLocaleString(undefined, {
+                      ${((tokenStats?.price || 0) * BURN_INFO.TOTAL_BURNED).toLocaleString(undefined, {
                         minimumFractionDigits: BURN_DISPLAY.DISPLAY_DECIMALS,
                         maximumFractionDigits: BURN_DISPLAY.DISPLAY_DECIMALS
                       })}
@@ -593,230 +622,104 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
             <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 gradient-text">
-                  Join the Conversation
-                </h2>
-                <p className="text-gray-400">
-                  Stay updated with the latest $SOBA news and community highlights
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="group"
-                >
-                  <div className="h-full p-6 rounded-xl bg-black/40 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <Share2 className="w-5 h-5 text-orange-500" />
-                        <h3 className="text-xl font-semibold text-orange-400">X Updates</h3>
-                      </div>
-                      <Link 
-                        href={SOCIAL_LINKS.TWITTER.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-orange-500 hover:text-orange-400 transition-colors"
-                      >
-                        Follow Us
-                      </Link>
-                    </div>
-                    <div className="space-y-4">
-                      {SOCIAL_FEED_DATA.X_UPDATES.map((update) => (
-                        <div 
-                          key={update.id}
-                          className="p-4 rounded-lg bg-neutral-900/50 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300"
-                        >
-                          <p className="text-gray-300 mb-2">{update.content}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>{update.timestamp}</span>
-                            <span>{update.engagement} interactions</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="group"
-                >
-                  <div className="h-full p-6 rounded-xl bg-black/40 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <MessageCircle className="w-5 h-5 text-orange-500" />
-                        <h3 className="text-xl font-semibold text-orange-400">Telegram Highlights</h3>
-                      </div>
-                      <Link 
-                        href={SOCIAL_LINKS.TELEGRAM.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-orange-500 hover:text-orange-400 transition-colors"
-                      >
-                        Join Chat
-                      </Link>
-                    </div>
-                    <div className="space-y-4">
-                      {SOCIAL_FEED_DATA.TELEGRAM_HIGHLIGHTS.map((highlight) => (
-                        <div 
-                          key={highlight.id}
-                          className="p-4 rounded-lg bg-neutral-900/50 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300"
-                        >
-                          <p className="text-gray-300 mb-2">{highlight.content}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>{highlight.author}</span>
-                            <span>{highlight.timestamp}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        </ScrollAnimatedSection>
-
-        <ScrollAnimatedSection>
-          <div className="container mx-auto px-4 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.08)_0%,transparent_70%)]" />
-            <div className="card-base p-6 md:p-8 lg:p-10 relative z-10">
               <h2 className="text-3xl font-bold mb-8 md:mb-10 text-center gradient-text">
                 Community Gallery
               </h2>
-              <div className="relative group">
-                <div className="overflow-x-auto overflow-y-hidden scrollbar-none">
-                  <div className="flex gap-4 md:gap-6 pb-4 min-w-full">
-                    {memeResponse?.data ? (
-                      [...Object.entries(MEME_IMAGES).map(([key, path]) => ({
-                        id: key,
-                        url: path,
-                        isStatic: true
-                      })),
-                      ...memeResponse.data.map(meme => ({
-                        id: meme.id,
-                        url: meme.url,
-                        isStatic: false
-                      }))].map((meme, index) => (
-                        <motion.div
-                          key={meme.id}
-                          whileHover={{ scale: 1.02 }}
-                          className="flex-shrink-0 w-[280px] md:w-[320px] aspect-square rounded-xl overflow-hidden bg-neutral-900/50 border border-orange-500/20"
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Object.entries(STATIC_MEMES).map(([key, path]) => ({
+                  id: key,
+                  url: path,
+                  isStatic: true
+                }))].map((meme, index) => (
+                  <motion.div
+                    key={meme.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    whileHover={{ scale: 1.02 }}
+                    className="aspect-square rounded-xl overflow-hidden bg-neutral-900/50 border border-orange-500/20"
+                  >
+                    <div className="relative w-full h-full group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/5" />
+                      <Image
+                        src={meme.url}
+                        alt={`Community Meme ${index + 1}`}
+                        fill
+                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                        unoptimized
+                        onClick={() => handleMemeClick(meme.url)}
+                      />
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity duration-300 flex items-center justify-center gap-2">
+                        <ButtonBase
+                          variant="ghost"
+                          size="sm"
+                          className="text-white hover:text-orange-400 transition-colors duration-300"
+                          onClick={() => handleMemeClick(meme.url)}
+                          aria-label={`View meme ${index + 1}`}
                         >
-                          <div className="relative w-full h-full group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/5" />
-                            <Image
-                              src={meme.url}
-                              alt={`Community Meme ${index + 1}`}
-                              width={400}
-                              height={400}
-                              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                              unoptimized
-                            />
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity duration-300 flex items-center justify-center">
-                              <ButtonBase
-                                variant="ghost"
-                                size="sm"
-                                className="text-white hover:text-orange-400 transition-colors duration-300"
-                                onClick={() => handleMemeClick(meme.url)}
-                                aria-label={`View meme ${index + 1}`}
-                              >
-                                View Full Size
-                              </ButtonBase>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="flex justify-center items-center h-full">
-                        <p className="text-gray-400">Loading...</p>
+                          View
+                        </ButtonBase>
+                        <ButtonBase
+                          variant="ghost"
+                          size="sm"
+                          className="text-white hover:text-orange-400 transition-colors duration-300"
+                          onClick={() => downloadImage(meme.url)}
+                          aria-label={`Download meme ${index + 1}`}
+                        >
+                          Download
+                        </ButtonBase>
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ButtonBase
-                    variant="ghost"
-                    size="sm"
-                    className="bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
-                    onClick={() => {
-                      const container = document.querySelector('.overflow-x-auto')
-                      if (container) {
-                        container.scrollBy({ left: -340, behavior: 'smooth' })
-                      }
-                    }}
-                    aria-label="Scroll left"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </ButtonBase>
-                </div>
-                <div className="absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ButtonBase
-                    variant="ghost"
-                    size="sm"
-                    className="bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
-                    onClick={() => {
-                      const container = document.querySelector('.overflow-x-auto')
-                      if (container) {
-                        container.scrollBy({ left: 340, behavior: 'smooth' })
-                      }
-                    }}
-                    aria-label="Scroll right"
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </ButtonBase>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-center justify-center gap-4 mt-8">
-                <ButtonBase
-                  variant="default"
-                  size="lg"
-                  className="group relative overflow-hidden"
-                  onClick={() => setIsMemeModalOpen(true)}
-                >
-                  <span className="flex items-center gap-2">
-                    <Upload className="w-5 h-5" />
-                    Submit Your Meme
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                </ButtonBase>
-                <p className="text-sm text-gray-400/90">
-                  Share your creativity with the $SOBA community!
-                </p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </div>
         </ScrollAnimatedSection>
 
         {selectedMeme && (
-          <div
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
             onClick={handleCloseFullView}
           >
-            <div className="relative max-w-4xl max-h-[90vh] w-full h-full">
-              <Image
-                src={selectedMeme}
-                alt="Full size meme"
-                fill
-                className="object-contain"
-              />
+            <div className="relative max-w-5xl w-full h-[85vh] rounded-xl overflow-hidden">
+              <ButtonBase
+                variant="ghost"
+                size="sm"
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloseFullView();
+                }}
+                aria-label="Close viewer"
+              >
+                <X className="w-6 h-6" />
+              </ButtonBase>
+              <div className="relative w-full h-full">
+                <Image
+                  src={selectedMeme}
+                  alt="Full size meme"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <ButtonBase
+                variant="default"
+                size="lg"
+                className="absolute bottom-6 right-6 bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full shadow-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  downloadImage(selectedMeme);
+                }}
+              >
+                Download
+              </ButtonBase>
             </div>
-          </div>
+          </motion.div>
         )}
-
-        <SubmitMemeModal 
-          isOpen={isMemeModalOpen}
-          onClose={() => setIsMemeModalOpen(false)}
-          onSuccess={() => {
-            mutate();
-          }}
-        />
 
         <ScrollAnimatedSection>
           <div className="container mx-auto px-4 relative">
@@ -919,3 +822,4 @@ const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
     </motion.section>
   )
 }
+

@@ -3,6 +3,7 @@ import { formatNumber } from '@/lib/utils';
 import { Flame, Percent, DollarSign } from 'lucide-react';
 import { Card } from '../ui/card';
 import type { TokenStatsResponse } from '@/types';
+import { BURN_INFO } from '@/constants/static';
 
 export function BurnStats() {
   const { data: stats, isLoading, error } = useTokenStats();

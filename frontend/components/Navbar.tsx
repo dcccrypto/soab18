@@ -28,16 +28,16 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="/burns-page" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
+          <Link href="/burns" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
             Burns
           </Link>
-          <Link href="/tokenomics-page" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
+          <Link href="/tokenomics" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
             Tokenomics
           </Link>
-          <Link href="/3d-roadmap" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
+          <Link href="/roadmap" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
             Roadmap
           </Link>
-          <Link href="/community-page" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
+          <Link href="/community" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
             Community
           </Link>
           <Button

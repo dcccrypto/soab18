@@ -69,9 +69,10 @@ export const Header = ({ isDarkMode = true, toggleTheme }: HeaderProps) => {
                 variant="default" 
                 size="md"
                 className="px-6 py-2 text-base font-semibold rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-[0_4px_16px_rgba(255,165,0,0.15)] hover:shadow-[0_4px_16px_rgba(255,165,0,0.25)] transition-all duration-300"
-                onClick={toggleTheme}
+                onClick={() => window.open('https://jup.ag/swap/soba-SOL', '_blank')}
               >
-                Connect Wallet
+                Buy $SOBA
+              
               </ButtonBase>
             </nav>
 
@@ -121,9 +122,9 @@ export const Header = ({ isDarkMode = true, toggleTheme }: HeaderProps) => {
                   variant="default" 
                   size="lg"
                   className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
-                  onClick={toggleTheme}
+                  onClick={() => window.open('https://jup.ag/swap/soba-SOL', '_blank')}
                 >
-                  Connect Wallet
+                  Buy $SOBA
                 </ButtonBase>
               </div>
             </nav>

@@ -2,6 +2,9 @@ import '@/styles/globals.css'
 import { Providers } from './providers'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { defaultMetadata } from './metadata'
+
+export const metadata = defaultMetadata
 
 export default function RootLayout({
   children,
@@ -10,6 +13,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="canonical" href="https://solbastard.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "SOL Bastard",
+              "alternateName": ["SOBA Token", "$SOBA"],
+              "url": "https://solbastard.com",
+              "description": "The most sophisticated memecoin on Solana, featuring a cigar-smoking chimp mascot, regular token burns, and exclusive NFTs.",
+              "sameAs": [
+                "https://x.com/SolBastardSoba",
+                "https://t.me/SolBastardSOBA",
+                "https://www.tiktok.com/@cryptobastard"
+              ]
+            })
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-black">
         <div className="relative min-h-screen overflow-hidden">
           {/* Base gradient */}

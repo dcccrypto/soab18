@@ -21,13 +21,13 @@ import fetcher from '@/lib/fetcher'
 import { formatDateToCst, getTimeUntilNextBurn, getNextBurnDate } from '@/lib/dateUtils'
 
 const SOBA_QUOTES = [
-  "Time to make SOBA more scarce! ",
-  "Every burn makes SOBA stronger! ",
-  "Join the burn revolution! ",
-  "SOBA getting rarer by the minute! ",
-  "Less SOBA = More Value! ",
-  "December Mega Burn incoming! ",
-  "December 1st - Mark your calendars! "
+  "Time to make $SOBA more exclusive! 🔥",
+  "Another premium burn event! 💨",
+  "Making $SOBA rarer, like a fine cigar! 🚬",
+  "Less $SOBA = More Prestige! 💎",
+  "This month's cigar lounge burn is ready! 🔥",
+  "Mark your calendars - premium burn incoming! 📅",
+  "Join the exclusive burn ceremony! 🎩"
 ] as const
 
 const fadeInUpVariant = {
@@ -65,7 +65,7 @@ export default function BurnsPage() {
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
   const burnStats = {
-    burnedTokens: tokenStats?.toBeBurnedTokens || 0,
+    burnedTokens: BURN_INFO.TOTAL_BURNED || 0,
     burnRate: tokenStats?.burnRate || 0,
     burnedValue: tokenStats?.toBeBurnedValue || 0,
     nextBurnDate: tokenStats?.lastUpdated ? new Date(tokenStats.lastUpdated) : new Date()
@@ -227,10 +227,10 @@ export default function BurnsPage() {
             animate="visible"
             className="max-w-4xl mx-auto space-y-6"
           >
-            <h1 className="text-5xl font-bold mb-6 text-center gradient-text">
+            <h1 className="text-5xl font-bold mb-6 text-center gradient-text text-[#FF6B00]">
               {BURN_SECTIONS.HERO.TITLE}
             </h1>
-            <p className="text-xl text-center mb-12 max-w-3xl mx-auto text-gray-100">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto leading-relaxed drop-shadow-xl">
               {BURN_SECTIONS.HERO.SUBTITLE}
             </p>
           </motion.div>
@@ -362,7 +362,7 @@ export default function BurnsPage() {
                         <p className="text-sm text-gray-400 mb-1">Tokens Collected</p>
                         <div className="flex items-end gap-2">
                           <p className="text-xl font-bold text-orange-500">
-                            <AnimatedNumber value={burnedTokens || 0} />
+                            <AnimatedNumber value={tokenStats?.toBeBurnedTokens || 0} />
                             <span className="ml-2">SOBA</span>
                           </p>
                         </div>
@@ -481,4 +481,5 @@ export default function BurnsPage() {
       </div>
     </div>
   )
-}
+};
+

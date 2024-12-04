@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 export function formatNumber(number: number | string, decimals?: number): string {
   const num = typeof number === 'string' ? parseFloat(number) : number
   if (isNaN(num)) return '0'
