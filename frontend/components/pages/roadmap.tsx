@@ -351,6 +351,17 @@ export default function Roadmap() {
   const [progress, setProgress] = useState(66.67) // 8 out of 12 phases completed (8/12 * 100)
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // Adjust breakpoint as needed
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handlePhaseClick = (phase: RoadmapPhase) => {
     setSelectedPhase(phase)
@@ -422,33 +433,44 @@ export default function Roadmap() {
               {/* Simplified Progress Bar */}
               <SimplifiedProgressBar progress={progress} />
 
-              <div className="h-[800px] mb-12 overflow-hidden card-base">
-                <Canvas>
-                  <RoadmapScene setSelectedPhase={handlePhaseClick} />
-                </Canvas>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {roadmapData.map((phase) => (
-                  <motion.div
-                    key={phase.phase}
-                    className={`card-base p-6 cursor-pointer
-                      ${phase.status === 'Completed' 
-                        ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
-                        : 'bg-black/40 hover:bg-black/50'}`}
-                    onClick={() => handlePhaseClick(phase)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-center mb-4">
-                      <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
-                      <h3 className="text-xl font-bold">{phase.title}</h3>
-                    </div>
-                    <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>{phase.status}</p>
-                    <p className="text-base text-gray-400">{phase.description}</p>
-                  </motion.div>
-                ))}
-              </div>
+              {isMobile ? (
+                // Mobile fallback view
+                <div className="space-y-6 mb-12">
+                  {roadmapData.map((phase) => (
+                    <motion.div
+                      key={phase.phase}
+                      className={`card-base p-6 cursor-pointer
+                        ${phase.status === 'Completed' 
+                          ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
+                          : 'bg-black/40 hover:bg-black/50'}`}
+                      onClick={() => handlePhaseClick(phase)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-center mb-4">
+                        <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
+                        <div>
+                          <h3 className="text-xl font-bold">{phase.title}</h3>
+                          <p className={`text-sm ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>
+                            Phase {phase.phase}
+                          </p>
+                        </div>
+                      </div>
+                      <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>
+                        {phase.status}
+                      </p>
+                      <p className="text-base text-gray-400">{phase.description}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                // Desktop 3D view
+                <div className="h-[800px] mb-12 overflow-hidden card-base">
+                  <Canvas>
+                    <RoadmapScene setSelectedPhase={handlePhaseClick} />
+                  </Canvas>
+                </div>
+              )}
 
               {/* CTA Section */}
               <div className="text-center mb-16">

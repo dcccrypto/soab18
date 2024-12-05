@@ -80,16 +80,16 @@ const BURN_DISPLAY = {
 } as const
 
 const NFT_SHOWCASE = [
-  { id: 1, image: '/nft1.png', name: 'SOBA #001', rarity: 'Legendary' },
-  { id: 2, image: '/nft2.png', name: 'SOBA #002', rarity: 'Epic' },
-  { id: 3, image: '/nft3.png', name: 'SOBA #003', rarity: 'Rare' },
-  { id: 4, image: '/nft4.png', name: 'SOBA #004', rarity: 'Epic' },
-  { id: 5, image: '/nft5.png', name: 'SOBA #005', rarity: 'Legendary' },
-  { id: 6, image: '/nft6.png', name: 'SOBA #006', rarity: 'Rare' },
-  { id: 7, image: '/nft7.png', name: 'SOBA #007', rarity: 'Epic' },
-  { id: 8, image: '/nft8.png', name: 'SOBA #008', rarity: 'Rare' },
-  { id: 9, image: '/nft9.png', name: 'SOBA #009', rarity: 'Legendary' },
-  { id: 10, image: '/nft10.png', name: 'SOBA #010', rarity: 'Epic' },
+  { id: 1, image: '/images/nfts/nft1.avif', name: 'SOBA #051', rarity: 'Gold' },
+  { id: 2, image: '/images/nfts/nft2.avif', name: 'SOBA #069', rarity: 'Gold' },
+  { id: 3, image: '/images/nfts/nft3.avif', name: 'SOBA #094', rarity: 'Gold' },
+  { id: 4, image: '/images/nfts/nft4.avif', name: 'SOBA #063', rarity: 'Red-Gem' },
+  { id: 5, image: '/images/nfts/nft5.avif', name: 'SOBA #016', rarity: 'Red-Gem' },
+  { id: 6, image: '/images/nfts/nft6.avif', name: 'SOBA #060', rarity: 'Red-Gem' },
+  { id: 7, image: '/images/nfts/nft7.avif', name: 'SOBA #030', rarity: 'Red-Gem' },
+  { id: 8, image: '/images/nfts/nft8.avif', name: 'SOBA #033', rarity: 'Red-Gem' },
+  { id: 9, image: '/images/nfts/nft9.avif', name: 'SOBA #097', rarity: 'Red-Gem' },
+  { id: 10, image: '/images/nfts/nft10.avif', name: 'SOBA #056', rarity: 'Red-Gem' },
 ]
 
 // Add this helper function at the top level
@@ -460,7 +460,7 @@ export default function LandingPage() {
                 className="text-center"
               >
                 <Link 
-                  href="/nft-marketplace"
+                  href="https://magiceden.io/marketplace/solbastard"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-bold py-3 px-8 rounded-full hover:brightness-110 transition-all duration-300 shadow-lg hover:shadow-orange-500/25"
                 >
                   Buy NFTs

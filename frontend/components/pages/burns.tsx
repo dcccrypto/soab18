@@ -428,25 +428,31 @@ export default function BurnsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="flex items-center gap-4 p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                    <code className="text-orange-400 flex-1 font-mono">{BURN_INFO.BURN_WALLET}</code>
-                    <TooltipProviderComponent>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="hover:bg-orange-500/20"
-                            onClick={() => navigator.clipboard.writeText(BURN_INFO.BURN_WALLET)}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Copy to clipboard</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProviderComponent>
+                  <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                    <div className="w-full overflow-x-auto scrollbar-hide">
+                      <code className="text-orange-400 font-mono whitespace-nowrap block">
+                        {BURN_INFO.BURN_WALLET}
+                      </code>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <TooltipProviderComponent>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-orange-500/20"
+                              onClick={() => navigator.clipboard.writeText(BURN_INFO.BURN_WALLET)}
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy to clipboard</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProviderComponent>
+                    </div>
                   </div>
                   <div className="space-y-4">
                     {BURN_SECTIONS.CONTRIBUTE.STEPS.map((step, index) => (
