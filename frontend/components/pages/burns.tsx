@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ScrollAnimatedSection } from '@/components/ScrollAnimatedSection'
 import { BurnChart } from '@/components/burns/BurnChart'
-import { BURN_INFO, BURN_SECTIONS } from '@/constants'
+import { BURN_INFO, BURN_SECTIONS, BURN_HISTORY } from '@/constants'
 import { formatNumber } from '@/lib/utils'
 import { useTokenStats } from '@/hooks/useTokenStats'
 import Image from 'next/image'
@@ -64,9 +64,44 @@ export default function BurnsPage() {
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
 
+  // Calculate average monthly burn from history
+  const calculateAverageMonthlyBurn = () => {
+    if (!BURN_HISTORY.length) return 0;
+
+    // Sort burns by date
+    const sortedBurns = [...BURN_HISTORY].sort((a, b) => {
+      const [dayA, monthA, yearA] = a.date.split('/').map(Number);
+      const [dayB, monthB, yearB] = b.date.split('/').map(Number);
+      return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+    });
+
+    // Get first and last burn dates
+    const [firstDay, firstMonth, firstYear] = sortedBurns[0].date.split('/').map(Number);
+    const [lastDay, lastMonth, lastYear] = sortedBurns[sortedBurns.length - 1].date.split('/').map(Number);
+    
+    const firstDate = new Date(firstYear, firstMonth - 1, firstDay);
+    const lastDate = new Date(lastYear, lastMonth - 1, lastDay);
+    
+    // Calculate total months between first and last burn
+    const monthsDiff = (lastDate.getFullYear() - firstDate.getFullYear()) * 12 + 
+                      (lastDate.getMonth() - firstDate.getMonth());
+    
+    // Calculate total amount burned
+    const totalBurned = BURN_HISTORY.reduce((sum, burn) => sum + burn.amount, 0);
+    
+    // Calculate monthly average (use max of 1 month to avoid division by zero)
+    const averageMonthlyBurn = totalBurned / Math.max(1, monthsDiff);
+    
+    return averageMonthlyBurn;
+  };
+
   const burnStats = {
     burnedTokens: BURN_INFO.TOTAL_BURNED || 0,
-    burnRate: tokenStats?.burnRate || 0,
+    // Use both historical and current burn rate
+    burnRate: Math.max(
+      calculateAverageMonthlyBurn(),
+      (tokenStats?.burnRate || 0) * 30 // Keep existing calculation as fallback
+    ),
     burnedValue: tokenStats?.toBeBurnedValue || 0,
     nextBurnDate: tokenStats?.lastUpdated ? new Date(tokenStats.lastUpdated) : new Date()
   }
@@ -274,16 +309,21 @@ export default function BurnsPage() {
             <CardHeader>
               <CardTitle className="text-gray-300 flex items-center gap-2">
                 <TrendingUp className="text-green-500" />
-                Burn Rate
+                Monthly Burn Rate
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Current burn velocity
+                Historical monthly average
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-green-400">
-                {formatNumber(burnRate)}/day
+                {formatNumber(burnRate)} SOBA/month
               </div>
+              {BURN_HISTORY.length > 0 && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Based on {BURN_HISTORY.length} burn events
+                </p>
+              )}
             </CardContent>
           </Card>
 
