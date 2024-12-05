@@ -305,7 +305,7 @@ export default function LandingPage() {
                     variant="default"
                     size="lg"
                     className="w-full min-w-[200px] font-bold hover:scale-105 transition-transform duration-200 py-4"
-                    onClick={() => window.location.href = '#buy-soba'}
+                    onClick={() => window.open('https://jup.ag/swap/soba-SOL', '_blank')}
                   >
                     Buy $SOBA
                   </ButtonBase>

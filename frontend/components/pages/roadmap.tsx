@@ -1,20 +1,143 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { ClientOnly } from '@/components/client-only'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Rocket, Users, Megaphone, LineChart, Building, Palette, Flame, Cpu, Gamepad, Vote, Moon, Sun, ArrowRight } from 'lucide-react'
-import * as THREE from 'three'
-import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
-import { Text, Box, OrbitControls } from '@react-three/drei'
 import { Button } from "@/components/ui/button"
 import { ButtonBase } from '@/components/ui/button-base'
-import { useScroll, useTransform } from 'framer-motion'
 import { NAV_LINKS, SOCIAL_LINKS } from '@/constants'
-import { DragControls } from '@react-three/drei'
+import type { Group } from 'three'
+import type { ThreeEvent } from '@react-three/fiber'
+
+// Dynamically import Three.js components
+const DynamicCanvas = dynamic(() => import('@react-three/fiber').then((mod) => mod.Canvas), {
+  ssr: false,
+})
+
+// Dynamically import Text component
+const DynamicText = dynamic(() => 
+  import('@react-three/drei').then((mod) => mod.Text), 
+  { ssr: false }
+)
+
+const DynamicRoadmapScene = dynamic(() => {
+  return Promise.all([
+    import('@react-three/fiber'),
+    import('@react-three/drei'),
+    import('three')
+  ]).then(([fiber, drei, THREE]) => {
+    const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
+      const { camera, gl } = fiber.useThree()
+    
+      useEffect(() => {
+        if (camera) {
+          camera.position.set(0, 10, 25)
+          camera.lookAt(0, 0, 0)
+        }
+        if (gl) {
+          gl.setClearColor('#111111', 1)
+        }
+      }, [camera, gl])
+    
+      const calculatePosition = (index: number): [number, number, number] => {
+        const spacing = 6
+        const totalWidth = (roadmapData.length - 1) * spacing
+        const xPos = (index * spacing) - (totalWidth / 2)
+        return [xPos, 0, 0]
+      }
+    
+      return (
+        <>
+          <ambientLight intensity={1.2} />
+          <pointLight position={[10, 15, 10]} intensity={2} />
+          <pointLight position={[-10, 15, -10]} intensity={2} />
+          <spotLight 
+            position={[0, 20, 0]} 
+            intensity={1.5} 
+            angle={0.6}
+            penumbra={0.5}
+            castShadow
+          />
+          <hemisphereLight intensity={0.7} groundColor="#ff8f00" />
+          
+          <drei.OrbitControls 
+            enableZoom={true}
+            enablePan={true}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={Math.PI / 2.2}
+            makeDefault
+            maxDistance={40}
+            minDistance={15}
+            target={[0, 0, 0]}
+          />
+          
+          {roadmapData.map((phase, index) => (
+            <RoadmapCube
+              key={phase.phase}
+              phase={phase}
+              position={calculatePosition(index)}
+              onClick={() => setSelectedPhase(phase)}
+              useFrame={fiber.useFrame}
+            />
+          ))}
+        </>
+      )
+    }
+    return RoadmapScene
+  })
+}, {
+  ssr: false,
+})
+
+// Phase Number Text Component
+const PhaseNumber: React.FC<{
+  number: number;
+  position: [number, number, number];
+  rotationX: number;
+  rotationY: number;
+  isCompleted: boolean;
+  status: string;
+}> = ({ number, position, rotationX, rotationY, isCompleted, status }) => {
+  return (
+    <Suspense fallback={null}>
+      <DynamicText
+        position={position}
+        fontSize={1.2}
+        color={isCompleted ? "#FFFFFF" : "#CCCCCC"}
+        anchorX="center"
+        anchorY="middle"
+        rotation-x={-rotationX}
+        rotation-y={-rotationY}
+        outlineWidth={0.08}
+        outlineColor="#000000"
+        characters="0123456789"
+        material-toneMapped={false}
+        material-fog={false}
+      >
+        {number}
+      </DynamicText>
+      <DynamicText
+        position={[position[0], position[1] - 1.5, position[2]]}
+        fontSize={0.3}
+        color={isCompleted ? "#FFFFFF" : "#CCCCCC"}
+        anchorX="center"
+        anchorY="middle"
+        rotation-x={-rotationX}
+        rotation-y={-rotationY}
+        outlineWidth={0.03}
+        outlineColor="#000000"
+        material-toneMapped={false}
+        material-fog={false}
+      >
+        {status}
+      </DynamicText>
+    </Suspense>
+  )
+}
 
 interface RoadmapPhase {
   phase: number
@@ -30,6 +153,7 @@ interface RoadmapCubeProps {
   phase: RoadmapPhase
   position: [number, number, number]
   onClick: () => void
+  useFrame: any
 }
 
 interface RoadmapSceneProps {
@@ -160,27 +284,23 @@ const roadmapData: RoadmapPhase[] = [
   }
 ]
 
-const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) => {
-  const groupRef = useRef<THREE.Group>(null)
+const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick, useFrame }) => {
+  const groupRef = useRef<Group>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [hover, setHover] = useState(false)
   const [localPosition, setLocalPosition] = useState<[number, number, number]>(position)
   const [rotationX, setRotationX] = useState(0)
   const [rotationY, setRotationY] = useState(0)
 
-  // Idle animation
-  useFrame((state) => {
+  useFrame((state: any) => {
     if (groupRef.current && !isDragging) {
-      // Gentle floating animation
       const time = state.clock.getElapsedTime()
-      groupRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.1
+      groupRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.15
       
       if (hover) {
-        // Additional hover animation
-        groupRef.current.rotation.y += 0.01
-        groupRef.current.scale.setScalar(1.1)
+        groupRef.current.rotation.y += 0.02
+        groupRef.current.scale.setScalar(1.15)
       } else {
-        // Reset scale when not hovering
         groupRef.current.scale.setScalar(1)
       }
     }
@@ -224,70 +344,37 @@ const RoadmapCube: React.FC<RoadmapCubeProps> = ({ phase, position, onClick }) =
       rotation-x={rotationX}
       rotation-y={rotationY}
     >
-      <mesh onClick={(e) => {
-        e.stopPropagation()
-        onClick()
-      }}>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial 
+      <mesh 
+        onClick={(e) => {
+          e.stopPropagation()
+          onClick()
+        }}
+        castShadow
+        receiveShadow
+      >
+        <boxGeometry args={[3, 3, 3]} />
+        <meshPhysicalMaterial 
           color={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'} 
-          roughness={0.5}
-          metalness={0.5}
-          opacity={hover ? 0.9 : 1}
+          roughness={0.2}
+          metalness={0.8}
+          opacity={hover ? 0.95 : 1}
           transparent
           emissive={phase.status === 'Completed' ? '#FFA500' : '#4A4A4A'}
-          emissiveIntensity={hover ? 0.5 : 0}
+          emissiveIntensity={hover ? 1 : 0.3}
+          clearcoat={0.5}
+          clearcoatRoughness={0.3}
+          reflectivity={1}
         />
       </mesh>
-      <Text
-        position={[0, 0, 1.2]}
-        fontSize={0.5}
-        color="#FFFFFF"
-        anchorX="center"
-        anchorY="middle"
-        rotation-x={-rotationX}
-        rotation-y={-rotationY}
-      >
-        {phase.phase}
-      </Text>
-    </group>
-  )
-}
-
-const RoadmapScene: React.FC<RoadmapSceneProps> = ({ setSelectedPhase }) => {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    camera.position.set(0, 8, 20) // Adjusted camera position
-  }, [camera])
-
-  const calculatePosition = (index: number): [number, number, number] => {
-    const spacing = 5 // Increased spacing between boxes
-    const totalWidth = (roadmapData.length - 1) * spacing
-    const xPos = (index * spacing) - (totalWidth / 2)
-    return [xPos, -3, 0] // Moved boxes closer to progress bar
-  }
-
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={0.8} />
-      <OrbitControls 
-        enableZoom={true}
-        enablePan={true}
-        minPolarAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI / 2}
-        makeDefault
+      <PhaseNumber
+        number={phase.phase}
+        position={[0, 0, 1.6]}
+        rotationX={rotationX}
+        rotationY={rotationY}
+        isCompleted={phase.status === 'Completed'}
+        status={phase.status}
       />
-      {roadmapData.map((phase, index) => (
-        <RoadmapCube
-          key={phase.phase}
-          phase={phase}
-          position={calculatePosition(index)}
-          onClick={() => setSelectedPhase(phase)}
-        />
-      ))}
-    </>
+    </group>
   )
 }
 
@@ -344,6 +431,42 @@ const DynamicDialogDescription = dynamic(
   { ssr: false }
 )
 
+// Mobile Card Component
+const PhaseCard: React.FC<{ phase: RoadmapPhase; onClick: () => void }> = ({ phase, onClick }) => {
+  return (
+    <motion.div
+      className={`p-6 rounded-lg shadow-lg cursor-pointer transform transition-all duration-300
+        ${phase.status === 'Completed' 
+          ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
+          : 'bg-black/40 hover:bg-black/50'}`}
+      onClick={onClick}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center gap-4 mb-4">
+        <div className={`p-3 rounded-full ${phase.status === 'Completed' ? 'bg-orange-500' : 'bg-gray-700'}`}>
+          <phase.icon className={`w-6 h-6 ${phase.status === 'Completed' ? 'text-white' : 'text-orange-500'}`} />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white">{phase.title}</h3>
+          <p className={`text-sm ${phase.status === 'Completed' ? 'text-orange-200' : 'text-orange-400'}`}>
+            Phase {phase.phase}
+          </p>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <p className={`text-sm font-semibold ${phase.status === 'Completed' ? 'text-orange-200' : 'text-orange-400'}`}>
+          {phase.status}
+        </p>
+        <p className="text-gray-300">{phase.description}</p>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Roadmap() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [selectedPhase, setSelectedPhase] = useState<RoadmapPhase | null>(null)
@@ -352,15 +475,17 @@ export default function Roadmap() {
   const { scrollY } = useScroll()
   const heroY = useTransform(scrollY, [0, 500], [0, 150])
   const [isMobile, setIsMobile] = useState(false)
+  const [viewportWidth, setViewportWidth] = useState(0)
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768) // Adjust breakpoint as needed
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth)
+      setIsMobile(window.innerWidth < 768)
     }
     
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const handlePhaseClick = (phase: RoadmapPhase) => {
@@ -370,7 +495,7 @@ export default function Roadmap() {
 
   return (
     <div className="min-h-screen gradient-dark text-white">
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-transparent">
         <div className="relative">
           <section className="min-h-[70vh] pt-16 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
@@ -426,7 +551,7 @@ export default function Roadmap() {
           </section>
 
           <section className="min-h-screen relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.15)_0%,transparent_70%)] z-0" />
+            <div className="absolute inset-0 bg-gradient-radial from-orange-500/10 via-transparent to-transparent z-0" />
             
             {/* Roadmap Content */}
             <div className="container mx-auto px-4 py-12 relative z-10">
@@ -434,41 +559,35 @@ export default function Roadmap() {
               <SimplifiedProgressBar progress={progress} />
 
               {isMobile ? (
-                // Mobile fallback view
-                <div className="space-y-6 mb-12">
-                  {roadmapData.map((phase) => (
-                    <motion.div
-                      key={phase.phase}
-                      className={`card-base p-6 cursor-pointer
-                        ${phase.status === 'Completed' 
-                          ? 'bg-gradient-to-br from-orange-600/90 to-red-700/90' 
-                          : 'bg-black/40 hover:bg-black/50'}`}
-                      onClick={() => handlePhaseClick(phase)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className="flex items-center mb-4">
-                        <phase.icon className={`w-8 h-8 mr-3 ${phase.status === 'Completed' ? 'text-yellow-300' : 'text-orange-500'}`} />
-                        <div>
-                          <h3 className="text-xl font-bold">{phase.title}</h3>
-                          <p className={`text-sm ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>
-                            Phase {phase.phase}
-                          </p>
-                        </div>
-                      </div>
-                      <p className={`text-lg mb-3 ${phase.status === 'Completed' ? 'text-yellow-200' : 'text-orange-400'}`}>
-                        {phase.status}
-                      </p>
-                      <p className="text-base text-gray-400">{phase.description}</p>
-                    </motion.div>
-                  ))}
+                <div className="space-y-4 px-4">
+                  <motion.div 
+                    className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {roadmapData.map((phase) => (
+                      <PhaseCard
+                        key={phase.phase}
+                        phase={phase}
+                        onClick={() => handlePhaseClick(phase)}
+                      />
+                    ))}
+                  </motion.div>
                 </div>
               ) : (
-                // Desktop 3D view
-                <div className="h-[800px] mb-12 overflow-hidden card-base">
-                  <Canvas>
-                    <RoadmapScene setSelectedPhase={handlePhaseClick} />
-                  </Canvas>
+                <div className="h-[800px] w-full mb-12 overflow-hidden card-base relative bg-gradient-to-b from-transparent to-black/20">
+                  <ClientOnly>
+                    <DynamicCanvas
+                      camera={{ position: [0, 10, 25], fov: 60 }}
+                      shadows
+                      dpr={[1, 2]}
+                    >
+                      <Suspense fallback={null}>
+                        <DynamicRoadmapScene setSelectedPhase={handlePhaseClick} />
+                      </Suspense>
+                    </DynamicCanvas>
+                  </ClientOnly>
                 </div>
               )}
 
@@ -480,6 +599,7 @@ export default function Roadmap() {
                   <ButtonBase
                     size="lg"
                     className="bg-[#FF6B00] hover:bg-[#FF8C00] text-white"
+                    onClick={() => window.open("https://jup.ag/swap/soba-SOL", "_blank")}
                   >
                     <span className="flex items-center gap-2">
                       Buy $SOBA Now
