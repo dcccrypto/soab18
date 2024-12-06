@@ -278,7 +278,7 @@ export default function LandingPage() {
               className="max-w-4xl mx-auto space-y-6"
             >
               <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold gradient-text drop-shadow-2xl leading-tight text-[#FF6B00]">
-                Meet SOBA: The SOL Bastard! I AM THE REAL PB
+                Meet SOBA: The SOL Bastard! 
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto leading-relaxed drop-shadow-xl">
                 The richest, smoothest memecoin on Solana, led by a cigar-smoking chimp with expensive taste
