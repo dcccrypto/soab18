@@ -106,6 +106,12 @@ export const BURN_INFO: BurnInfo = {
 // Replace the generateBurnHistory function with actual data
 export const BURN_HISTORY: BurnTransaction[] = [
   {
+    txId: '3VDqCxHw3EzSRBosEKHNAyLWe8wDaYBVhCHhKurj6RvxrPsQeBSuV51jFPLybpAzm6typsN3fW8Jvyeh75Rw9o59',
+    amount: 4000000,
+    date: '01/01/2025',
+    value: 25850.90
+  },
+  {
     txId: '4F3m9BWdYvixUHaf7WoioTM9VH1p6mz9pfzLHoFoRDE2bqJogAgvDM7uyXcqhHj3NpnK9jsiHAXXdMoAZzdWsXib',
     amount: 12777077,
     date: '01/12/2024',
